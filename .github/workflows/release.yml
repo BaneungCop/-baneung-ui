@@ -55,4 +55,8 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # actions/setup-node가 ~/.npmrc에 자동 생성한 라인이
+          # //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} 이라
+          # 같은 이름의 env로 토큰을 넘긴다.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
