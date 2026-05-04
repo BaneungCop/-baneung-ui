@@ -1,25 +1,23 @@
 /*
  * apps/docs 자체 Tailwind 진입점.
  *
- * @baneung-pack/ui/styles.css가 layout.tsx에서 먼저 로드되어 토큰·베이스 리셋·@theme를
- * 제공합니다. 여기서는 docs 페이지가 사용하는 utility(mx-auto, text-*, flex 등)를
- * docs 자체 빌드가 트리쉐이크해 포함시키도록 Tailwind 코어만 임포트합니다.
+ * @baneung-pack/ui/styles.css가 토큰·preflight·@theme·라이브러리 컴포넌트 utility를
+ * 모두 @layer baneung 안에 포함하므로 docs는 **preflight를 중복 임포트하지 않는다**.
+ * 대신 theme(변수 정의)와 utilities(.mx-auto, .md:flex 등 docs가 쓰는 클래스)만
+ * 임포트해서 라이브러리 utility(특히 .hidden)와의 cross-layer 충돌을 피한다.
  *
- * @baneung-pack/tokens는 ui/styles.css에서 이미 로드되므로 중복 임포트하지 않습니다.
- *
- * # CSS 격리 (Cascade Layers)
- * 라이브러리(@baneung-pack/ui)는 모든 스타일을 @layer baneung에 격리하기 때문에
- * 소비자(docs)도 동일하게 @layer app으로 감싸 명시 우선순위로 다뤄야 한다.
- * 순서 `@layer app, baneung;` → baneung이 뒤(=상위) → 라이브러리 컴포넌트 스타일이
- * docs의 Tailwind preflight(button{padding:0} 등)를 이긴다.
- * docs는 라이브러리를 demo하는 사이트이므로 library가 우선이 자연스럽다.
+ * # 왜 이런 구조인가
+ * 라이브러리는 @layer baneung에 격리되고, docs의 utilities는 unlayered.
+ * CSS spec상 unlayered > any layer 이므로 docs의 utility가 라이브러리의 같은 utility를
+ * 자연스럽게 override → `<aside class="hidden md:flex">` 같은 반응형 패턴이 정상 동작.
+ * 동시에 docs는 preflight를 안 가져오므로 라이브러리 컴포넌트의 button/input 스타일이
+ * 깨지지 않는다 (preflight↔utility 충돌 자체가 발생하지 않음).
  *
  * @source — Tailwind v4의 자동 source 감지가 monorepo 구조에서 누락되는 경우가 있어
  * apps/docs 안의 모든 .tsx/.ts를 명시적으로 스캔한다.
  */
-@layer app, baneung;
-
-@import 'tailwindcss' layer(app);
+@import 'tailwindcss/theme';
+@import 'tailwindcss/utilities';
 
 @source "../app/**/*.{ts,tsx}";
 @source "../components/**/*.{ts,tsx}";

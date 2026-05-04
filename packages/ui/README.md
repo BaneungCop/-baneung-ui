@@ -61,16 +61,16 @@ document.documentElement.dataset.theme = 'dark';
 
 ### CSS 격리 (Cascade Layers)
 
-라이브러리의 모든 스타일은 `@layer baneung` 안에 들어 있습니다. 소비자는 자신의 CSS를 layer로 감싸 우선순위를 명시 제어할 수 있습니다.
+라이브러리의 모든 스타일(preflight + 토큰 + 컴포넌트 utility)은 `@layer baneung` 안에 격리되어 있습니다. 소비자 프로젝트가 자체 Tailwind/글로벌 CSS를 함께 쓸 때 발생하는 두 가지 충돌 패턴을 정리합니다.
 
-> **핵심**: CSS Cascade Layer는 **처음 등록된 시점의 위치**가 cascade 우선순위를 결정합니다. 따라서 **import 순서**와 **layer 선언 순서** 두 가지를 함께 맞춰야 합니다.
+#### 패턴 A — 소비자가 라이브러리를 override 가능 (일반적)
 
-#### 시나리오 1 — 소비자가 라이브러리를 override 가능 (일반적)
+소비자의 글로벌 CSS를 `@layer app`으로 감싸 명시 순서를 선언합니다.
 
 ```tsx
 // app/layout.tsx
-import '@baneung-pack/ui/styles.css'; // 먼저 — baneung을 0번에 등록
-import './globals.css'; // 나중 — app을 1번에 새로 등록
+import '@baneung-pack/ui/styles.css'; // 먼저 — baneung 등록
+import './globals.css'; // 나중 — app 등록
 ```
 
 ```css
@@ -85,30 +85,36 @@ import './globals.css'; // 나중 — app을 1번에 새로 등록
 }
 ```
 
-결과: `[baneung=0, app=1]` → **app(소비자) 우선**. 본인이 override 가능.
+결과: `[baneung=0, app=1]` → **app(소비자) 우선**. 의도된 override만 적용되고 그 외는 라이브러리 기본값 유지.
 
-#### 시나리오 2 — 라이브러리를 강제 우선 (demo/docs 사이트 등)
+#### 패턴 B — 소비자도 Tailwind를 쓰는 경우 (권장)
 
-import 순서와 layer 순서를 모두 뒤집습니다:
+소비자가 자체 Tailwind를 임포트해서 페이지 layout(`mx-auto`, `md:flex` 등) 유틸리티를 쓰면, 같은 utility(예: `.hidden`)가 라이브러리 번들에도 들어 있어 cross-layer로 충돌합니다. `hidden md:flex` 같은 반응형 패턴이 깨질 수 있습니다.
+
+해결책: 소비자는 **preflight를 제외**하고 Tailwind를 import합니다 (preflight는 라이브러리가 이미 제공).
 
 ```tsx
-// app/layout.tsx
-import './globals.css'; // 먼저 — app을 0번, baneung을 1번에 등록
-import '@baneung-pack/ui/styles.css'; // 나중 — baneung 이미 존재
+// app/layout.tsx (Next.js 예시)
+import '@baneung-pack/ui/styles.css';
+import './globals.css';
 ```
 
 ```css
-/* globals.css 최상단 */
-@layer app, baneung;
+/* globals.css */
+@import 'tailwindcss/theme';
+@import 'tailwindcss/utilities';
+/* @import 'tailwindcss/preflight'; ← 의도적으로 제외 */
 
-@layer app {
-  /* layout 유틸리티 등 */
-}
+@source "./app/**/*.{ts,tsx}";
+@source "./components/**/*.{ts,tsx}";
 ```
 
-결과: `[app=0, baneung=1]` → **baneung(라이브러리) 우선**.
+이 구성에서:
 
-> 레이어 선언/import 순서를 무시하면 unlayered 소비자 CSS가 layered 라이브러리 CSS보다 항상 우선합니다 (CSS 표준). 라이브러리 의도를 보존하려면 위 패턴 중 하나를 따라주세요.
+- **preflight 충돌 없음**: docs preflight↔library button utility 충돌이 발생하지 않음 (preflight가 한쪽에만 존재)
+- **반응형 정상 동작**: 소비자 utility는 unlayered → CSS 표준상 layered 라이브러리 utility를 자연스럽게 override → `md:flex`가 `hidden`을 정상적으로 이김
+
+> **핵심**: CSS Cascade Layer는 처음 등록된 시점의 위치가 우선순위를 결정합니다. 라이브러리가 `@layer baneung`에 격리되어 있는 한, unlayered 소비자 CSS는 항상 라이브러리를 이깁니다 — 이게 isolation의 본질입니다. 패턴 A(`@layer app`)는 본인 글로벌 CSS를 명시적으로 통제하고 싶을 때, 패턴 B는 페이지 layout 용 utility만 추가로 쓰고 싶을 때 사용하세요.
 
 ## 컴포넌트 (58)
 

@@ -3,12 +3,12 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 import type { Metadata } from 'next';
 
-// CSS layer 등록 순서가 cascade 우선순위를 결정한다.
-// docs의 globals.css가 먼저 파싱돼야 `@layer app, baneung;` 선언이 두 레이어를
-// 그 순서대로 등록(app=0, baneung=1)하고, 결과적으로 baneung이 우선이 된다.
-// 라이브러리 styles.css를 먼저 import하면 baneung이 0번에 등록돼 app(1)에 짐.
-import './globals.css';
+// 라이브러리 styles.css를 먼저 → preflight·토큰·컴포넌트 utility를 @layer baneung에
+// 등록. 그 다음 docs globals.css → docs용 utility(unlayered)를 추가.
+// CSS spec상 unlayered > layered이므로 docs의 .md\:flex 같은 반응형 utility가
+// 라이브러리의 .hidden(layered)을 자연스럽게 override한다.
 import '@baneung-pack/ui/styles.css';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: '@baneung-pack/ui — 바능 디자인 시스템',

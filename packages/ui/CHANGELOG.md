@@ -1,5 +1,21 @@
 # @baneung-pack/ui
 
+## 1.0.4
+
+### Patch Changes
+
+- README의 "CSS 격리 (Cascade Layers)" 섹션을 실전 검증 기반으로 재작성.
+
+  이전 안내(`@layer app, baneung;` + import 순서 swap으로 라이브러리 강제 우선)는
+  같은 utility(예: `.hidden` ↔ `.md:flex`)가 양쪽 번들에 존재할 때 cross-layer로
+  충돌해 반응형 패턴이 깨지는 함정이 있음. 새 README에서는:
+  - 패턴 A: 소비자가 본인 글로벌 CSS를 `@layer app`으로 감싸 라이브러리 override
+  - 패턴 B (권장): 소비자가 Tailwind를 함께 쓸 때 preflight를 제외하고 import해
+    preflight↔utility 충돌 자체를 회피하고, unlayered utility로 자연스럽게
+    layered 라이브러리 utility를 override
+
+  데모 사이트(apps/docs)도 패턴 B로 적용 검증 완료.
+
 ## 1.0.3
 
 ### Patch Changes
