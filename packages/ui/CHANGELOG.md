@@ -1,5 +1,14 @@
 # @baneung-pack/ui
 
+## 1.0.3
+
+### Patch Changes
+
+- README의 "CSS 격리 (Cascade Layers)" 섹션 보강. CSS Cascade Layer는 처음
+  등록된 시점의 위치가 우선순위를 결정하기 때문에 layer 선언 순서뿐 아니라
+  import 순서도 함께 맞춰야 한다는 점을 명시. 두 시나리오(소비자 override /
+  라이브러리 강제 우선) 각각의 import + layer 선언 패턴을 예시로 안내.
+
 ## 1.0.2
 
 ### Patch Changes

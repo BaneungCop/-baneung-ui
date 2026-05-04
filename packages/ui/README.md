@@ -61,33 +61,54 @@ document.documentElement.dataset.theme = 'dark';
 
 ### CSS 격리 (Cascade Layers)
 
-라이브러리의 모든 스타일은 `@layer baneung` 안에 들어 있습니다. 소비자 프로젝트의 `global.css`가 라이브러리 스타일을 의도치 않게 덮어쓰지 않도록 **레이어 순서를 명시**해 주세요.
+라이브러리의 모든 스타일은 `@layer baneung` 안에 들어 있습니다. 소비자는 자신의 CSS를 layer로 감싸 우선순위를 명시 제어할 수 있습니다.
+
+> **핵심**: CSS Cascade Layer는 **처음 등록된 시점의 위치**가 cascade 우선순위를 결정합니다. 따라서 **import 순서**와 **layer 선언 순서** 두 가지를 함께 맞춰야 합니다.
+
+#### 시나리오 1 — 소비자가 라이브러리를 override 가능 (일반적)
+
+```tsx
+// app/layout.tsx
+import '@baneung-pack/ui/styles.css'; // 먼저 — baneung을 0번에 등록
+import './globals.css'; // 나중 — app을 1번에 새로 등록
+```
 
 ```css
-/* 소비자 프로젝트의 global.css 최상단 */
+/* globals.css 최상단 */
 @layer baneung, app;
 
-/* 본인 프로젝트의 글로벌 스타일은 app 레이어로 감싸기 */
 @layer app {
-  /* 본인의 reset / 글로벌 스타일 */
+  /* 본인 글로벌 스타일 — 라이브러리를 override */
   body {
     background: #f5f5f5;
   }
 }
 ```
 
-위와 같이 선언하면:
+결과: `[baneung=0, app=1]` → **app(소비자) 우선**. 본인이 override 가능.
 
-- `@layer app` (뒤 선언) → **소비자 스타일 우선** (의도된 override 가능)
-- `@layer baneung` (앞 선언) → 라이브러리 기본값
+#### 시나리오 2 — 라이브러리를 강제 우선 (demo/docs 사이트 등)
 
-반대로 **라이브러리를 강제 우선**하고 싶으면 순서를 뒤집습니다:
+import 순서와 layer 순서를 모두 뒤집습니다:
 
-```css
-@layer app, baneung; /* baneung이 더 우선 */
+```tsx
+// app/layout.tsx
+import './globals.css'; // 먼저 — app을 0번, baneung을 1번에 등록
+import '@baneung-pack/ui/styles.css'; // 나중 — baneung 이미 존재
 ```
 
-> 레이어 선언을 안 하면 unlayered 소비자 CSS가 라이브러리 layered CSS보다 우선합니다 (CSS 표준). 라이브러리 의도를 보존하려면 위 한 줄 선언이 필요합니다.
+```css
+/* globals.css 최상단 */
+@layer app, baneung;
+
+@layer app {
+  /* layout 유틸리티 등 */
+}
+```
+
+결과: `[app=0, baneung=1]` → **baneung(라이브러리) 우선**.
+
+> 레이어 선언/import 순서를 무시하면 unlayered 소비자 CSS가 layered 라이브러리 CSS보다 항상 우선합니다 (CSS 표준). 라이브러리 의도를 보존하려면 위 패턴 중 하나를 따라주세요.
 
 ## 컴포넌트 (58)
 

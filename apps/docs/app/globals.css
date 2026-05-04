@@ -7,10 +7,19 @@
  *
  * @baneung-pack/tokens는 ui/styles.css에서 이미 로드되므로 중복 임포트하지 않습니다.
  *
+ * # CSS 격리 (Cascade Layers)
+ * 라이브러리(@baneung-pack/ui)는 모든 스타일을 @layer baneung에 격리하기 때문에
+ * 소비자(docs)도 동일하게 @layer app으로 감싸 명시 우선순위로 다뤄야 한다.
+ * 순서 `@layer app, baneung;` → baneung이 뒤(=상위) → 라이브러리 컴포넌트 스타일이
+ * docs의 Tailwind preflight(button{padding:0} 등)를 이긴다.
+ * docs는 라이브러리를 demo하는 사이트이므로 library가 우선이 자연스럽다.
+ *
  * @source — Tailwind v4의 자동 source 감지가 monorepo 구조에서 누락되는 경우가 있어
- * apps/docs 안의 모든 .tsx/.ts를 명시적으로 스캔합니다.
+ * apps/docs 안의 모든 .tsx/.ts를 명시적으로 스캔한다.
  */
-@import 'tailwindcss';
+@layer app, baneung;
+
+@import 'tailwindcss' layer(app);
 
 @source "../app/**/*.{ts,tsx}";
 @source "../components/**/*.{ts,tsx}";
