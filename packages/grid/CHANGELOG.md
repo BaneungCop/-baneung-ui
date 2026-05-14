@@ -1,5 +1,17 @@
 # @baneung-pack/grid
 
+## 0.3.0
+
+### Minor Changes
+
+- Tree (계층) 모드 추가.
+  - `tree` prop으로 활성, `getChildren`으로 중첩 데이터 자식 추출
+  - 첫 컬럼에 caret(▶/▼) + 들여쓰기 자동 삽입
+  - `defaultExpandedIds`로 초기 펼침 상태 제어 (`'all'` / `'none'` / id 배열)
+  - 가상화·페이지네이션과 호환 (펼침 상태 기반 flat 리스트에 적용)
+  - 인라인 편집·삭제는 최상위 행만 안전 (중첩 행 편집은 후속 버전)
+  - 22 tests (tree 4개 신규)
+
 ## 0.2.0
 
 ### Minor Changes

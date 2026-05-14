@@ -147,10 +147,6 @@ function PaginationDemo() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Demo 5: 외부 페이지네이션 (controlled + showPagination=false)
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Demo 6: 인라인 편집 + 행 선택 + ref API (외부 버튼으로 일괄 삭제·저장)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -279,6 +275,144 @@ function InspectorBlock({ title, children }: { title: string; children: React.Re
         {children}
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Demo 5: 외부 페이지네이션 (controlled + showPagination=false)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Demo 7: Tree (계층) 모드
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface TreeNode {
+  id: string;
+  name: string;
+  type: 'folder' | 'task';
+  status?: 'todo' | 'doing' | 'done';
+  children?: TreeNode[];
+}
+
+const treeData: TreeNode[] = [
+  {
+    id: 'p1',
+    name: 'Proposal of Project',
+    type: 'folder',
+    children: [
+      {
+        id: 'p1-1',
+        name: 'Gathering of idea',
+        type: 'folder',
+        children: [
+          { id: 'p1-1-1', name: 'Define project objective', type: 'task', status: 'done' },
+          { id: 'p1-1-2', name: 'Brainstorming', type: 'task', status: 'done' },
+          { id: 'p1-1-3', name: 'Think my idea', type: 'task', status: 'doing' },
+          {
+            id: 'p1-1-4',
+            name: 'Complete proposal of individual idea',
+            type: 'task',
+            status: 'doing',
+          },
+          { id: 'p1-1-5', name: 'Have a idea appraisal', type: 'task', status: 'todo' },
+          {
+            id: 'p1-1-6',
+            name: 'Make the decision in a management meeting',
+            type: 'task',
+            status: 'todo',
+          },
+        ],
+      },
+      {
+        id: 'p1-2',
+        name: 'Market research',
+        type: 'folder',
+        children: [
+          { id: 'p1-2-1', name: 'Competitor analysis', type: 'task', status: 'todo' },
+          { id: 'p1-2-2', name: 'User survey', type: 'task', status: 'todo' },
+        ],
+      },
+      {
+        id: 'p1-3',
+        name: 'Writing Proposal',
+        type: 'folder',
+        children: [{ id: 'p1-3-1', name: 'Draft proposal', type: 'task', status: 'todo' }],
+      },
+    ],
+  },
+  {
+    id: 'p2',
+    name: 'Planning',
+    type: 'folder',
+    children: [
+      {
+        id: 'p2-1',
+        name: 'Scheduling of Projct',
+        type: 'folder',
+        children: [{ id: 'p2-1-1', name: 'Define milestones', type: 'task', status: 'todo' }],
+      },
+      {
+        id: 'p2-2',
+        name: 'Assignment of resource',
+        type: 'folder',
+        children: [{ id: 'p2-2-1', name: 'Allocate team', type: 'task', status: 'todo' }],
+      },
+      {
+        id: 'p2-3',
+        name: 'Assignment of Task',
+        type: 'folder',
+        children: [{ id: 'p2-3-1', name: 'Distribute tasks', type: 'task', status: 'todo' }],
+      },
+    ],
+  },
+  {
+    id: 'p3',
+    name: 'Design',
+    type: 'folder',
+    children: [
+      { id: 'p3-1', name: 'Design user interface web page', type: 'task', status: 'todo' },
+      { id: 'p3-2', name: 'Define user interface functionality', type: 'task', status: 'todo' },
+    ],
+  },
+];
+
+const statusBadge = {
+  todo: <Badge variant="outline">To Do</Badge>,
+  doing: <Badge variant="secondary">In Progress</Badge>,
+  done: <Badge variant="success">Done</Badge>,
+} as const;
+
+const treeColumns: GridColumn<TreeNode>[] = [
+  { id: 'name', header: '항목', accessor: 'name' },
+  {
+    id: 'type',
+    header: '종류',
+    accessor: 'type',
+    width: 100,
+    renderer: (v) => (v === 'folder' ? '📁 폴더' : '· 작업'),
+  },
+  {
+    id: 'status',
+    header: '상태',
+    accessor: 'status',
+    width: 120,
+    renderer: (v) => {
+      if (!v) return '';
+      return statusBadge[v as keyof typeof statusBadge];
+    },
+  },
+];
+
+function TreeDemo() {
+  return (
+    <Grid
+      columns={treeColumns}
+      data={treeData}
+      tree
+      getChildren={(row) => row.children}
+      getRowId={(row) => row.id}
+      defaultExpandedIds={['p1', 'p1-1']}
+    />
   );
 }
 
@@ -426,6 +560,21 @@ export default function GridPage() {
           </Muted>
         </div>
         <EditableSelectableDemo />
+      </section>
+
+      {/* Demo 7: Tree (계층) */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <Heading level={2} className="text-2xl">
+            Tree (계층) 모드
+          </Heading>
+          <Muted className="text-sm">
+            <code>tree</code> + <code>getChildren</code>으로 중첩 데이터를 계층 표시. 각 노드의
+            caret(▶/▼)으로 펼침/접힘. <code>defaultExpandedIds</code>로 초기 상태 제어 (
+            <code>&apos;all&apos;</code> / <code>&apos;none&apos;</code> / 명시 id 배열).
+          </Muted>
+        </div>
+        <TreeDemo />
       </section>
 
       <Separator />

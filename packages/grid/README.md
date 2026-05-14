@@ -176,6 +176,51 @@ function MyPage() {
 | `clearSelection()` | `void`   | 모든 선택 해제                            |
 | `reset()`          | `void`   | 편집/삭제 내역 폐기, 원본 data로 복원     |
 
+## Tree (계층) 모드
+
+중첩 데이터를 계층 표시 가능. 첫 컬럼에 caret + 들여쓰기가 자동 삽입됩니다.
+
+```tsx
+interface Node {
+  id: string;
+  name: string;
+  children?: Node[];
+}
+
+const data: Node[] = [
+  {
+    id: '1',
+    name: 'Root',
+    children: [
+      { id: '1-1', name: 'Child A' },
+      { id: '1-2', name: 'Child B', children: [{ id: '1-2-1', name: 'Grandchild' }] },
+    ],
+  },
+];
+
+<Grid
+  columns={cols}
+  data={data}
+  tree // ← 트리 모드 활성
+  getChildren={(row) => row.children} // ← 자식 추출
+  getRowId={(row) => row.id} // ← 안정적 ID 필수
+  defaultExpandedIds={['1']} // ← 'all' / 'none' / id 배열
+/>;
+```
+
+### 옵션
+
+| Prop                 | 타입                                      | 설명                             |
+| -------------------- | ----------------------------------------- | -------------------------------- |
+| `tree`               | `boolean`                                 | 트리 모드 활성                   |
+| `getChildren`        | `(row) => TRow[] \| undefined`            | 자식 행 추출 (tree=true 시 필수) |
+| `defaultExpandedIds` | `'all' \| 'none' \| (string \| number)[]` | 기본 펼침 상태. 기본 `'none'`    |
+
+### 제약
+
+- 인라인 편집·삭제는 최상위 행만 안전. 중첩 행 편집/삭제는 후속 버전 개선 예정.
+- 가상화·페이지네이션은 정상 작동 (펼침 상태 기반 flat 리스트에 적용).
+
 ## CSS 격리
 
 `@baneung-pack/ui`와 동일하게 모든 스타일이 `@layer baneung`에 격리되어 있습니다. ui 패키지와 함께 사용 시 layer가 자동으로 머지되어 충돌하지 않습니다.

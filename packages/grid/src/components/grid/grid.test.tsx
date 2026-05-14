@@ -296,6 +296,98 @@ describe('Grid', () => {
   });
 
   // ───────────────────────────────────────────────────────────────────────────
+  // tree (계층) 모드
+  // ───────────────────────────────────────────────────────────────────────────
+
+  interface TreeNode {
+    id: number;
+    name: string;
+    children?: TreeNode[];
+  }
+
+  const treeData: TreeNode[] = [
+    {
+      id: 1,
+      name: 'Root',
+      children: [
+        { id: 2, name: 'Child A' },
+        { id: 3, name: 'Child B', children: [{ id: 4, name: 'Grandchild' }] },
+      ],
+    },
+    { id: 5, name: 'Sibling' },
+  ];
+  const treeColumns: GridColumn<TreeNode>[] = [{ id: 'name', header: '이름', accessor: 'name' }];
+
+  it('tree: collapsed by default — only root nodes visible', () => {
+    render(
+      <Grid
+        columns={treeColumns}
+        data={treeData}
+        tree
+        getChildren={(r) => r.children}
+        getRowId={(r) => r.id}
+      />,
+    );
+    expect(screen.getByText('Root')).toBeInTheDocument();
+    expect(screen.getByText('Sibling')).toBeInTheDocument();
+    expect(screen.queryByText('Child A')).not.toBeInTheDocument();
+    expect(screen.queryByText('Grandchild')).not.toBeInTheDocument();
+  });
+
+  it('tree: clicking caret expands the node', async () => {
+    const user = userEvent.setup();
+    render(
+      <Grid
+        columns={treeColumns}
+        data={treeData}
+        tree
+        getChildren={(r) => r.children}
+        getRowId={(r) => r.id}
+      />,
+    );
+    // Root 노드의 펼치기 버튼 클릭
+    const carets = screen.getAllByRole('button', { name: '펼치기' });
+    await user.click(carets[0]!);
+    expect(screen.getByText('Child A')).toBeInTheDocument();
+    expect(screen.getByText('Child B')).toBeInTheDocument();
+    // Child B는 자식이 있지만 아직 안 펼쳤음
+    expect(screen.queryByText('Grandchild')).not.toBeInTheDocument();
+  });
+
+  it('tree: defaultExpandedIds="all" expands all nodes', () => {
+    render(
+      <Grid
+        columns={treeColumns}
+        data={treeData}
+        tree
+        getChildren={(r) => r.children}
+        getRowId={(r) => r.id}
+        defaultExpandedIds="all"
+      />,
+    );
+    expect(screen.getByText('Root')).toBeInTheDocument();
+    expect(screen.getByText('Child A')).toBeInTheDocument();
+    expect(screen.getByText('Child B')).toBeInTheDocument();
+    expect(screen.getByText('Grandchild')).toBeInTheDocument();
+  });
+
+  it('tree: defaultExpandedIds with id array expands specific nodes', () => {
+    render(
+      <Grid
+        columns={treeColumns}
+        data={treeData}
+        tree
+        getChildren={(r) => r.children}
+        getRowId={(r) => r.id}
+        defaultExpandedIds={[1]}
+      />,
+    );
+    expect(screen.getByText('Child A')).toBeInTheDocument();
+    // Child B는 펼쳐졌지만 그 자식(4)은 안 펼침
+    expect(screen.queryByText('Grandchild')).not.toBeInTheDocument();
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
   // active cell highlight (셀 클릭)
   // ───────────────────────────────────────────────────────────────────────────
 

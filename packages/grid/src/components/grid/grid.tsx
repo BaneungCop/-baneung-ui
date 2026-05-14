@@ -4,6 +4,7 @@ import * as React from 'react';
 import { EditableCell } from './editable-cell';
 import { GridPagination } from './pagination';
 import { SelectionCheckbox } from './selection-checkbox';
+import { collectExpandableIds, flattenTree, type FlatRow } from './tree-utils';
 import { useGridState } from './use-grid-state';
 import { cn } from '../../lib/cn';
 
@@ -20,9 +21,6 @@ function getCellValue<TRow>(column: GridColumn<TRow>, row: TRow): unknown {
 
 /**
  * 한 셀의 표시 노드 (편집 모드의 input은 EditableCell이 별도로 다룬다).
- *
- *   - renderer === 'text' 또는 미지정: 값을 String() 변환 후 표시
- *   - renderer가 함수: (value, row) => ReactNode 결과를 그대로 렌더
  */
 function renderDisplay<TRow>(column: GridColumn<TRow>, row: TRow): React.ReactNode {
   const value = getCellValue(column, row);
@@ -34,30 +32,28 @@ function renderDisplay<TRow>(column: GridColumn<TRow>, row: TRow): React.ReactNo
 }
 
 /**
- * Grid — virtualization · 페이지네이션 · 인라인 편집 · 행 선택 · imperative API를
- * 통합한 데이터 그리드.
- *
- * # 모드
- * - `virtualized={false}` (기본): 전체 행을 일반 `<table>`로 렌더.
- * - `virtualized={true}`: 보이는 행만 렌더 (TanStack Virtual).
- *
- * # 페이지네이션
- * - `pageSize > 0`이면 자동 활성. `showPagination=false`로 내장 UI만 숨길 수 있음
- *   (외부 컴포넌트 + `page`/`onPageChange` controlled로 통합).
- *
- * # 편집
- * - 컬럼에 `editable: true` 지정 → 셀 더블클릭 → input 진입.
- * - Enter/blur로 commit (한글 IME composition 안전), Escape로 cancel.
- *
- * # 행 선택 + 외부 제어
- * - `selectable={true}`로 첫 컬럼에 체크박스 자동 추가.
- * - `ref={gridRef}`로 imperative API 접근. 외부 버튼에서
- *   `gridRef.current?.deleteSelected()` 호출로 일괄 삭제 가능.
+ * Grid — virtualization · 페이지네이션 · 인라인 편집 · 행 선택 · 트리(계층) 모드 ·
+ * imperative API를 통합한 데이터 그리드.
  *
  * @example
- *   const gridRef = useRef<GridHandle<Item>>(null);
- *   <Grid ref={gridRef} columns={cols} data={rows} selectable getRowId={r => r.id} />
- *   <Button onClick={() => gridRef.current?.deleteSelected()}>선택 삭제</Button>
+ *   <Grid
+ *     ref={gridRef}
+ *     columns={cols}
+ *     data={rows}
+ *     selectable
+ *     getRowId={(r) => r.id}
+ *   />
+ *
+ * @example
+ *   // Tree 모드 (계층 표시)
+ *   <Grid
+ *     columns={cols}
+ *     data={nestedData}
+ *     tree
+ *     getChildren={(r) => r.children}
+ *     getRowId={(r) => r.id}
+ *     defaultExpandedIds="all"
+ *   />
  */
 export const Grid = React.forwardRef(function GridInner<TRow = Record<string, unknown>>(
   {
@@ -74,12 +70,15 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     getRowId,
     selectable = false,
     onRowChange,
+    tree = false,
+    getChildren,
+    defaultExpandedIds = 'none',
     className,
     ...props
   }: GridProps<TRow>,
   ref: React.ForwardedRef<GridHandle<TRow>>,
 ) {
-  // ID 추출 — getRowId 미지정 시 인덱스. 단 selectable/편집과는 같이 쓰지 말 것.
+  // ID 추출 — getRowId 미지정 시 인덱스. tree 모드에서는 안정적 ID가 필수.
   const resolveRowId = React.useCallback(
     (row: TRow, index: number): RowId => (getRowId ? getRowId(row, index) : index),
     [getRowId],
@@ -88,7 +87,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
   // 1. 내부 상태 (편집·삭제·선택)
   const state = useGridState(data, resolveRowId, onRowChange);
 
-  // 1b. active cell — 클릭한 셀에 테두리 highlight (AUIGrid 스타일 current cell)
+  // 1b. 활성 셀 (클릭한 셀 outline 강조)
   const [activeCell, setActiveCell] = React.useState<{
     rowId: RowId;
     columnId: string;
@@ -97,7 +96,31 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     setActiveCell({ rowId, columnId });
   }, []);
 
-  // 2. 페이지 상태 — controlled/uncontrolled
+  // 1c. Tree 펼침 상태 — defaultExpandedIds로 초기화. data 또는 prop이 바뀌면 재계산.
+  const initialExpanded = React.useMemo<Set<RowId>>(() => {
+    if (!tree || !getChildren) return new Set();
+    if (defaultExpandedIds === 'all') {
+      return collectExpandableIds(data, getChildren, resolveRowId);
+    }
+    if (Array.isArray(defaultExpandedIds)) {
+      return new Set(defaultExpandedIds);
+    }
+    return new Set();
+  }, [tree, getChildren, data, defaultExpandedIds, resolveRowId]);
+  const [expandedIds, setExpandedIds] = React.useState<Set<RowId>>(initialExpanded);
+  React.useEffect(() => {
+    setExpandedIds(initialExpanded);
+  }, [initialExpanded]);
+  const toggleExpand = React.useCallback((id: RowId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // 2. 페이지 상태
   const [internalPage, setInternalPage] = React.useState(1);
   const page = pageProp ?? internalPage;
   const setPage = React.useCallback(
@@ -108,24 +131,38 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     [onPageChange],
   );
 
-  // 3. 현재 화면에 보일 데이터 (편집된 rows + 페이지네이션 적용)
-  const pageCount = pageSize > 0 ? Math.max(1, Math.ceil(state.rows.length / pageSize)) : 1;
-  const visibleData = React.useMemo(() => {
-    if (pageSize <= 0) return state.rows;
-    const start = (page - 1) * pageSize;
-    return state.rows.slice(start, start + pageSize);
-  }, [state.rows, page, pageSize]);
+  // 3. 화면에 보일 행 — 트리 모드면 flattenTree, 아니면 state.rows를 FlatRow로 wrap
+  const allFlatRows = React.useMemo<FlatRow<TRow>[]>(() => {
+    if (tree && getChildren) {
+      return flattenTree(data, getChildren, expandedIds, resolveRowId);
+    }
+    return state.rows.map((row, idx) => ({
+      row,
+      id: resolveRowId(row, idx),
+      level: 0,
+      hasChildren: false,
+      expanded: false,
+    }));
+  }, [tree, getChildren, data, expandedIds, state.rows, resolveRowId]);
 
-  // 4. 가상화
+  // 4. 페이지네이션 적용
+  const pageCount = pageSize > 0 ? Math.max(1, Math.ceil(allFlatRows.length / pageSize)) : 1;
+  const visibleFlatRows = React.useMemo(() => {
+    if (pageSize <= 0) return allFlatRows;
+    const start = (page - 1) * pageSize;
+    return allFlatRows.slice(start, start + pageSize);
+  }, [allFlatRows, page, pageSize]);
+
+  // 5. 가상화
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
-    count: virtualized ? visibleData.length : 0,
+    count: virtualized ? visibleFlatRows.length : 0,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => rowHeight,
     overscan: 8,
   });
 
-  // 5. imperative API 노출
+  // 6. imperative API
   React.useImperativeHandle(
     ref,
     () => ({
@@ -140,30 +177,24 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     [state],
   );
 
-  // 6. 셀 commit 핸들러 — string key accessor만 지원
+  // 7. 셀 commit 핸들러
   const handleCellCommit = React.useCallback(
     (id: RowId, col: GridColumn<TRow>, value: string) => {
-      if (typeof col.accessor === 'function') {
-        // 함수 accessor는 set 방법을 모르므로 편집 무시.
-        return;
-      }
+      if (typeof col.accessor === 'function') return;
       state.editCell(id, col.accessor as string, value);
     },
     [state],
   );
 
   const heightStyle = typeof height === 'number' ? `${height}px` : height;
-  const isEmpty = visibleData.length === 0;
-  // 헤더 체크박스 상태 — visibleData 기준
+  const isEmpty = visibleFlatRows.length === 0;
+  // 헤더 체크박스 — visible 행 기준
   const allSelected =
     selectable &&
-    visibleData.length > 0 &&
-    visibleData.every((row, idx) => state.selectedIds.has(resolveRowId(row, idx)));
+    visibleFlatRows.length > 0 &&
+    visibleFlatRows.every((fr) => state.selectedIds.has(fr.id));
   const someSelected =
-    selectable &&
-    !allSelected &&
-    visibleData.some((row, idx) => state.selectedIds.has(resolveRowId(row, idx)));
-  // selectable 시 헤더/td 컬럼 수 +1
+    selectable && !allSelected && visibleFlatRows.some((fr) => state.selectedIds.has(fr.id));
   const colSpan = columns.length + (selectable ? 1 : 0);
 
   return (
@@ -177,7 +208,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       >
         <table
           className="w-full border-collapse text-sm"
-          aria-rowcount={state.rows.length}
+          aria-rowcount={allFlatRows.length}
           aria-colcount={colSpan}
         >
           <thead className="sticky top-0 z-10 bg-surface">
@@ -191,7 +222,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                     label="모두 선택"
                     checked={allSelected}
                     indeterminate={someSelected}
-                    onChange={() => state.toggleAll(visibleData)}
+                    onChange={() => state.toggleAll(visibleFlatRows.map((fr) => fr.row))}
                   />
                 </th>
               )}
@@ -223,36 +254,35 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
           ) : virtualized ? (
             <VirtualizedBody
               columns={columns}
-              data={visibleData}
+              flatRows={visibleFlatRows}
               virtualizer={virtualizer}
               rowHeight={rowHeight}
-              resolveRowId={resolveRowId}
               selectable={selectable}
               selectedIds={state.selectedIds}
               onToggleRow={state.toggleRow}
               onCellCommit={handleCellCommit}
               activeCell={activeCell}
               onCellActivate={activateCell}
+              tree={tree}
+              onToggleExpand={toggleExpand}
             />
           ) : (
             <tbody>
-              {visibleData.map((row, idx) => {
-                const id = resolveRowId(row, idx);
-                return (
-                  <GridRow
-                    key={id}
-                    rowId={id}
-                    row={row}
-                    columns={columns}
-                    selectable={selectable}
-                    selected={state.selectedIds.has(id)}
-                    onToggle={state.toggleRow}
-                    onCellCommit={handleCellCommit}
-                    activeCell={activeCell}
-                    onCellActivate={activateCell}
-                  />
-                );
-              })}
+              {visibleFlatRows.map((fr) => (
+                <GridRow
+                  key={fr.id}
+                  flatRow={fr}
+                  columns={columns}
+                  selectable={selectable}
+                  selected={state.selectedIds.has(fr.id)}
+                  onToggle={state.toggleRow}
+                  onCellCommit={handleCellCommit}
+                  activeCell={activeCell}
+                  onCellActivate={activateCell}
+                  tree={tree}
+                  onToggleExpand={toggleExpand}
+                />
+              ))}
             </tbody>
           )}
         </table>
@@ -270,12 +300,52 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
 (Grid as unknown as { displayName: string }).displayName = 'Grid';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 행 1개 렌더 — 체크박스 + 각 컬럼 셀 (편집 가능 셀은 EditableCell 사용)
+// Tree 컨트롤 — caret + 들여쓰기 (첫 컬럼에만 삽입)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface TreeAffixProps {
+  level: number;
+  hasChildren: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+}
+
+function TreeAffix({ level, hasChildren, expanded, onToggle }: TreeAffixProps) {
+  return (
+    <span className="inline-flex items-center" style={{ paddingLeft: level * 16 }}>
+      {hasChildren ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+          aria-label={expanded ? '접기' : '펼치기'}
+          aria-expanded={expanded}
+          className="mr-1 inline-flex h-4 w-4 items-center justify-center text-foreground-muted hover:text-foreground"
+        >
+          <span aria-hidden="true" className="text-xs leading-none">
+            {expanded ? '▼' : '▶'}
+          </span>
+        </button>
+      ) : (
+        <span
+          aria-hidden="true"
+          className="mr-1 inline-block w-4 text-center text-xs leading-none text-foreground-subtle"
+        >
+          ·
+        </span>
+      )}
+    </span>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 행 1개 렌더 (체크박스 + 컬럼 셀들)
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface GridRowProps<TRow> {
-  rowId: RowId;
-  row: TRow;
+  flatRow: FlatRow<TRow>;
   columns: GridColumn<TRow>[];
   selectable: boolean;
   selected: boolean;
@@ -283,12 +353,13 @@ interface GridRowProps<TRow> {
   onCellCommit: (id: RowId, col: GridColumn<TRow>, value: string) => void;
   activeCell: { rowId: RowId; columnId: string } | null;
   onCellActivate: (rowId: RowId, columnId: string) => void;
+  tree: boolean;
+  onToggleExpand: (id: RowId) => void;
   height?: number;
 }
 
 function GridRow<TRow>({
-  rowId,
-  row,
+  flatRow,
   columns,
   selectable,
   selected,
@@ -296,8 +367,11 @@ function GridRow<TRow>({
   onCellCommit,
   activeCell,
   onCellActivate,
+  tree,
+  onToggleExpand,
   height,
 }: GridRowProps<TRow>) {
+  const { row, id, level, hasChildren, expanded } = flatRow;
   return (
     <tr
       className="border-b border-border-subtle last:border-b-0 hover:bg-surface"
@@ -307,28 +381,26 @@ function GridRow<TRow>({
       {selectable && (
         <td className="w-10 px-3 py-2 text-center">
           <SelectionCheckbox
-            label={`행 ${String(rowId)} 선택`}
+            label={`행 ${String(id)} 선택`}
             checked={selected}
-            onChange={() => onToggle(rowId)}
+            onChange={() => onToggle(id)}
           />
         </td>
       )}
-      {columns.map((col) => {
+      {columns.map((col, colIdx) => {
         const display = renderDisplay(col, row);
         const align = col.align;
-        // 편집 가능 + accessor가 string key일 때만 EditableCell 사용
         const isEditable = col.editable && typeof col.accessor === 'string';
         const value = getCellValue(col, row);
-        const isActive = activeCell?.rowId === rowId && activeCell.columnId === col.id;
+        const isActive = activeCell?.rowId === id && activeCell.columnId === col.id;
+        const isFirstCol = colIdx === 0;
 
         return (
           <td
             key={col.id}
             aria-selected={isActive || undefined}
-            onClick={() => onCellActivate(rowId, col.id)}
+            onClick={() => onCellActivate(id, col.id)}
             className={cn(
-              // td는 항상 relative — 편집 모드 input의 absolute inset-0 기준점.
-              // 활성 셀은 outline으로 안쪽 테두리 그려서 layout shift 없이 강조 (AUIGrid 스타일).
               'relative cursor-pointer px-3 py-2 text-foreground',
               isActive && 'z-[1] outline outline-2 -outline-offset-2 outline-ring',
               align === 'right' && 'text-right',
@@ -336,12 +408,33 @@ function GridRow<TRow>({
               (!align || align === 'left') && 'text-left',
             )}
           >
-            {isEditable ? (
+            {tree && isFirstCol ? (
+              <span className="flex items-center">
+                <TreeAffix
+                  level={level}
+                  hasChildren={hasChildren}
+                  expanded={expanded}
+                  onToggle={() => onToggleExpand(id)}
+                />
+                <span className="flex-1">
+                  {isEditable ? (
+                    <EditableCell
+                      value={value}
+                      display={display}
+                      align={align}
+                      onCommit={(next) => onCellCommit(id, col, next)}
+                    />
+                  ) : (
+                    display
+                  )}
+                </span>
+              </span>
+            ) : isEditable ? (
               <EditableCell
                 value={value}
                 display={display}
                 align={align}
-                onCommit={(next) => onCellCommit(rowId, col, next)}
+                onCommit={(next) => onCellCommit(id, col, next)}
               />
             ) : (
               display
@@ -354,35 +447,37 @@ function GridRow<TRow>({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 가상화 tbody — 보이는 행만 GridRow로 렌더
+// 가상화 tbody
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface VirtualizedBodyProps<TRow> {
   columns: GridColumn<TRow>[];
-  data: TRow[];
+  flatRows: FlatRow<TRow>[];
   virtualizer: Virtualizer<HTMLDivElement, Element>;
   rowHeight: number;
-  resolveRowId: (row: TRow, index: number) => RowId;
   selectable: boolean;
   selectedIds: Set<RowId>;
   onToggleRow: (id: RowId) => void;
   onCellCommit: (id: RowId, col: GridColumn<TRow>, value: string) => void;
   activeCell: { rowId: RowId; columnId: string } | null;
   onCellActivate: (rowId: RowId, columnId: string) => void;
+  tree: boolean;
+  onToggleExpand: (id: RowId) => void;
 }
 
 function VirtualizedBody<TRow>({
   columns,
-  data,
+  flatRows,
   virtualizer,
   rowHeight,
-  resolveRowId,
   selectable,
   selectedIds,
   onToggleRow,
   onCellCommit,
   activeCell,
   onCellActivate,
+  tree,
+  onToggleExpand,
 }: VirtualizedBodyProps<TRow>) {
   const items = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
@@ -400,21 +495,21 @@ function VirtualizedBody<TRow>({
         </tr>
       )}
       {items.map((vi) => {
-        const row = data[vi.index];
-        if (row === undefined) return null;
-        const id = resolveRowId(row, vi.index);
+        const fr = flatRows[vi.index];
+        if (fr === undefined) return null;
         return (
           <GridRow
-            key={id}
-            rowId={id}
-            row={row}
+            key={fr.id}
+            flatRow={fr}
             columns={columns}
             selectable={selectable}
-            selected={selectedIds.has(id)}
+            selected={selectedIds.has(fr.id)}
             onToggle={onToggleRow}
             onCellCommit={onCellCommit}
             activeCell={activeCell}
             onCellActivate={onCellActivate}
+            tree={tree}
+            onToggleExpand={onToggleExpand}
             height={rowHeight}
           />
         );

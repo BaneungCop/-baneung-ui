@@ -75,6 +75,28 @@ export interface GridProps<TRow = Record<string, unknown>> extends Omit<
    * 디버깅/로깅 또는 자동 저장 트리거 용도로 유용.
    */
   onRowChange?: (row: TRow, id: string | number) => void;
+  /**
+   * Tree(계층) 모드. 첫 컬럼에 caret + 들여쓰기를 자동 삽입해 펼침/접힘 가능한
+   * 트리뷰로 렌더한다. `getChildren`이 함께 필요.
+   *
+   * # 제약
+   * - 인라인 편집은 최상위 행만 정상 반영됨 (중첩 행은 편집 시 UI 갱신은 되지만
+   *   getSavedData / getChangedData에 반영되지 않음 — 후속 버전 개선).
+   * - 삭제(deleteSelected)도 최상위 행만 안전. 중첩 행 삭제는 동작 보장 X.
+   */
+  tree?: boolean;
+  /**
+   * 행에서 자식 배열을 추출하는 함수. tree=true일 때만 사용된다.
+   * undefined / 빈 배열을 반환하면 leaf 노드로 간주.
+   */
+  getChildren?: (row: TRow) => TRow[] | undefined;
+  /**
+   * 기본 펼침 상태.
+   * - `'none'` (기본): 모두 접힘
+   * - `'all'`: 자식이 있는 모든 노드 펼침
+   * - `(string | number)[]`: 지정한 id의 노드만 펼침
+   */
+  defaultExpandedIds?: (string | number)[] | 'all' | 'none';
 }
 
 /**
