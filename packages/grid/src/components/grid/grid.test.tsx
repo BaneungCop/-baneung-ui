@@ -413,6 +413,79 @@ describe('Grid', () => {
     expect(newActive[0]?.textContent).toBe('2000');
   });
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // 빌트인 editor: number / date / dropdown
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('editor=dropdown: select 즉시 commit', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<GridHandle<Row>>();
+    const cols: GridColumn<Row>[] = [
+      {
+        id: 'name',
+        header: '이름',
+        accessor: 'name',
+        editable: true,
+        editor: 'dropdown',
+        options: [
+          { value: '사과', label: '사과' },
+          { value: '오렌지', label: '오렌지' },
+          { value: '키위', label: '키위' },
+        ],
+      },
+    ];
+    render(<Grid ref={ref} columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+
+    await user.dblClick(screen.getByText('사과'));
+    const select = screen.getByRole('combobox', { name: '셀 편집 (드롭다운)' });
+    await user.selectOptions(select, '키위');
+
+    expect(screen.getByText('키위')).toBeInTheDocument();
+    const changed = ref.current?.getChangedData() ?? [];
+    expect(changed[0]?.name).toBe('키위');
+  });
+
+  it('editor=number: input type=number 로 진입', async () => {
+    const user = userEvent.setup();
+    const cols: GridColumn<Row>[] = [
+      { id: 'price', header: '가격', accessor: 'price', editable: true, editor: 'number' },
+    ];
+    render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+
+    await user.dblClick(screen.getByText('1000'));
+    const input = screen.getByRole('spinbutton', { name: '셀 편집' });
+    expect(input).toHaveAttribute('type', 'number');
+
+    await user.clear(input);
+    await user.type(input, '9999{Enter}');
+    expect(screen.getByText('9999')).toBeInTheDocument();
+  });
+
+  it('renderer=progress: progressbar role + aria-valuenow', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'price', header: '진행률', accessor: 'price', renderer: 'progress', max: 5000 },
+    ];
+    render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+
+    const bars = screen.getAllByRole('progressbar');
+    expect(bars.length).toBe(3);
+    expect(bars[0]).toHaveAttribute('aria-valuenow', '1000');
+    expect(bars[0]).toHaveAttribute('aria-valuemax', '5000');
+  });
+
+  it('renderer=date + dateFormat: 포맷 적용', () => {
+    interface DateRow {
+      id: number;
+      due: string;
+    }
+    const cols: GridColumn<DateRow>[] = [
+      { id: 'due', header: '마감', accessor: 'due', renderer: 'date', dateFormat: 'YYYY/MM/DD' },
+    ];
+    const data: DateRow[] = [{ id: 1, due: '2024-02-15' }];
+    render(<Grid columns={cols} data={data} getRowId={(r) => r.id} />);
+    expect(screen.getByText('2024/02/15')).toBeInTheDocument();
+  });
+
   it('getSavedData returns current edited values (excluding deleted)', async () => {
     const user = userEvent.setup();
     const ref = React.createRef<GridHandle<Row>>();

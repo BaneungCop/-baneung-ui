@@ -21,14 +21,68 @@ function getCellValue<TRow>(column: GridColumn<TRow>, row: TRow): unknown {
 
 /**
  * 한 셀의 표시 노드 (편집 모드의 input은 EditableCell이 별도로 다룬다).
+ *
+ * renderer 값:
+ *  - 함수: 결과 그대로
+ *  - 'progress': 진행률 바 + 숫자 (min/max로 범위 조정)
+ *  - 'date': 날짜 포맷팅 (dateFormat 옵션)
+ *  - 'text' / undefined: String(value)
  */
 function renderDisplay<TRow>(column: GridColumn<TRow>, row: TRow): React.ReactNode {
   const value = getCellValue(column, row);
-  if (typeof column.renderer === 'function') {
-    return column.renderer(value, row);
-  }
+  if (typeof column.renderer === 'function') return column.renderer(value, row);
+  if (column.renderer === 'progress') return renderProgress(value, column);
+  if (column.renderer === 'date') return renderDate(value, column);
   if (value === null || value === undefined) return '';
   return String(value);
+}
+
+/** 진행률 바 + 우측 숫자 — `<progress>` 시맨틱 + 위에 시각적 fill. */
+function renderProgress<TRow>(value: unknown, column: GridColumn<TRow>): React.ReactNode {
+  const min = column.min ?? 0;
+  const max = column.max ?? 100;
+  const num = typeof value === 'number' ? value : Number(value);
+  const safe = Number.isFinite(num) ? num : min;
+  const clamped = Math.max(min, Math.min(max, safe));
+  const ratio = max > min ? (clamped - min) / (max - min) : 0;
+  return (
+    <span
+      role="progressbar"
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={clamped}
+      className="relative flex h-5 w-full items-center bg-surface"
+    >
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 bg-success"
+        style={{ width: `${ratio * 100}%` }}
+      />
+      <span className="relative z-[1] w-full text-center text-xs font-medium text-foreground">
+        {Math.round(clamped)}
+      </span>
+    </span>
+  );
+}
+
+/** Date 포맷팅 — YYYY/MM/DD/HH/mm/ss 토큰 치환. */
+function renderDate<TRow>(value: unknown, column: GridColumn<TRow>): string {
+  const fmt = column.dateFormat ?? 'YYYY-MM-DD';
+  let date: Date | null = null;
+  if (value instanceof Date) date = value;
+  else if (typeof value === 'string' || typeof value === 'number') {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) date = parsed;
+  }
+  if (!date) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return fmt
+    .replace('YYYY', String(date.getFullYear()))
+    .replace('MM', pad(date.getMonth() + 1))
+    .replace('DD', pad(date.getDate()))
+    .replace('HH', pad(date.getHours()))
+    .replace('mm', pad(date.getMinutes()))
+    .replace('ss', pad(date.getSeconds()));
 }
 
 /**
@@ -419,6 +473,7 @@ function GridRow<TRow>({
                 <span className="flex-1">
                   {isEditable ? (
                     <EditableCell
+                      column={col}
                       value={value}
                       display={display}
                       align={align}
@@ -431,6 +486,7 @@ function GridRow<TRow>({
               </span>
             ) : isEditable ? (
               <EditableCell
+                column={col}
                 value={value}
                 display={display}
                 align={align}

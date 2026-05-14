@@ -20,15 +20,38 @@ export interface GridColumn<TRow = Record<string, unknown>> {
   /**
    * 셀 렌더링 방식.
    * - 'text' (기본): 값을 String()으로 변환 후 표시
+   * - 'progress': 진행률 바 + 숫자. `min`/`max`로 범위 설정 (기본 0 ~ 100).
+   * - 'date': 날짜 포맷팅. `dateFormat`으로 형식 지정 (기본 'YYYY-MM-DD').
    * - function: `(value, row) => ReactNode` 임의 렌더
    */
-  renderer?: 'text' | ((value: unknown, row: TRow) => React.ReactNode);
+  renderer?: 'text' | 'progress' | 'date' | ((value: unknown, row: TRow) => React.ReactNode);
   /**
-   * 편집 가능 여부 (기본 false). true면 셀 더블클릭 시 input으로 전환되어
+   * 편집 가능 여부 (기본 false). true면 셀 더블클릭 시 editor로 전환되어
    * Enter/blur로 commit, Escape로 cancel. `accessor`는 key 문자열인 경우만
    * 편집 결과를 행에 반영 가능하다 (함수 accessor는 set 방법을 알 수 없음).
    */
   editable?: boolean;
+  /**
+   * 편집 모드에서 사용할 에디터. `editable: true`일 때만 의미 있다.
+   * - 'text' (기본): 일반 텍스트 input
+   * - 'number': 숫자 input (type=number)
+   * - 'date': 날짜 input (type=date, 브라우저 네이티브 달력 popup)
+   * - 'dropdown': `options` 배열로부터 select. `options` 필수.
+   */
+  editor?: 'text' | 'number' | 'date' | 'dropdown';
+  /**
+   * `editor: 'dropdown'` 또는 `renderer: 'dropdown-label'`을 쓸 때 선택지.
+   */
+  options?: { value: string | number; label: string }[];
+  /** `renderer: 'progress'`의 최소값 (기본 0). */
+  min?: number;
+  /** `renderer: 'progress'`의 최대값 (기본 100). */
+  max?: number;
+  /**
+   * `renderer: 'date'`의 출력 포맷. 토큰: YYYY, MM, DD, HH, mm, ss.
+   * 기본 'YYYY-MM-DD'.
+   */
+  dateFormat?: string;
 }
 
 /**

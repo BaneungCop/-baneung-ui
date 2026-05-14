@@ -2,7 +2,11 @@ import * as React from 'react';
 
 import { cn } from '../../lib/cn';
 
-interface EditableCellProps {
+import type { GridColumn } from './types';
+
+interface EditableCellProps<TRow> {
+  /** 컬럼 정의 — editor 종류·options 결정. */
+  column: GridColumn<TRow>;
   /** 현재 표시 값. */
   value: unknown;
   /** 비편집 시 표시되는 노드. */
@@ -14,43 +18,66 @@ interface EditableCellProps {
 }
 
 /**
- * 더블클릭 → input 전환, Enter/blur로 commit, Escape로 cancel.
+ * 더블클릭 → editor 전환, Enter/blur로 commit, Escape로 cancel.
+ *
+ * # editor 종류 (`column.editor`)
+ * - 'text' (기본): `<input type="text">`
+ * - 'number': `<input type="number">`
+ * - 'date': `<input type="date">` — 브라우저 네이티브 달력 popup
+ * - 'dropdown': `<select>` with `column.options`
  *
  * # 키보드/포커스
- * - 더블클릭으로 진입 (네이티브 dblclick — 마우스 사용자만)
- * - Enter: commit
+ * - 더블클릭으로 진입
+ * - Enter: commit (Select는 change 즉시 commit)
  * - Escape: cancel
- * - blur: commit (다른 곳 클릭 시)
- * - 자동 포커스 + 전체 선택 (rapid edit 흐름 위해)
+ * - blur: commit
+ * - 자동 포커스 + 텍스트류는 전체 선택
  *
  * # 한글 IME
- * - composition 중에는 Enter가 commit이 아니라 한글 조합 확정 키이므로
- *   `e.nativeEvent.isComposing` 가드로 보호.
+ * - composition 중 Enter는 commit이 아니라 한글 조합 확정 — isComposing 가드.
  */
-export function EditableCell({ value, display, align, onCommit }: EditableCellProps) {
+export function EditableCell<TRow>({
+  column,
+  value,
+  display,
+  align,
+  onCommit,
+}: EditableCellProps<TRow>) {
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState('');
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement | HTMLSelectElement | null>(null);
 
-  // 편집 진입 시 현재 값을 draft에 복사 + 자동 포커스/전체선택
+  const editor = column.editor ?? 'text';
+
   React.useEffect(() => {
     if (editing) {
-      setDraft(value === null || value === undefined ? '' : String(value));
+      // 초기 값을 draft로 복사 — date editor는 YYYY-MM-DD 형식으로 정규화 필요.
+      if (editor === 'date') {
+        setDraft(toDateInputValue(value));
+      } else {
+        setDraft(value === null || value === undefined ? '' : String(value));
+      }
     }
-  }, [editing, value]);
+  }, [editing, value, editor]);
 
   React.useEffect(() => {
     if (editing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.select();
+      // 텍스트류는 전체 선택해서 즉시 덮어쓰기 가능
+      if (
+        inputRef.current instanceof HTMLInputElement &&
+        (editor === 'text' || editor === 'number')
+      ) {
+        inputRef.current.select();
+      }
     }
-  }, [editing]);
+  }, [editing, editor]);
 
   const enter = () => setEditing(true);
   const cancel = () => setEditing(false);
-  const commit = () => {
+  const commit = (nextValue?: string) => {
     setEditing(false);
-    onCommit(draft);
+    onCommit(nextValue ?? draft);
   };
 
   if (!editing) {
@@ -70,41 +97,86 @@ export function EditableCell({ value, display, align, onCommit }: EditableCellPr
     );
   }
 
-  // 편집 모드: input을 부모 td의 inset-0에 absolute로 깔아 셀 전체를 꽉 채운다
-  // (AUIGrid 스타일). td는 항상 relative여야 한다 (grid.tsx에서 보장).
-  // 부모 td 높이가 input absolute로 인해 collapse되지 않도록 invisible
-  // placeholder를 같이 렌더해서 원래 표시 노드의 크기를 유지한다.
+  const commonInputClass = cn(
+    // 셀 가장자리까지 꽉 차도록 absolute inset-0. 부모 td는 relative 가정.
+    'absolute inset-0 z-10 box-border w-full border-0 bg-canvas px-3 py-2 text-foreground outline-none',
+    align === 'right' && 'text-right',
+    align === 'center' && 'text-center',
+  );
+
+  const keyDownHandler = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !(e.nativeEvent as KeyboardEvent).isComposing) {
+      e.preventDefault();
+      commit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancel();
+    }
+  };
+
+  // 부모 td 높이 유지용 invisible placeholder + editor 오버레이
   return (
     <>
       <span aria-hidden="true" className="invisible block min-h-[1.5rem]">
-        {display ?? ' '}
+        {display ?? ' '}
       </span>
-      <input
-        ref={inputRef}
-        type="text"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          // IME 조합 중 Enter는 commit이 아니라 한글 조합 확정 — 무시한다.
-          if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-            e.preventDefault();
-            commit();
-          } else if (e.key === 'Escape') {
-            e.preventDefault();
-            cancel();
-          }
-        }}
-        onBlur={commit}
-        className={cn(
-          // 셀 가장자리까지 꽉 차도록 absolute inset-0. 내부 padding은 셀 padding과 동일하게.
-          // border 없음 — 편집 중인 셀은 active 상태이므로 부모 td의 outline이 강조 역할.
-          // 둘 다 그리면 이중선으로 보임.
-          'absolute inset-0 z-10 box-border w-full border-0 bg-canvas px-3 py-2 text-foreground outline-none',
-          align === 'right' && 'text-right',
-          align === 'center' && 'text-center',
-        )}
-        aria-label="셀 편집"
-      />
+      {editor === 'dropdown' ? (
+        <select
+          ref={(el) => {
+            inputRef.current = el;
+          }}
+          value={draft}
+          onChange={(e) => commit(e.target.value)}
+          onBlur={() => setEditing(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              cancel();
+            }
+          }}
+          className={commonInputClass}
+          aria-label="셀 편집 (드롭다운)"
+        >
+          {(column.options ?? []).map((opt) => (
+            <option key={String(opt.value)} value={String(opt.value)}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          ref={(el) => {
+            inputRef.current = el;
+          }}
+          type={editor === 'number' ? 'number' : editor === 'date' ? 'date' : 'text'}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={keyDownHandler}
+          onBlur={() => commit()}
+          className={commonInputClass}
+          aria-label="셀 편집"
+        />
+      )}
     </>
   );
+}
+
+/**
+ * 임의 값을 `<input type="date">`가 받는 YYYY-MM-DD 형식으로 정규화.
+ * - Date 객체: ISO 날짜 부분
+ * - YYYY-MM-DD 문자열: 그대로
+ * - YYYY/MM/DD 문자열: '-'로 치환
+ * - 그 외: 빈 문자열 (재선택 유도)
+ */
+function toDateInputValue(value: unknown): string {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().slice(0, 10);
+  }
+  if (typeof value === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+    if (/^\d{4}\/\d{2}\/\d{2}/.test(value)) return value.slice(0, 10).replace(/\//g, '-');
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+  }
+  return '';
 }

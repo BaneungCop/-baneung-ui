@@ -1,5 +1,27 @@
 # @baneung-pack/grid
 
+## 0.4.0
+
+### Minor Changes
+
+- 빌트인 셀 에디터 및 렌더러 추가.
+
+  # Editors (`column.editor`)
+  - `'text'` (기본): 일반 텍스트 input (기존)
+  - `'number'`: `<input type="number">`
+  - `'date'`: `<input type="date">` — 브라우저 네이티브 달력 popup
+  - `'dropdown'`: `<select>` with `column.options`
+
+  # Renderers (`column.renderer`)
+  - `'progress'`: 진행률 바 + 숫자. `min`/`max`로 범위 (기본 0~100)
+  - `'date'`: 포맷팅된 날짜 문자열. `dateFormat`으로 YYYY/MM/DD/HH/mm/ss 토큰
+
+  # 호환
+  - 기존 `editor` 미지정 + `editable: true`는 'text' 동작 그대로
+  - renderer가 함수면 함수 결과 우선 (기존 동작)
+  - aria 표준 준수 (progressbar role + aria-valuenow, combobox role 등)
+  - 26 tests (editor 4개 신규)
+
 ## 0.3.0
 
 ### Minor Changes

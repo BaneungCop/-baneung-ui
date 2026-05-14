@@ -417,6 +417,87 @@ function TreeDemo() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Demo 8: 빌트인 에디터 — dropdown · date · number + progress 렌더러
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Task {
+  id: number;
+  charge: string;
+  complete: number;
+  startDate: string;
+  endDate: string;
+}
+
+const chargeOptions = [
+  { value: 'Lawrence', label: 'Lawrence' },
+  { value: 'Anna', label: 'Anna' },
+  { value: 'Chaly', label: 'Chaly' },
+  { value: 'Ken', label: 'Ken' },
+  { value: 'Sindy', label: 'Sindy' },
+  { value: 'Paude Jim', label: 'Paude Jim' },
+  { value: 'Jim Mackulan', label: 'Jim Mackulan' },
+  { value: 'Steve', label: 'Steve' },
+];
+
+const tasks: Task[] = [
+  { id: 1, charge: 'Lawrence', complete: 62, startDate: '2024-02-01', endDate: '2024-08-21' },
+  { id: 2, charge: 'Anna', complete: 99, startDate: '2024-02-01', endDate: '2024-03-31' },
+  { id: 3, charge: 'Chaly', complete: 100, startDate: '2024-02-01', endDate: '2024-02-15' },
+  { id: 4, charge: 'Ken', complete: 100, startDate: '2024-02-05', endDate: '2024-02-28' },
+  { id: 5, charge: 'Sindy', complete: 100, startDate: '2024-02-15', endDate: '2024-03-05' },
+  { id: 6, charge: 'Paude Jim', complete: 100, startDate: '2024-03-11', endDate: '2024-03-20' },
+  { id: 7, charge: 'Jim Mackulan', complete: 98, startDate: '2024-03-31', endDate: '2024-03-31' },
+  { id: 8, charge: 'Steve', complete: 50, startDate: '2024-03-01', endDate: '2024-05-31' },
+];
+
+const taskColumns: GridColumn<Task>[] = [
+  { id: 'id', header: 'ID', accessor: 'id', width: 60, align: 'right' },
+  {
+    id: 'charge',
+    header: 'Charge',
+    accessor: 'charge',
+    editable: true,
+    editor: 'dropdown',
+    options: chargeOptions,
+  },
+  {
+    id: 'complete',
+    header: 'Complete(%)',
+    accessor: 'complete',
+    renderer: 'progress',
+    min: 0,
+    max: 100,
+    editable: true,
+    editor: 'number',
+    width: 140,
+  },
+  {
+    id: 'startDate',
+    header: 'Start Date',
+    accessor: 'startDate',
+    renderer: 'date',
+    dateFormat: 'YYYY/MM/DD',
+    editable: true,
+    editor: 'date',
+    width: 130,
+  },
+  {
+    id: 'endDate',
+    header: 'End Date',
+    accessor: 'endDate',
+    renderer: 'date',
+    dateFormat: 'YYYY/MM/DD',
+    editable: true,
+    editor: 'date',
+    width: 130,
+  },
+];
+
+function EditorTypesDemo() {
+  return <Grid columns={taskColumns} data={tasks} getRowId={(r) => r.id} />;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Demo 5: 외부 페이지네이션 (controlled + showPagination=false)
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -575,6 +656,22 @@ export default function GridPage() {
           </Muted>
         </div>
         <TreeDemo />
+      </section>
+
+      {/* Demo 8: 빌트인 에디터 */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <Heading level={2} className="text-2xl">
+            빌트인 에디터 — Dropdown · Date · Number + Progress
+          </Heading>
+          <Muted className="text-sm">
+            셀 더블클릭으로 편집기 진입. <code>editor: &apos;dropdown&apos;</code> +{' '}
+            <code>options</code>로 선택지 / <code>editor: &apos;date&apos;</code>로 네이티브 달력
+            popup / <code>editor: &apos;number&apos;</code> +{' '}
+            <code>renderer: &apos;progress&apos;</code>로 숫자 편집 + 진행률 바 시각화.
+          </Muted>
+        </div>
+        <EditorTypesDemo />
       </section>
 
       <Separator />
