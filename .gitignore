@@ -42,3 +42,6 @@ Thumbs.db
 CLAUDE.md
 PROJECT_PLAN.md
 PROMPTS.md
+
+# Claude Code 로컬 설정 (개인 권한 허용 목록 등)
+.claude/
