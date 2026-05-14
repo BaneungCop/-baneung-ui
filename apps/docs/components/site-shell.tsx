@@ -19,6 +19,10 @@ const navSections = [
     ],
   },
   {
+    label: '패키지',
+    items: [{ href: '/grid', label: 'Grid (@baneung-pack/grid)' }],
+  },
+  {
     label: '가이드',
     items: [{ href: '/accessibility', label: '접근성' }],
   },

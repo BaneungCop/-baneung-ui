@@ -7,7 +7,10 @@ import type { Metadata } from 'next';
 // 등록. 그 다음 docs globals.css → docs용 utility(unlayered)를 추가.
 // CSS spec상 unlayered > layered이므로 docs의 .md\:flex 같은 반응형 utility가
 // 라이브러리의 .hidden(layered)을 자연스럽게 override한다.
+//
+// grid styles.css도 같은 @layer baneung을 사용하므로 ui 다음에 import해 layer 머지.
 import '@baneung-pack/ui/styles.css';
+import '@baneung-pack/grid/styles.css';
 import './globals.css';
 
 export const metadata: Metadata = {

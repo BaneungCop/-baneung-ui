@@ -21,11 +21,14 @@ export interface GridColumn<TRow = Record<string, unknown>> {
    * 셀 렌더링 방식.
    * - 'text' (기본): 값을 String()으로 변환 후 표시
    * - function: `(value, row) => ReactNode` 임의 렌더
-   *
-   * v0.1.0은 text + 커스텀 함수만 지원. dropdown/icon/date/number-comma 등의
-   * built-in renderer는 후속 버전에서 추가.
    */
   renderer?: 'text' | ((value: unknown, row: TRow) => React.ReactNode);
+  /**
+   * 편집 가능 여부 (기본 false). true면 셀 더블클릭 시 input으로 전환되어
+   * Enter/blur로 commit, Escape로 cancel. `accessor`는 key 문자열인 경우만
+   * 편집 결과를 행에 반영 가능하다 (함수 accessor는 set 방법을 알 수 없음).
+   */
+  editable?: boolean;
 }
 
 /**
@@ -33,7 +36,7 @@ export interface GridColumn<TRow = Record<string, unknown>> {
  */
 export interface GridProps<TRow = Record<string, unknown>> extends Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  'children'
+  'children' | 'onChange'
 > {
   /** 컬럼 정의 배열. */
   columns: GridColumn<TRow>[];
@@ -58,6 +61,51 @@ export interface GridProps<TRow = Record<string, unknown>> extends Omit<
   onPageChange?: (page: number) => void;
   /** 데이터 비어있을 때 표시할 노드. */
   emptyState?: React.ReactNode;
-  /** 각 행의 고유 키 추출 함수. 미지정 시 인덱스 사용 (재정렬 비권장). */
+  /**
+   * 각 행의 고유 키 추출 함수. 미지정 시 인덱스 사용 (재정렬 시 추적이 깨질 수 있음).
+   * `selectable` 또는 편집 가능 컬럼을 쓰는 경우 안정적인 ID를 반환하는 함수를
+   * 반드시 전달하는 것이 권장된다.
+   */
   getRowId?: (row: TRow, index: number) => string | number;
+  /** 행 선택(체크박스) 활성. true면 첫 컬럼으로 체크박스 컬럼 자동 추가. */
+  selectable?: boolean;
+  /**
+   * 셀이 편집되어 행 값이 변경됐을 때 호출되는 콜백. 변경된 행 객체와 그 행의 id.
+   * 내부 상태도 자동 업데이트되므로 외부에 별도로 동기화할 필요는 없지만
+   * 디버깅/로깅 또는 자동 저장 트리거 용도로 유용.
+   */
+  onRowChange?: (row: TRow, id: string | number) => void;
+}
+
+/**
+ * Grid의 imperative API.
+ *
+ * `useRef<GridHandle<TRow>>()`를 만들어 `<Grid ref={ref} ... />`로 전달하면
+ * `ref.current?.deleteSelected()` 같은 메서드로 외부에서 그리드 상태를
+ * 조회/조작할 수 있다.
+ */
+export interface GridHandle<TRow = Record<string, unknown>> {
+  /**
+   * 현재 그리드의 데이터 상태 — 편집된 값이 반영되고 삭제된 행은 제외된
+   * 전체 행 배열. 서버에 "저장" 보낼 때 주로 사용.
+   */
+  getSavedData(): TRow[];
+  /**
+   * 편집된 행만 (현재 값 포함). 부분 업데이트(PATCH) API에 적합.
+   * 행 ID 추출이 안정적이지 않으면 정확도가 떨어질 수 있다.
+   */
+  getChangedData(): TRow[];
+  /**
+   * 삭제된 행의 원본 스냅샷 배열. 서버에 "삭제" 알릴 때 사용.
+   * (편집 후 삭제된 경우에도 편집 전의 원본 값이 반환됨.)
+   */
+  getDeletedData(): TRow[];
+  /** 현재 선택된 행 ID 배열. */
+  getSelectedIds(): (string | number)[];
+  /** 선택된 행을 모두 삭제 처리 (UI에서 사라지고 getDeletedData에 누적). */
+  deleteSelected(): void;
+  /** 모든 행의 선택 상태 해제. */
+  clearSelection(): void;
+  /** 모든 편집/삭제 내역 폐기하고 원본 data prop으로 복원. */
+  reset(): void;
 }

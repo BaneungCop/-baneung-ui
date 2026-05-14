@@ -1,2 +1,2 @@
 export { Grid } from './grid';
-export type { GridColumn, GridProps } from './types';
+export type { GridColumn, GridHandle, GridProps } from './types';

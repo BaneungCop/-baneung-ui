@@ -1,10 +1,11 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Grid } from './grid';
 
-import type { GridColumn } from './types';
+import type { GridColumn, GridHandle } from './types';
 
 interface Row {
   id: number;
@@ -146,5 +147,191 @@ describe('Grid', () => {
 
     // 단순 렌더 성공 검증 — key warning이 없으면 통과
     expect(container.querySelectorAll('tbody tr').length).toBe(2);
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // selection + ref API
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('renders selection checkboxes when selectable=true', () => {
+    render(<Grid columns={columns} data={sampleData} selectable getRowId={(r) => r.id} />);
+    // 헤더 체크박스 + 행 3개 체크박스 = 4개
+    expect(screen.getAllByRole('checkbox').length).toBe(4);
+    expect(screen.getByRole('checkbox', { name: '모두 선택' })).toBeInTheDocument();
+  });
+
+  it('toggle individual row selection', async () => {
+    const user = userEvent.setup();
+    render(<Grid columns={columns} data={sampleData} selectable getRowId={(r) => r.id} />);
+    const row1Checkbox = screen.getByRole('checkbox', { name: '행 1 선택' });
+    expect(row1Checkbox).not.toBeChecked();
+    await user.click(row1Checkbox);
+    expect(row1Checkbox).toBeChecked();
+    await user.click(row1Checkbox);
+    expect(row1Checkbox).not.toBeChecked();
+  });
+
+  it('header checkbox toggles all rows', async () => {
+    const user = userEvent.setup();
+    render(<Grid columns={columns} data={sampleData} selectable getRowId={(r) => r.id} />);
+
+    const header = screen.getByRole('checkbox', { name: '모두 선택' });
+    await user.click(header);
+
+    // 모든 행 체크됨
+    expect(screen.getByRole('checkbox', { name: '행 1 선택' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: '행 2 선택' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: '행 3 선택' })).toBeChecked();
+
+    await user.click(header);
+    expect(screen.getByRole('checkbox', { name: '행 1 선택' })).not.toBeChecked();
+  });
+
+  it('exposes imperative API via ref — deleteSelected + getDeletedData', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<GridHandle<Row>>();
+    render(
+      <Grid ref={ref} columns={columns} data={sampleData} selectable getRowId={(r) => r.id} />,
+    );
+
+    // 1, 2번 선택 후 deleteSelected
+    await user.click(screen.getByRole('checkbox', { name: '행 1 선택' }));
+    await user.click(screen.getByRole('checkbox', { name: '행 2 선택' }));
+    expect(ref.current?.getSelectedIds()).toEqual([1, 2]);
+
+    // 외부에서 imperative API 호출 — React state flush를 위해 act로 감싼다.
+    act(() => {
+      ref.current?.deleteSelected();
+    });
+
+    // 화면에서 사라지고 deleted bucket으로 이동
+    expect(screen.queryByText('사과')).not.toBeInTheDocument();
+    expect(screen.queryByText('바나나')).not.toBeInTheDocument();
+    expect(screen.getByText('체리')).toBeInTheDocument();
+
+    const deleted = ref.current?.getDeletedData() ?? [];
+    expect(deleted.map((r) => r.name).sort()).toEqual(['바나나', '사과']);
+
+    // 삭제 후 selection은 비어있어야 함
+    expect(ref.current?.getSelectedIds()).toEqual([]);
+  });
+
+  it('exposes imperative API — reset() restores original data', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<GridHandle<Row>>();
+    render(
+      <Grid ref={ref} columns={columns} data={sampleData} selectable getRowId={(r) => r.id} />,
+    );
+
+    await user.click(screen.getByRole('checkbox', { name: '행 1 선택' }));
+    act(() => {
+      ref.current?.deleteSelected();
+    });
+    expect(screen.queryByText('사과')).not.toBeInTheDocument();
+
+    act(() => {
+      ref.current?.reset();
+    });
+    expect(screen.getByText('사과')).toBeInTheDocument();
+    expect(ref.current?.getDeletedData()).toEqual([]);
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 인라인 편집
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('enters edit mode on double-click and commits with Enter', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<GridHandle<Row>>();
+    const editableColumns: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', editable: true },
+      { id: 'price', header: '가격', accessor: 'price', align: 'right' },
+    ];
+    render(<Grid ref={ref} columns={editableColumns} data={sampleData} getRowId={(r) => r.id} />);
+
+    // 더블클릭으로 편집 진입
+    const cell = screen.getByText('사과');
+    await user.dblClick(cell);
+    const input = screen.getByRole('textbox', { name: '셀 편집' });
+    expect(input).toBeInTheDocument();
+
+    // 값 변경 후 Enter
+    await user.clear(input);
+    await user.type(input, '딸기{Enter}');
+
+    // 편집 반영됨
+    expect(screen.getByText('딸기')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+
+    // getChangedData에 포함
+    const changed = ref.current?.getChangedData() ?? [];
+    expect(changed.length).toBe(1);
+    expect(changed[0]?.name).toBe('딸기');
+    expect(changed[0]?.id).toBe(1);
+  });
+
+  it('cancels edit on Escape', async () => {
+    const user = userEvent.setup();
+    const editableColumns: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', editable: true },
+    ];
+    render(<Grid columns={editableColumns} data={sampleData} getRowId={(r) => r.id} />);
+
+    await user.dblClick(screen.getByText('사과'));
+    const input = screen.getByRole('textbox', { name: '셀 편집' });
+    await user.clear(input);
+    await user.type(input, '딸기{Escape}');
+
+    // 원래 값 유지
+    expect(screen.getByText('사과')).toBeInTheDocument();
+    expect(screen.queryByText('딸기')).not.toBeInTheDocument();
+  });
+
+  it('does not edit non-editable columns on double-click', async () => {
+    const user = userEvent.setup();
+    // editable: false (기본) → 더블클릭 무시
+    render(<Grid columns={columns} data={sampleData} getRowId={(r) => r.id} />);
+    await user.dblClick(screen.getByText('사과'));
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('getSavedData returns current edited values (excluding deleted)', async () => {
+    const user = userEvent.setup();
+    const ref = React.createRef<GridHandle<Row>>();
+    const editableColumns: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', editable: true },
+      { id: 'price', header: '가격', accessor: 'price' },
+    ];
+    render(
+      <Grid
+        ref={ref}
+        columns={editableColumns}
+        data={sampleData}
+        selectable
+        getRowId={(r) => r.id}
+      />,
+    );
+
+    // 1번 편집
+    await user.dblClick(screen.getByText('사과'));
+    const input = screen.getByRole('textbox', { name: '셀 편집' });
+    await user.clear(input);
+    await user.type(input, '딸기{Enter}');
+
+    // 2번 삭제
+    await user.click(screen.getByRole('checkbox', { name: '행 2 선택' }));
+    act(() => {
+      ref.current?.deleteSelected();
+    });
+
+    const saved = ref.current?.getSavedData() ?? [];
+    expect(saved.length).toBe(2);
+    expect(saved.find((r) => r.id === 1)?.name).toBe('딸기');
+    expect(saved.find((r) => r.id === 3)?.name).toBe('체리');
+
+    // 삭제 데이터는 원본 스냅샷
+    const deleted = ref.current?.getDeletedData() ?? [];
+    expect(deleted.length).toBe(1);
+    expect(deleted[0]?.name).toBe('바나나');
   });
 });
