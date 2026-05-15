@@ -52,7 +52,10 @@ const navSections: { label: string; items: NavItem[] }[] = [
   },
   {
     label: '가이드',
-    items: [{ href: '/accessibility', label: '접근성' }],
+    items: [
+      { href: '/accessibility', label: '접근성' },
+      { href: '/versions', label: 'Versions' },
+    ],
   },
 ];
 
@@ -133,7 +136,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             @baneung-pack/ui
           </Heading>
           <Badge variant="secondary" className="text-[10px]">
-            v0.0.0
+            v1.0.4
           </Badge>
         </div>
         <nav className="flex-1 overflow-y-auto p-3">
