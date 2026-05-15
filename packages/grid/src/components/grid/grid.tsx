@@ -2,9 +2,10 @@ import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import * as React from 'react';
 
 import { EditableCell } from './editable-cell';
+import { FilterPopover } from './filter-popover';
 import { GridPagination } from './pagination';
 import { SelectionCheckbox } from './selection-checkbox';
-import { applySortAndFilter, nextSortState } from './sort-filter';
+import { applySortAndFilter, collectUniqueValues, nextSortState } from './sort-filter';
 import { collectExpandableIds, flattenTree, type FlatRow } from './tree-utils';
 import { useGridState } from './use-grid-state';
 import { cn } from '../../lib/cn';
@@ -63,6 +64,15 @@ function renderProgress<TRow>(value: unknown, column: GridColumn<TRow>): React.R
         {Math.round(clamped)}
       </span>
     </span>
+  );
+}
+
+/** 필터 funnel 아이콘 — SVG. */
+function FunnelIcon() {
+  return (
+    <svg viewBox="0 0 14 14" className="h-3 w-3" aria-hidden="true" fill="currentColor">
+      <path d="M1.5 2h11l-4.25 5.5V12L5.75 11V7.5L1.5 2z" />
+    </svg>
   );
 }
 
@@ -186,16 +196,16 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     [onPageChange],
   );
 
-  // 1d. sort / filter 상태
+  // 1d. sort / filter 상태 — filter는 컬럼별 "제외" 값 Set.
   const [sortState, setSortState] = React.useState<GridSortState | null>(null);
-  const [filters, setFilters] = React.useState<Record<string, string>>({});
+  const [filters, setFilters] = React.useState<Record<string, Set<string>>>({});
+  const [openFilterColId, setOpenFilterColId] = React.useState<string | null>(null);
   const toggleSort = React.useCallback((columnId: string) => {
     setSortState((prev) => nextSortState(prev, columnId));
   }, []);
-  const setFilter = React.useCallback((columnId: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [columnId]: value }));
+  const applyFilter = React.useCallback((columnId: string, excluded: Set<string>) => {
+    setFilters((prev) => ({ ...prev, [columnId]: excluded }));
   }, []);
-  const hasFilterableColumn = columns.some((c) => c.filterable);
 
   // 3. 화면에 보일 행 — 트리 모드면 flattenTree, 아니면 state.rows를 FlatRow로 wrap.
   //    그 후 filter + sort를 적용 (트리 모드는 sort skip — hierarchy 보존).
@@ -303,6 +313,8 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                     : sortState!.direction === 'asc'
                       ? '▲'
                       : '▼';
+                const filterActive = (filters[col.id]?.size ?? 0) > 0;
+                const isFilterOpen = openFilterColId === col.id;
                 return (
                   <th
                     key={col.id}
@@ -315,7 +327,8 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                           : 'descending'
                     }
                     className={cn(
-                      'border-b border-border-default px-3 py-2 font-medium text-foreground',
+                      // relative — FilterPopover absolute 위치 기준점.
+                      'relative border-b border-border-default px-3 py-2 font-medium text-foreground',
                       col.sortable && 'cursor-pointer select-none hover:bg-surface-strong',
                       col.align === 'right' && 'text-right',
                       col.align === 'center' && 'text-center',
@@ -337,35 +350,38 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                           {sortIcon}
                         </span>
                       )}
+                      {col.filterable && (
+                        <button
+                          type="button"
+                          aria-label={`${typeof col.header === 'string' ? col.header : col.id} 필터`}
+                          aria-haspopup="dialog"
+                          aria-expanded={isFilterOpen}
+                          onClick={(e) => {
+                            // sortable header onClick과 충돌하지 않도록.
+                            e.stopPropagation();
+                            setOpenFilterColId((cur) => (cur === col.id ? null : col.id));
+                          }}
+                          className={cn(
+                            'inline-flex h-4 w-4 items-center justify-center hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                            filterActive ? 'text-success' : 'text-foreground-subtle',
+                          )}
+                        >
+                          <FunnelIcon />
+                        </button>
+                      )}
                     </span>
+                    {isFilterOpen && (
+                      <FilterPopover
+                        allValues={collectUniqueValues(col, data, tree ? getChildren : undefined)}
+                        excluded={filters[col.id] ?? new Set()}
+                        onApply={(next) => applyFilter(col.id, next)}
+                        onClose={() => setOpenFilterColId(null)}
+                      />
+                    )}
                   </th>
                 );
               })}
             </tr>
-            {hasFilterableColumn && (
-              <tr>
-                {selectable && (
-                  <th
-                    aria-hidden="true"
-                    className="w-10 border-b border-border-default bg-canvas px-3 py-1"
-                  />
-                )}
-                {columns.map((col) => (
-                  <th key={col.id} className="border-b border-border-default bg-canvas px-2 py-1">
-                    {col.filterable && (
-                      <input
-                        type="text"
-                        value={filters[col.id] ?? ''}
-                        onChange={(e) => setFilter(col.id, e.target.value)}
-                        placeholder="필터..."
-                        aria-label={`${typeof col.header === 'string' ? col.header : col.id} 필터`}
-                        className="w-full border border-border-default bg-canvas px-2 py-1 text-xs text-foreground placeholder:text-foreground-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                      />
-                    )}
-                  </th>
-                ))}
-              </tr>
-            )}
           </thead>
           {isEmpty ? (
             <tbody>

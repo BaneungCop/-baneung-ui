@@ -1,3 +1,5 @@
+import { NULL_VALUE_KEY } from './filter-popover';
+
 import type { FlatRow } from './tree-utils';
 import type { GridColumn, GridSortState } from './types';
 
@@ -21,36 +23,38 @@ function getValue<TRow>(column: GridColumn<TRow>, row: TRow): unknown {
     : (row as Record<string, unknown>)[column.accessor as string];
 }
 
+/** 값을 필터 set 키로 정규화 (null/undefined → NULL_VALUE_KEY). */
+function toFilterKey(v: unknown): string {
+  return v == null ? NULL_VALUE_KEY : String(v);
+}
+
 /**
- * filter + sort를 차례로 적용해 최종 FlatRow 배열을 반환.
+ * filter + sort를 차례로 적용.
  *
- * - filter: 각 활성 필터에 대해 컬럼 값을 부분 일치(case-insensitive) 검사
- * - sort: 트리 모드면 skip (부모-자식 구조 보존). 아니면 accessor 값 기준 정렬
+ * filter 상태: `Record<columnId, Set<excludedValueKey>>` — 빈 set이면 필터 없음.
+ *
+ * - 트리 모드는 sort skip (부모-자식 구조 보존).
  */
 export function applySortAndFilter<TRow>(
   rows: FlatRow<TRow>[],
   columns: GridColumn<TRow>[],
-  filters: Record<string, string>,
+  filters: Record<string, Set<string>>,
   sort: GridSortState | null,
   tree: boolean,
 ): FlatRow<TRow>[] {
   let result = rows;
 
-  // 1. filter
-  const activeFilters = Object.entries(filters).filter(([, v]) => v.trim() !== '');
-  if (activeFilters.length > 0) {
+  const active = Object.entries(filters).filter(([, s]) => s.size > 0);
+  if (active.length > 0) {
     result = result.filter((fr) =>
-      activeFilters.every(([colId, query]) => {
+      active.every(([colId, excluded]) => {
         const col = columns.find((c) => c.id === colId);
         if (!col) return true;
-        const v = getValue(col, fr.row);
-        if (v == null) return false;
-        return String(v).toLowerCase().includes(query.toLowerCase());
+        return !excluded.has(toFilterKey(getValue(col, fr.row)));
       }),
     );
   }
 
-  // 2. sort — 트리 모드에서는 hierarchy 보존을 위해 무시
   if (sort && !tree) {
     const col = columns.find((c) => c.id === sort.columnId);
     if (col) {
@@ -64,9 +68,7 @@ export function applySortAndFilter<TRow>(
   return result;
 }
 
-/**
- * sort 3-state 토글: 없음 → asc → desc → 없음.
- */
+/** sort 3-state 토글: 없음 → asc → desc → 없음. */
 export function nextSortState(
   current: GridSortState | null,
   columnId: string,
@@ -74,4 +76,34 @@ export function nextSortState(
   if (!current || current.columnId !== columnId) return { columnId, direction: 'asc' };
   if (current.direction === 'asc') return { columnId, direction: 'desc' };
   return null;
+}
+
+/**
+ * 컬럼의 unique 값 목록 생성 (필터 popover의 체크박스용).
+ * 트리 모드면 자식 행까지 재귀로 모음. 결과는 정렬된 문자열 배열, null이 있으면
+ * 마지막에 NULL_VALUE_KEY를 추가.
+ */
+export function collectUniqueValues<TRow>(
+  column: GridColumn<TRow>,
+  data: TRow[],
+  getChildren?: (row: TRow) => TRow[] | undefined,
+): string[] {
+  const set = new Set<string>();
+  let hasNull = false;
+  const walk = (rs: TRow[]) => {
+    rs.forEach((row) => {
+      const v = getValue(column, row);
+      if (v == null) {
+        hasNull = true;
+      } else {
+        set.add(String(v));
+      }
+      const kids = getChildren?.(row);
+      if (kids) walk(kids);
+    });
+  };
+  walk(data);
+  const result = Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  if (hasNull) result.push(NULL_VALUE_KEY);
+  return result;
 }

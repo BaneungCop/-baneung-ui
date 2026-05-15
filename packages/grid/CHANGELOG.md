@@ -1,5 +1,29 @@
 # @baneung-pack/grid
 
+## 0.6.0
+
+### Minor Changes
+
+- 필터 UX를 Excel/AUIGrid 스타일 popover로 교체.
+
+  # 변경
+  - 헤더 두 번째 행의 input은 제거
+  - 헤더 첫 행에 funnel 아이콘 버튼 (sortable 라벨 옆) — 클릭 → popover 열림
+  - popover에는:
+    - "필터 초기화" 링크 (이 컬럼 제외 set 비우기)
+    - 검색 input (체크박스 목록 좁히기)
+    - "(전체선택)" + 각 unique 값 + "(필드 값 없음)" 체크박스
+    - 확인 (적용) / 취소 (폐기) 버튼
+  - 외부 클릭 / Escape → popover 닫힘 (draft 폐기)
+  - 데이터 모델: `filters[columnId] = Set<excluded value key>` (빈 set = 필터 없음)
+  - 트리 모드: `getChildren`으로 자식까지 재귀해 unique 값 수집
+
+  # 기타
+  - 새 `collectUniqueValues` helper, `FilterPopover` 컴포넌트
+  - aria-haspopup="dialog", aria-expanded, role="dialog" 등 ARIA 표준 준수
+  - 활성 필터일 때 funnel 아이콘 색 강조 (text-success)
+  - 31 tests (filter popover 3개 신규)
+
 ## 0.5.0
 
 ### Minor Changes

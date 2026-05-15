@@ -326,19 +326,63 @@ describe('Grid', () => {
     expect(cells[0]?.textContent).toBe('1000');
   });
 
-  it('filterable: 필터 input에 텍스트 입력하면 행이 좁혀짐', async () => {
+  it('filterable: funnel 버튼 클릭으로 popover 열림 — 체크 해제 + 확인으로 행 제외', async () => {
     const user = userEvent.setup();
     const cols: GridColumn<Row>[] = [
       { id: 'name', header: '이름', accessor: 'name', filterable: true },
     ];
-    render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+    const { container } = render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+    const tbody = container.querySelector('tbody')!;
 
-    const filterInput = screen.getByRole('textbox', { name: '이름 필터' });
-    await user.type(filterInput, '바나');
+    // popover 열기
+    await user.click(screen.getByRole('button', { name: '이름 필터' }));
+    expect(screen.getByRole('dialog', { name: '컬럼 필터' })).toBeInTheDocument();
 
-    expect(screen.getByText('바나나')).toBeInTheDocument();
-    expect(screen.queryByText('사과')).not.toBeInTheDocument();
-    expect(screen.queryByText('체리')).not.toBeInTheDocument();
+    // '사과' 체크 해제 + 확인 → '사과' 행 사라짐 (tbody scope로 검사)
+    const appleCheckbox = screen.getByRole('checkbox', { name: '사과' });
+    expect(appleCheckbox).toBeChecked();
+    await user.click(appleCheckbox);
+    await user.click(screen.getByRole('button', { name: '확인' }));
+
+    expect(within(tbody).queryByText('사과')).not.toBeInTheDocument();
+    expect(within(tbody).getByText('바나나')).toBeInTheDocument();
+    expect(within(tbody).getByText('체리')).toBeInTheDocument();
+  });
+
+  it('filterable: 취소 누르면 변경 폐기', async () => {
+    const user = userEvent.setup();
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', filterable: true },
+    ];
+    const { container } = render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+    const tbody = container.querySelector('tbody')!;
+
+    await user.click(screen.getByRole('button', { name: '이름 필터' }));
+    await user.click(screen.getByRole('checkbox', { name: '사과' }));
+    await user.click(screen.getByRole('button', { name: '취소' }));
+
+    // 취소 → 사과 그대로 표시 (tbody scope)
+    expect(within(tbody).getByText('사과')).toBeInTheDocument();
+  });
+
+  it('filterable: 필터 초기화 — draft를 비움', async () => {
+    const user = userEvent.setup();
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', filterable: true },
+    ];
+    const { container } = render(<Grid columns={cols} data={sampleData} getRowId={(r) => r.id} />);
+    const tbody = container.querySelector('tbody')!;
+
+    await user.click(screen.getByRole('button', { name: '이름 필터' }));
+    await user.click(screen.getByRole('checkbox', { name: '사과' }));
+    await user.click(screen.getByRole('button', { name: '확인' }));
+    expect(within(tbody).queryByText('사과')).not.toBeInTheDocument();
+
+    // 다시 열어 초기화 → 모두 표시
+    await user.click(screen.getByRole('button', { name: '이름 필터' }));
+    await user.click(screen.getByRole('button', { name: /필터 초기화/ }));
+    await user.click(screen.getByRole('button', { name: '확인' }));
+    expect(within(tbody).getByText('사과')).toBeInTheDocument();
   });
 
   it('sort + filter 동시 적용', async () => {
@@ -355,8 +399,11 @@ describe('Grid', () => {
     ];
     const { container } = render(<Grid columns={cols} data={moreData} getRowId={(r) => r.id} />);
 
-    // 필터: '사과'
-    await user.type(screen.getByRole('textbox', { name: '이름 필터' }), '사과');
+    // 필터: 바나나 해제 → 사과 계열 3개만 남음
+    await user.click(screen.getByRole('button', { name: '이름 필터' }));
+    await user.click(screen.getByRole('checkbox', { name: '바나나' }));
+    await user.click(screen.getByRole('button', { name: '확인' }));
+
     // 정렬: 가격 desc (2번 클릭)
     const priceHeader = screen.getByRole('columnheader', { name: /가격/ });
     await user.click(priceHeader);
