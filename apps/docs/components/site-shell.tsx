@@ -9,18 +9,44 @@ import { Badge, Button, Heading, Item, Kbd, Muted, Separator, cn } from '@baneun
 import { CommandPalette } from '@/components/command-palette';
 import { useTheme } from '@/components/theme-provider';
 
-const navSections = [
+interface NavItem {
+  href: string;
+  label: string;
+  /** 옵션 — 이 항목 아래 들여쓰기로 표시할 하위 메뉴. */
+  children?: { href: string; label: string }[];
+}
+
+const navSections: { label: string; items: NavItem[] }[] = [
   {
     label: '시작하기',
     items: [
       { href: '/', label: '소개' },
+      { href: '/install', label: 'Install' },
       { href: '/tokens', label: '디자인 토큰' },
       { href: '/components', label: '컴포넌트' },
     ],
   },
   {
     label: '패키지',
-    items: [{ href: '/grid', label: 'Grid (@baneung-pack/grid)' }],
+    items: [
+      {
+        href: '/grid',
+        label: 'Grid (@baneung-pack/grid)',
+        children: [
+          { href: '/grid/install', label: 'Install' },
+          { href: '/grid/props', label: 'Props' },
+          { href: '/grid/basic', label: '기본 사용' },
+          { href: '/grid/custom-renderer', label: '커스텀 렌더러' },
+          { href: '/grid/virtualized', label: '가상화 모드' },
+          { href: '/grid/pagination', label: '내장 페이지네이션' },
+          { href: '/grid/external-pagination', label: '외부 페이지네이션' },
+          { href: '/grid/editing', label: '인라인 편집 · 선택 · ref API' },
+          { href: '/grid/tree', label: 'Tree (계층) 모드' },
+          { href: '/grid/editors-sort-filter', label: '빌트인 에디터 · 정렬 · 필터' },
+          { href: '/grid/row-operations', label: '행 추가 · 삭제 · 다중 셀 선택' },
+        ],
+      },
+    ],
   },
   {
     label: '가이드',
@@ -67,11 +93,28 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               <ul className="mt-1 flex flex-col">
                 {section.items.map((item) => {
                   const isActive = pathname === item.href;
+                  // 자식 메뉴 표시 조건 — 부모/자식 어느 경로든 해당 영역에 있을 때 펼침
+                  const childActive = item.children?.some((c) => pathname === c.href);
+                  const showChildren = item.children && (isActive || childActive);
                   return (
                     <li key={item.href}>
                       <Item asChild selected={isActive} className="px-3">
                         <Link href={item.href}>{item.label}</Link>
                       </Item>
+                      {showChildren && (
+                        <ul className="ml-4 mt-1 flex flex-col border-l border-border-subtle">
+                          {item.children!.map((child) => {
+                            const childIsActive = pathname === child.href;
+                            return (
+                              <li key={child.href}>
+                                <Item asChild selected={childIsActive} className="px-3 text-xs">
+                                  <Link href={child.href}>{child.label}</Link>
+                                </Item>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
                     </li>
                   );
                 })}
