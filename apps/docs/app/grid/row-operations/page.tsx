@@ -1,5 +1,7 @@
 import { Heading, Lead, Separator } from '@baneung-pack/ui';
 
+import { CodeViewer } from '@/components/code-viewer';
+import { rowOperationsCode } from '@/lib/grid-demo-code';
 import { RowOperationsDemo } from '@/lib/grid-demos';
 
 export default function Page() {
@@ -15,6 +17,7 @@ export default function Page() {
       </header>
       <Separator />
       <RowOperationsDemo />
+      <CodeViewer code={rowOperationsCode} />
     </div>
   );
 }

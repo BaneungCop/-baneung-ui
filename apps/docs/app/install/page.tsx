@@ -32,13 +32,10 @@ export default function InstallPage() {
           <li>
             <code>@baneung-pack/ui</code> — 58개 React 컴포넌트 (Radix 기반).
           </li>
-          <li>
-            <code>@baneung-pack/grid</code> — 데이터 그리드 (가상화·편집·트리·정렬·필터 풀스펙).
-          </li>
         </ul>
         <Muted className="text-xs">
-          각 패키지는 독립적으로 설치 가능. ui와 grid는 같은 토큰을 공유하지만 의존 X (각 패키지
-          빌드에 토큰이 inline).
+          Grid 패키지(<code>@baneung-pack/grid</code>) 설치는 별도 — 좌측 메뉴의 패키지 &gt; Grid
+          &gt; Install 참조.
         </Muted>
       </section>
 
@@ -50,13 +47,13 @@ export default function InstallPage() {
           <CardContent>
             <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
               <code>{`# pnpm
-pnpm add @baneung-pack/ui @baneung-pack/tokens @baneung-pack/grid
+pnpm add @baneung-pack/ui @baneung-pack/tokens
 
 # npm
-npm install @baneung-pack/ui @baneung-pack/tokens @baneung-pack/grid
+npm install @baneung-pack/ui @baneung-pack/tokens
 
 # yarn
-yarn add @baneung-pack/ui @baneung-pack/tokens @baneung-pack/grid`}</code>
+yarn add @baneung-pack/ui @baneung-pack/tokens`}</code>
             </pre>
           </CardContent>
         </Card>
@@ -82,14 +79,13 @@ yarn add @baneung-pack/ui @baneung-pack/tokens @baneung-pack/grid`}</code>
           <CardContent>
             <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
               <code>{`// app/layout.tsx — 한 번만 로드
-import '@baneung-pack/ui/styles.css';
-import '@baneung-pack/grid/styles.css';`}</code>
+import '@baneung-pack/ui/styles.css';`}</code>
             </pre>
           </CardContent>
         </Card>
         <Muted className="text-xs">
-          ui와 grid 모두 `@layer baneung`에 격리되어 layer가 자동 머지됩니다. 둘 다 임포트해도 충돌
-          없음.
+          ui의 styles는 <code>@layer baneung</code>에 격리됩니다. Grid를 함께 쓰면 layer가 자동
+          머지되니 별도 설정 불필요.
         </Muted>
       </section>
 

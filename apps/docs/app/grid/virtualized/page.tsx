@@ -1,5 +1,7 @@
 import { Badge, Heading, Lead, Separator } from '@baneung-pack/ui';
 
+import { CodeViewer } from '@/components/code-viewer';
+import { virtualizedCode } from '@/lib/grid-demo-code';
 import { VirtualizedDemo } from '@/lib/grid-demos';
 
 export default function Page() {
@@ -17,6 +19,7 @@ export default function Page() {
       </header>
       <Separator />
       <VirtualizedDemo />
+      <CodeViewer code={virtualizedCode} />
     </div>
   );
 }

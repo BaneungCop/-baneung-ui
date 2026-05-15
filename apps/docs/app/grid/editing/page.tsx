@@ -1,5 +1,7 @@
 import { Heading, Lead, Separator } from '@baneung-pack/ui';
 
+import { CodeViewer } from '@/components/code-viewer';
+import { editingCode } from '@/lib/grid-demo-code';
 import { EditableSelectableDemo } from '@/lib/grid-demos';
 
 export default function Page() {
@@ -15,6 +17,7 @@ export default function Page() {
       </header>
       <Separator />
       <EditableSelectableDemo />
+      <CodeViewer code={editingCode} />
     </div>
   );
 }

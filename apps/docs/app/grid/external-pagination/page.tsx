@@ -1,5 +1,7 @@
 import { Heading, Lead, Separator } from '@baneung-pack/ui';
 
+import { CodeViewer } from '@/components/code-viewer';
+import { externalPaginationCode } from '@/lib/grid-demo-code';
 import { ExternalPaginationDemo } from '@/lib/grid-demos';
 
 export default function Page() {
@@ -14,6 +16,7 @@ export default function Page() {
       </header>
       <Separator />
       <ExternalPaginationDemo />
+      <CodeViewer code={externalPaginationCode} />
     </div>
   );
 }
