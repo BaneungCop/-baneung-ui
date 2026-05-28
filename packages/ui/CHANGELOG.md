@@ -1,5 +1,27 @@
 # @baneung-pack/ui
 
+## 1.0.7
+
+### Patch Changes
+
+- Select 키보드 네비게이션 수정 — `searchable=false` 모드에서도 ↑↓ 방향키와 Enter로 옵션 순회·선택이 가능합니다.
+
+  # 문제
+
+  cmdk + Radix Popover 조합에서 Popover.Content가 열릴 때 자기 자신에게 포커스를 잡아
+  cmdk Input/Command가 키보드 이벤트(↑↓, Enter)를 받지 못함. 특히 `searchable=false`에선
+  CommandInput이 아예 렌더되지 않아 키 이벤트를 처리할 노드가 없었음.
+
+  # 수정
+  - `CommandInput`을 항상 DOM에 유지 — `searchable=false`일 땐 `sr-only`로 시각적으로만 숨김
+  - `Popover.Content`의 `onOpenAutoFocus`에서 `preventDefault()` 후 input으로 포커스 위임
+  - `shouldFilter={searchable}` — 비검색 모드는 필터링 비활성화 (Input은 키 이벤트 캐처 역할)
+  - 검색어 state controlled — popover 닫힐 때 자동 리셋
+
+  # 검증
+  - 신규 키보드 네비게이션 테스트 2개 (검색/비검색 양쪽)
+  - 기존 Select 테스트 11개 전부 통과
+
 ## 1.0.6
 
 ### Patch Changes

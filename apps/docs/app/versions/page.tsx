@@ -33,9 +33,21 @@ interface PackageHistory {
 
 const uiHistory: PackageHistory = {
   pkg: '@baneung-pack/ui',
-  current: '1.0.6',
+  current: '1.0.7',
   npmUrl: 'https://www.npmjs.com/package/@baneung-pack/ui',
   entries: [
+    {
+      version: '1.0.7',
+      type: 'patch',
+      summary: 'Select 키보드 네비게이션 수정 — searchable=false에서도 ↑↓·Enter 동작',
+      details: [
+        'cmdk + Radix Popover 조합에서 Popover.Content가 자기 자신에게 포커스를 잡아 키 이벤트가 cmdk에 전달되지 않던 문제',
+        'CommandInput을 항상 DOM에 유지(searchable=false일 땐 sr-only) → 키 이벤트 캐처 역할',
+        'Popover.Content.onOpenAutoFocus에서 input으로 포커스 위임',
+        'shouldFilter={searchable}로 비검색 모드는 필터링 비활성화',
+        '신규 키보드 네비게이션 테스트 2개 (검색/비검색 양쪽)',
+      ],
+    },
     {
       version: '1.0.6',
       type: 'patch',

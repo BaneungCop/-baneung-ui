@@ -121,6 +121,47 @@ describe('Select — searchable mode', () => {
   });
 });
 
+describe('Select — keyboard navigation', () => {
+  it('navigates options with arrow keys and selects with Enter (non-searchable)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Select options={cities} aria-label="도시" placeholder="도시" onValueChange={onChange} />,
+    );
+    // Trigger 클릭으로 popover 열기
+    await user.click(screen.getByRole('combobox'));
+    // popover가 열리고 첫 항목이 active 상태가 될 때까지 대기
+    await screen.findByText('서울');
+    // ↓ 한 번 → 두 번째 항목(부산) active
+    await user.keyboard('{ArrowDown}');
+    // Enter로 active 항목 선택
+    await user.keyboard('{Enter}');
+    expect(onChange).toHaveBeenLastCalledWith('busan');
+  });
+
+  it('navigates with arrow keys in searchable mode after typing', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Select
+        options={cities}
+        searchable
+        aria-label="도시"
+        placeholder="도시"
+        onValueChange={onChange}
+      />,
+    );
+    await user.click(screen.getByRole('combobox'));
+    const input = await screen.findByPlaceholderText('검색…');
+    // 검색어 입력 → 매칭 항목으로 좁힘
+    await user.type(input, '인');
+    expect(screen.getByText('인천')).toBeVisible();
+    // Enter로 active(=첫 매칭) 선택
+    await user.keyboard('{Enter}');
+    expect(onChange).toHaveBeenLastCalledWith('incheon');
+  });
+});
+
 describe('Select — a11y', () => {
   it('passes axe a11y scan (closed)', async () => {
     const { container } = render(<Select options={cities} aria-label="도시" placeholder="도시" />);

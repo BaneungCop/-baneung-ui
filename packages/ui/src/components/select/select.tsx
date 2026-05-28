@@ -132,6 +132,13 @@ export function Select(props: SelectProps): React.ReactElement {
     onChange: props.onValueChange as ((v: string | string[]) => void) | undefined,
   });
 
+  // cmdk는 Input(또는 Command 루트)에 포커스가 있어야 키보드 이벤트(↑↓, Enter)를 받는다.
+  // Popover.Content의 기본 autoFocus는 Content 자체로 가서 cmdk가 키 입력을 못 받음.
+  // searchable=false일 때도 Input을 DOM에 유지(시각적으로만 숨김)해 방향키 동작 보장.
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  // 검색이 아닐 때 타이핑으로 인한 필터링 방지를 위해 검색어 빈 문자열로 강제.
+  const [search, setSearch] = React.useState('');
+
   const selectedSet = React.useMemo(() => {
     if (isMultiple) return new Set(((value as string[] | undefined) ?? []) as string[]);
     return new Set(value ? [value as string] : []);
@@ -178,7 +185,13 @@ export function Select(props: SelectProps): React.ReactElement {
     (isMultiple && ((value as string[] | undefined) ?? []).length === 0) || (!isMultiple && !value);
 
   return (
-    <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+    <PopoverPrimitive.Root
+      open={open}
+      onOpenChange={(next): void => {
+        setOpen(next);
+        if (!next) setSearch('');
+      }}
+    >
       <PopoverPrimitive.Trigger
         id={id}
         type="button"
@@ -211,6 +224,12 @@ export function Select(props: SelectProps): React.ReactElement {
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}
+          onOpenAutoFocus={(e): void => {
+            // Popover.Content가 자기 자신을 포커싱하는 기본 동작을 막고
+            // cmdk Input으로 포커스를 옮겨 키보드 네비게이션이 동작하도록 한다.
+            e.preventDefault();
+            inputRef.current?.focus();
+          }}
           className={cn(
             'z-50 w-[var(--radix-popover-trigger-width)] min-w-48 max-w-[80vw]',
             'overflow-hidden bg-canvas text-foreground',
@@ -219,27 +238,41 @@ export function Select(props: SelectProps): React.ReactElement {
         >
           <CommandPrimitive
             label={ariaLabel ?? '옵션'}
+            // 비검색 모드: search state를 항상 빈 문자열로 유지 → cmdk가 필터링 안 함.
+            // 검색 모드: 입력에 따라 필터링.
+            shouldFilter={searchable}
             filter={
               filterFn
-                ? (val: string, search: string): number => {
+                ? (val: string, queryText: string): number => {
                     const opt = options.find((o) => o.value === val);
                     if (!opt) return 0;
-                    return filterFn(opt, search) ? 1 : 0;
+                    return filterFn(opt, queryText) ? 1 : 0;
                   }
                 : undefined
             }
           >
-            {searchable ? (
-              <div className="flex items-center border-b border-border-default px-3">
-                <CommandPrimitive.Input
-                  placeholder="검색…"
-                  className={cn(
-                    'flex h-10 w-full bg-transparent py-2 text-sm outline-none',
-                    'placeholder:text-foreground-subtle',
-                  )}
-                />
-              </div>
-            ) : null}
+            {/*
+              CommandInput을 항상 DOM에 유지(searchable=false일 땐 sr-only로 숨김).
+              cmdk는 Input에 포커스가 있어야 ↑↓/Enter 키 이벤트를 받아 옵션을 순회·선택한다.
+              비검색 모드에선 사용자 눈에 안 보이지만 키 이벤트는 정상 동작.
+            */}
+            <div
+              className={cn(
+                searchable ? 'flex items-center border-b border-border-default px-3' : 'sr-only',
+              )}
+            >
+              <CommandPrimitive.Input
+                ref={inputRef}
+                value={search}
+                onValueChange={setSearch}
+                placeholder={searchable ? '검색…' : undefined}
+                aria-label={searchable ? '옵션 검색' : '옵션 키보드 네비게이션'}
+                className={cn(
+                  'flex h-10 w-full bg-transparent py-2 text-sm outline-none',
+                  'placeholder:text-foreground-subtle',
+                )}
+              />
+            </div>
             <CommandPrimitive.List
               className="max-h-[280px] overflow-y-auto overflow-x-hidden p-1"
               aria-multiselectable={isMultiple || undefined}
