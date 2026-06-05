@@ -139,6 +139,26 @@ export function Select(props: SelectProps): React.ReactElement {
   // 검색이 아닐 때 타이핑으로 인한 필터링 방지를 위해 검색어 빈 문자열로 강제.
   const [search, setSearch] = React.useState('');
 
+  /**
+   * Dialog/Drawer/Sheet 등 부모 FocusScope 안에서 Select를 열 때,
+   * Popover.Content는 portal로 document.body에 렌더되므로 부모 FocusScope가
+   * "범위 밖"으로 인지하고 trigger로 포커스를 되돌릴 수 있다.
+   *
+   * 대응: 한 번 포커스를 옮긴 뒤 다음 두 시점에 한 번 더 강제 포커스해
+   * FocusScope 정리 후에도 Input이 활성 상태가 되도록 보장한다.
+   * - rAF: 같은 frame의 다른 focus 호출이 끝난 후
+   * - setTimeout: macrotask 큐의 가장 마지막 (FocusScope의 마지막 보정 후)
+   */
+  const focusInput = React.useCallback((): void => {
+    const focusOnce = (): void => {
+      const el = inputRef.current;
+      if (el && document.activeElement !== el) el.focus({ preventScroll: true });
+    };
+    focusOnce();
+    requestAnimationFrame(focusOnce);
+    setTimeout(focusOnce, 0);
+  }, []);
+
   const selectedSet = React.useMemo(() => {
     if (isMultiple) return new Set(((value as string[] | undefined) ?? []) as string[]);
     return new Set(value ? [value as string] : []);
@@ -227,8 +247,37 @@ export function Select(props: SelectProps): React.ReactElement {
           onOpenAutoFocus={(e): void => {
             // Popover.Content가 자기 자신을 포커싱하는 기본 동작을 막고
             // cmdk Input으로 포커스를 옮겨 키보드 네비게이션이 동작하도록 한다.
+            // 부모 Dialog/Drawer 등의 FocusScope가 포커스를 되돌리지 않도록 다단계 재시도.
             e.preventDefault();
-            inputRef.current?.focus();
+            focusInput();
+          }}
+          onKeyDownCapture={(e): void => {
+            // 부모 Dialog FocusScope가 Input 포커스를 trigger로 되돌렸을 수 있다.
+            // 사용자가 키를 누른 시점에 포커스가 Input이 아니면 옮겨 cmdk에 전달.
+            const isNavKey =
+              e.key === 'ArrowDown' ||
+              e.key === 'ArrowUp' ||
+              e.key === 'Enter' ||
+              e.key === 'Home' ||
+              e.key === 'End' ||
+              e.key === 'PageDown' ||
+              e.key === 'PageUp';
+            if (!isNavKey) return;
+            const input = inputRef.current;
+            if (input && document.activeElement !== input) {
+              input.focus({ preventScroll: true });
+              // 이미 발생한 이벤트는 cmdk가 못 받았으므로 같은 키 이벤트를 재dispatch.
+              // dispatchEvent로 cmdk의 onKeyDown 핸들러를 동기적으로 트리거.
+              const ev = new KeyboardEvent('keydown', {
+                key: e.key,
+                code: e.code,
+                bubbles: true,
+                cancelable: true,
+              });
+              input.dispatchEvent(ev);
+              e.preventDefault();
+              e.stopPropagation();
+            }
           }}
           className={cn(
             'z-50 w-[var(--radix-popover-trigger-width)] min-w-48 max-w-[80vw]',

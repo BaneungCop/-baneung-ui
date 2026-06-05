@@ -1,5 +1,24 @@
 # @baneung-pack/ui
 
+## 1.0.8
+
+### Patch Changes
+
+- Select 키보드 네비게이션 — Dialog/Drawer/Sheet 등 부모 FocusScope 안에서도 ↑↓ 동작.
+
+  # 문제
+
+  Select가 Dialog/Drawer/Sheet 등의 안에 있을 때, Popover.Content가 portal로
+  document.body에 렌더되므로 부모 FocusScope가 "범위 밖"으로 인지하고 cmdk Input에서
+  trigger 버튼으로 포커스를 되돌림 → 방향키 무반응.
+
+  # 수정 (2단계 방어)
+  1. **다단계 강제 포커스** — onOpenAutoFocus에서 즉시 + requestAnimationFrame +
+     setTimeout 3번 포커스 호출. 부모 FocusScope의 보정 timing race를 모두 커버.
+  2. **키 이벤트 캡처 fallback** — Popover.Content에서 ↑↓/Enter/Home/End/PageUp/PageDown
+     입력 시 Input이 활성 상태가 아니면 포커스 옮기고 같은 키 이벤트를 Input에 재dispatch.
+     첫 키 입력도 손실 없이 처리.
+
 ## 1.0.7
 
 ### Patch Changes

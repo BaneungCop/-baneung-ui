@@ -33,9 +33,19 @@ interface PackageHistory {
 
 const uiHistory: PackageHistory = {
   pkg: '@baneung-pack/ui',
-  current: '1.0.7',
+  current: '1.0.8',
   npmUrl: 'https://www.npmjs.com/package/@baneung-pack/ui',
   entries: [
+    {
+      version: '1.0.8',
+      type: 'patch',
+      summary: 'Select 키보드 네비게이션 — Dialog/Drawer/Sheet 등 popup 안에서도 ↑↓ 동작',
+      details: [
+        'Popover.Content가 portal로 body에 렌더 → 부모 FocusScope가 trigger로 포커스 되돌리던 문제',
+        '다단계 강제 포커스 — 즉시 + rAF + setTimeout 3번 호출로 race 커버',
+        '키 이벤트 캡처 fallback — Input이 비활성 상태일 때 포커스 옮기고 키 이벤트 재dispatch',
+      ],
+    },
     {
       version: '1.0.7',
       type: 'patch',
