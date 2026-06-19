@@ -24,6 +24,41 @@ export interface GridColumn<TRow = Record<string, unknown>> {
    * 기본은 Grid의 `resizable` 값을 따름.
    */
   resizable?: boolean;
+  /**
+   * 초기 표시 여부. false면 그리드 첫 렌더 시 숨김 상태로 시작.
+   * 사용자가 컬럼 메뉴에서 토글하면 변경됨 (uncontrolled).
+   * controlled 모드는 Grid의 `columnVisibility` prop 사용.
+   */
+  hidden?: boolean;
+  /**
+   * 사용자가 컬럼 메뉴에서 표시/숨김 토글 가능 여부 (기본 true).
+   * false면 메뉴에 표시되지 않음 — 항상 visible 상태 강제.
+   */
+  hideable?: boolean;
+  /**
+   * 컬럼 고정 — 좌/우측에 sticky로 고정. 가로 스크롤해도 자리 유지.
+   * 동일 방향에 여러 컬럼을 pin하면 누적 offset이 자동 계산됨.
+   * 보통 좌측 pin은 ID/이름 같은 핵심 컬럼, 우측 pin은 액션 컬럼.
+   */
+  pin?: 'left' | 'right';
+  /**
+   * 푸터 행에서 집계 표시. visible/필터된 행 기준으로 계산.
+   * - 'sum' / 'avg' / 'min' / 'max': 숫자 값만 대상
+   * - 'count': null 아닌 값 개수
+   * - 함수: (rows: TRow[]) => ReactNode — 임의 계산 + 표시
+   *
+   * Grid의 `showFooter=true`일 때만 표시됨.
+   */
+  aggregate?: 'sum' | 'avg' | 'count' | 'min' | 'max' | ((rows: TRow[]) => React.ReactNode);
+  /**
+   * 값/행 기준 셀 인라인 스타일. Excel의 조건부 서식 패턴.
+   * 음수 빨강 / 임계값 강조 등.
+   */
+  cellStyle?: (value: unknown, row: TRow) => React.CSSProperties | undefined;
+  /**
+   * 값/행 기준 셀 클래스명. cellStyle보다 토큰/Tailwind 쓰기 좋음.
+   */
+  cellClassName?: (value: unknown, row: TRow) => string | undefined;
   /** 컬럼 정렬 (left | center | right). 숫자 컬럼은 보통 right 권장. */
   align?: 'left' | 'center' | 'right';
   /**
@@ -191,6 +226,24 @@ export interface GridProps<TRow = Record<string, unknown>> extends Omit<
    */
   onColumnResize?: (columnId: string, widthPx: number) => void;
   /**
+   * 컬럼 표시/숨김 상태 (controlled). `{ [columnId]: boolean }` — true=표시, false=숨김.
+   * 미지정 시 내부 state로 관리 (column.hidden 초기값 사용).
+   */
+  columnVisibility?: Record<string, boolean>;
+  /** 컬럼 표시/숨김 상태 변경 시 호출. */
+  onColumnVisibilityChange?: (visibility: Record<string, boolean>) => void;
+  /**
+   * 그리드 우상단에 컬럼 표시/숨김 메뉴 버튼 표시 (기본 false).
+   * 활성 시 ⚙️ 버튼 → 체크박스 목록 popover.
+   * column.hideable=false인 컬럼은 메뉴에 표시되지 않음.
+   */
+  showColumnMenu?: boolean;
+  /**
+   * 그리드 하단에 집계 푸터 행 표시. column.aggregate가 설정된 컬럼만 값을 가짐.
+   * 합계는 visible/필터/검색 적용된 행에 대해 계산됨.
+   */
+  showFooter?: boolean;
+  /**
    * Tree(계층) 모드. 첫 컬럼에 caret + 들여쓰기를 자동 삽입해 펼침/접힘 가능한
    * 트리뷰로 렌더한다. `getChildren`이 함께 필요.
    *
@@ -303,4 +356,8 @@ export interface GridHandle<TRow = Record<string, unknown>> {
     rows?: TRow[];
     styledHeader?: boolean;
   }): Promise<void>;
+  /** 컬럼 표시/숨김 상태 반환. true=표시, 명시 안 된 컬럼은 visible로 간주. */
+  getColumnVisibility(): Record<string, boolean>;
+  /** 컬럼 표시/숨김 토글. */
+  toggleColumnVisibility(columnId: string): void;
 }

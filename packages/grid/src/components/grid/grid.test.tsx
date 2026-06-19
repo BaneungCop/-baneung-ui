@@ -982,6 +982,115 @@ describe('Grid', () => {
     expect(handles.length).toBe(1);
   });
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // 컬럼 표시/숨김 + Pin + 푸터 + 조건부 스타일
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('컬럼 표시/숨김: column.hidden=true는 초기 렌더에서 제외', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name' },
+      { id: 'price', header: '가격', accessor: 'price', hidden: true },
+    ];
+    render(<Grid columns={cols} data={sampleData} />);
+    expect(screen.getByRole('columnheader', { name: '이름' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: '가격' })).not.toBeInTheDocument();
+    // 데이터 셀에서도 가격 값 없음
+    expect(screen.queryByText('1000')).not.toBeInTheDocument();
+  });
+
+  it('컬럼 표시/숨김: ref API로 토글 가능', () => {
+    const ref = React.createRef<GridHandle<Row>>();
+    render(<Grid ref={ref} columns={columns} data={sampleData} />);
+    expect(screen.getByRole('columnheader', { name: '가격' })).toBeInTheDocument();
+    act(() => {
+      ref.current?.toggleColumnVisibility('price');
+    });
+    expect(screen.queryByRole('columnheader', { name: '가격' })).not.toBeInTheDocument();
+    expect(ref.current?.getColumnVisibility().price).toBe(false);
+  });
+
+  it('컬럼 표시/숨김: showColumnMenu=true 시 ⚙️ 버튼 표시', async () => {
+    const user = userEvent.setup();
+    render(<Grid columns={columns} data={sampleData} showColumnMenu />);
+    const btn = screen.getByRole('button', { name: '컬럼 표시 메뉴' });
+    expect(btn).toBeInTheDocument();
+    // 클릭 시 popover 표시
+    await user.click(btn);
+    expect(screen.getByRole('dialog', { name: '컬럼 표시 설정' })).toBeInTheDocument();
+  });
+
+  it('Pin: column.pin="left" 시 sticky 위치 + 컬럼 순서 재배치', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name' },
+      { id: 'price', header: '가격', accessor: 'price', pin: 'left', width: 100 },
+    ];
+    render(<Grid columns={cols} data={sampleData} />);
+    const headers = screen.getAllByRole('columnheader');
+    // 가격이 좌측 pin이므로 첫 번째 헤더
+    expect(headers[0]?.textContent).toContain('가격');
+    expect(headers[1]?.textContent).toContain('이름');
+    // sticky 스타일
+    expect(headers[0]?.getAttribute('style')).toMatch(/position:\s*sticky/);
+    expect(headers[0]?.getAttribute('style')).toMatch(/left:\s*0px/);
+  });
+
+  it('Pin: column.pin="right" 시 우측에 배치 + position sticky', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', pin: 'right', width: 80 },
+      { id: 'price', header: '가격', accessor: 'price' },
+    ];
+    render(<Grid columns={cols} data={sampleData} />);
+    const headers = screen.getAllByRole('columnheader');
+    // 이름이 우측 pin → 마지막 헤더
+    expect(headers[0]?.textContent).toContain('가격');
+    expect(headers[1]?.textContent).toContain('이름');
+    expect(headers[1]?.getAttribute('style')).toMatch(/right:\s*0px/);
+  });
+
+  it('집계 푸터: showFooter=true + aggregate=sum 적용 시 합계 표시', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', aggregate: 'count' },
+      { id: 'price', header: '가격', accessor: 'price', aggregate: 'sum' },
+    ];
+    render(<Grid columns={cols} data={sampleData} showFooter />);
+    // sampleData: 사과(1000) + 바나나(2000) + 체리(3000) = 6000
+    expect(screen.getByText('6,000')).toBeInTheDocument();
+    // count = 3
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('집계 푸터: 함수형 aggregate는 ReactNode 그대로 표시', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name' },
+      {
+        id: 'price',
+        header: '가격',
+        accessor: 'price',
+        aggregate: (rows: Row[]) => `최대 ${Math.max(...rows.map((r) => r.price))}원`,
+      },
+    ];
+    render(<Grid columns={cols} data={sampleData} showFooter />);
+    expect(screen.getByText('최대 3000원')).toBeInTheDocument();
+  });
+
+  it('조건부 셀 스타일: cellClassName + cellStyle 적용', () => {
+    const cols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name' },
+      {
+        id: 'price',
+        header: '가격',
+        accessor: 'price',
+        cellClassName: (v) => ((v as number) > 1500 ? 'high-price-cell' : undefined),
+        cellStyle: (v) => ((v as number) > 1500 ? { color: 'red' } : undefined),
+      },
+    ];
+    const { container } = render(<Grid columns={cols} data={sampleData} />);
+    // 2000, 3000은 high-price-cell + red, 1000은 아님
+    const highCells = container.querySelectorAll('.high-price-cell');
+    expect(highCells.length).toBe(2);
+    expect((highCells[0] as HTMLElement).style.color).toBe('red');
+  });
+
   it('컬럼 리사이즈: mousedown→move→up 시 onColumnResize 콜백 호출', () => {
     const onResize = vi.fn();
     const { container } = render(

@@ -1,6 +1,7 @@
 import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual';
 import * as React from 'react';
 
+import { computeAggregate } from './aggregate';
 import { buildTsv, parseTsv, readClipboard, writeClipboard } from './clipboard';
 import { buildCsv, downloadCsv } from './csv';
 import { EditableCell } from './editable-cell';
@@ -153,6 +154,10 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     quickFilter,
     resizable = false,
     onColumnResize,
+    columnVisibility: visibilityProp,
+    onColumnVisibilityChange,
+    showColumnMenu = false,
+    showFooter = false,
     className,
     ...props
   }: GridProps<TRow>,
@@ -248,8 +253,70 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     setFilters((prev) => ({ ...prev, [columnId]: excluded }));
   }, []);
 
+  // 1d-2. 컬럼 표시/숨김 — controlled (props) 또는 uncontrolled (내부 state).
+  //   초기값: column.hidden=true인 컬럼은 false, 나머지는 true.
+  const initialVisibility = React.useMemo<Record<string, boolean>>(() => {
+    const v: Record<string, boolean> = {};
+    columns.forEach((c) => {
+      v[c.id] = !c.hidden;
+    });
+    return v;
+  }, [columns]);
+  const [internalVisibility, setInternalVisibility] =
+    React.useState<Record<string, boolean>>(initialVisibility);
+  const columnVisibility = visibilityProp ?? internalVisibility;
+  const setVisibility = React.useCallback(
+    (next: Record<string, boolean>) => {
+      if (onColumnVisibilityChange) onColumnVisibilityChange(next);
+      if (visibilityProp === undefined) setInternalVisibility(next);
+    },
+    [visibilityProp, onColumnVisibilityChange],
+  );
+  const toggleColumnVisibility = React.useCallback(
+    (columnId: string) => {
+      setVisibility({ ...columnVisibility, [columnId]: !(columnVisibility[columnId] !== false) });
+    },
+    [columnVisibility, setVisibility],
+  );
+  // 화면에 실제 렌더할 컬럼 — visibility=false 제외 + pin 기준 재정렬.
+  //   순서: left-pinned → unpinned → right-pinned. 모든 컬럼 인덱스 비교는 이 순서 기준.
+  const visibleColumns = React.useMemo(() => {
+    const filtered = columns.filter((c) => columnVisibility[c.id] !== false);
+    const left = filtered.filter((c) => c.pin === 'left');
+    const middle = filtered.filter((c) => !c.pin);
+    const right = filtered.filter((c) => c.pin === 'right');
+    return [...left, ...middle, ...right];
+  }, [columns, columnVisibility]);
+  // 컬럼 메뉴 popover open/close
+  const [columnMenuOpen, setColumnMenuOpen] = React.useState(false);
+
   // 1e. 컬럼 폭 — 리사이즈 결과를 저장. column.width를 override.
   const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
+  // 1e-2. pin offsets — sticky 위치 누적 계산용. visibleColumns 또는 폭이 바뀌면 재계산.
+  /**
+   * 각 컬럼의 sticky 위치 (px). left/right 둘 중 하나만 채워짐.
+   * - `isEdge`: pin 블록의 안쪽 경계 컬럼 (좌측 마지막 / 우측 첫번째) — 경계선 표시용
+   * - 폭 미지정 시 fallback 120px (실제 측정값과 다를 수 있지만 sticky는 동작)
+   */
+  const pinOffsets = React.useMemo(() => {
+    const map: Record<string, { left?: number; right?: number; isEdge?: boolean }> = {};
+    const resolveWidth = (col: GridColumn<TRow>): number =>
+      columnWidths[col.id] ?? (typeof col.width === 'number' ? col.width : 120);
+    const leftCols = visibleColumns.filter((c) => c.pin === 'left');
+    const rightCols = visibleColumns.filter((c) => c.pin === 'right');
+    let cum = 0;
+    leftCols.forEach((c, i) => {
+      map[c.id] = { left: cum, isEdge: i === leftCols.length - 1 };
+      cum += resolveWidth(c);
+    });
+    cum = 0;
+    for (let i = rightCols.length - 1; i >= 0; i -= 1) {
+      const c = rightCols[i]!;
+      map[c.id] = { right: cum, isEdge: i === 0 };
+      cum += resolveWidth(c);
+    }
+    return map;
+  }, [visibleColumns, columnWidths]);
   // 드래그 중인 상태 — mousedown ~ mouseup 사이만 유효.
   const resizingRef = React.useRef<{
     columnId: string;
@@ -455,8 +522,19 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       clearSelectedCells,
       exportCsv,
       exportXlsx,
+      getColumnVisibility: () => columnVisibility,
+      toggleColumnVisibility,
     }),
-    [state, addRow, removeSelectedRows, clearSelectedCells, exportCsv, exportXlsx],
+    [
+      state,
+      addRow,
+      removeSelectedRows,
+      clearSelectedCells,
+      exportCsv,
+      exportXlsx,
+      columnVisibility,
+      toggleColumnVisibility,
+    ],
   );
 
   // 9. multi-cell drag — mousedown으로 시작, mousemove로 사각형 갱신, mouseup으로 종료.
@@ -479,7 +557,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       if (!start) return;
       // 사각형 계산: 행 인덱스 & 컬럼 인덱스 min~max 사이
       const rowIds = visibleFlatRows.map((fr) => fr.id);
-      const colIds = columns.map((c) => c.id);
+      const colIds = visibleColumns.map((c) => c.id);
       const r1 = rowIds.indexOf(start.rowId);
       const r2 = rowIds.indexOf(rowId);
       const c1 = colIds.indexOf(start.columnId);
@@ -529,12 +607,12 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
         const asNum = Number(rawId);
         const rowId = Number.isFinite(asNum) && String(asNum) === rawId ? asNum : rawId;
         const rIdx = visibleFlatRows.findIndex((fr) => fr.id === rowId);
-        const cIdx = columns.findIndex((c) => c.id === colId);
+        const cIdx = visibleColumns.findIndex((c) => c.id === colId);
         if (rIdx >= 0 && cIdx >= 0) positions.push({ rowIdx: rIdx, colIdx: cIdx });
       });
     } else if (activeCell) {
       const rIdx = visibleFlatRows.findIndex((fr) => fr.id === activeCell.rowId);
-      const cIdx = columns.findIndex((c) => c.id === activeCell.columnId);
+      const cIdx = visibleColumns.findIndex((c) => c.id === activeCell.columnId);
       if (rIdx >= 0 && cIdx >= 0) positions.push({ rowIdx: rIdx, colIdx: cIdx });
     }
     if (positions.length === 0) return;
@@ -556,7 +634,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       if (!flatRow) continue;
       const row: unknown[] = [];
       for (let c = minCol; c <= maxCol; c += 1) {
-        const col = columns[c];
+        const col = visibleColumns[c];
         if (!col) continue;
         row.push(getCellValue(col, flatRow.row));
       }
@@ -564,7 +642,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     }
     const tsv = buildTsv(matrix);
     await writeClipboard(tsv);
-  }, [cellSelection, selectedCells, activeCell, visibleFlatRows, columns]);
+  }, [cellSelection, selectedCells, activeCell, visibleFlatRows, visibleColumns]);
 
   // 10-b. clipboard TSV → activeCell 위치부터 셀에 일괄 입력 (Ctrl+V).
   //   accessor가 string key인 컬럼만 적용 (함수 accessor는 set 불가 → 스킵).
@@ -575,7 +653,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     const matrix = parseTsv(tsv);
     if (matrix.length === 0) return;
     const startRow = visibleFlatRows.findIndex((fr) => fr.id === activeCell.rowId);
-    const startCol = columns.findIndex((c) => c.id === activeCell.columnId);
+    const startCol = visibleColumns.findIndex((c) => c.id === activeCell.columnId);
     if (startRow < 0 || startCol < 0) return;
     matrix.forEach((rowValues, r) => {
       const targetIdx = startRow + r;
@@ -584,13 +662,13 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       if (!flatRow) return;
       rowValues.forEach((value, c) => {
         const colIdx = startCol + c;
-        if (colIdx >= columns.length) return;
-        const col = columns[colIdx];
+        if (colIdx >= visibleColumns.length) return;
+        const col = visibleColumns[colIdx];
         if (!col || typeof col.accessor !== 'string') return;
         state.editCell(flatRow.id, col.accessor, value);
       });
     });
-  }, [cellSelection, activeCell, visibleFlatRows, columns, state]);
+  }, [cellSelection, activeCell, visibleFlatRows, visibleColumns, state]);
 
   // 10. 키 입력 핸들러 — Delete/Backspace, Ctrl+C, Ctrl+V를 한 곳에서 처리.
   const handleContainerKeyDown = React.useCallback(
@@ -653,7 +731,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     visibleFlatRows.every((fr) => state.selectedIds.has(fr.id));
   const someSelected =
     selectable && !allSelected && visibleFlatRows.some((fr) => state.selectedIds.has(fr.id));
-  const colSpan = columns.length + (selectable ? 1 : 0);
+  const colSpan = visibleColumns.length + (selectable ? 1 : 0);
 
   return (
     <div
@@ -668,6 +746,32 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
       )}
       {...props}
     >
+      {showColumnMenu && (
+        // 툴바 — 우측 정렬, 그리드 외부의 간단한 영역. 우상단 ⚙️ 버튼만 표시.
+        <div className="relative flex items-center justify-end border-b border-border-default bg-surface px-2 py-1">
+          <button
+            type="button"
+            aria-label="컬럼 표시 메뉴"
+            aria-haspopup="dialog"
+            aria-expanded={columnMenuOpen}
+            onClick={() => setColumnMenuOpen((v) => !v)}
+            className="inline-flex h-7 items-center gap-1 rounded px-2 text-xs text-foreground hover:bg-surface-strong"
+          >
+            <span aria-hidden="true" className="text-sm leading-none">
+              ⚙
+            </span>
+            컬럼
+          </button>
+          {columnMenuOpen && (
+            <ColumnVisibilityMenu
+              columns={columns}
+              visibility={columnVisibility}
+              onToggle={toggleColumnVisibility}
+              onClose={() => setColumnMenuOpen(false)}
+            />
+          )}
+        </div>
+      )}
       <div
         ref={scrollRef}
         className={cn(
@@ -704,7 +808,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                   />
                 </th>
               )}
-              {columns.map((col) => {
+              {visibleColumns.map((col) => {
                 const sortIdx = sortStates.findIndex((s) => s.columnId === col.id);
                 const isSorted = sortIdx >= 0;
                 const sortDir = isSorted ? sortStates[sortIdx]!.direction : null;
@@ -719,6 +823,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                 const isFilterOpen = openFilter?.colId === col.id;
                 const isColResizable = resizable && col.resizable !== false;
                 const effectiveWidth = columnWidths[col.id] ?? col.width;
+                const pin = pinOffsets[col.id];
                 return (
                   <th
                     key={col.id}
@@ -731,11 +836,21 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                       col.align === 'right' && 'text-right',
                       col.align === 'center' && 'text-center',
                       (!col.align || col.align === 'left') && 'text-left',
+                      // pin 컬럼은 불투명 배경 필수 (sticky 시 뒤 콘텐츠가 비치지 않게)
+                      pin && 'bg-surface',
+                      // pin 블록 안쪽 경계에 강한 선 (시각적 구분)
+                      pin?.left !== undefined && pin.isEdge && 'border-r border-border-strong',
+                      pin?.right !== undefined && pin.isEdge && 'border-l border-border-strong',
                     )}
                     style={{
                       width: effectiveWidth,
                       minWidth: col.minWidth,
                       maxWidth: col.maxWidth,
+                      // sticky pin — 헤더는 가로/세로 모두 sticky가 되도록 z-index 상승
+                      position: pin ? 'sticky' : undefined,
+                      left: pin?.left,
+                      right: pin?.right,
+                      zIndex: pin ? 11 : undefined,
                     }}
                     onClick={col.sortable ? (e) => toggleSort(col.id, e.shiftKey) : undefined}
                   >
@@ -819,7 +934,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
             </tbody>
           ) : virtualized ? (
             <VirtualizedBody
-              columns={columns}
+              columns={visibleColumns}
               flatRows={visibleFlatRows}
               virtualizer={virtualizer}
               rowHeight={rowHeight}
@@ -834,6 +949,8 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
               selectedCells={selectedCells}
               onCellMouseDown={handleCellMouseDown}
               onCellMouseEnter={handleCellMouseEnter}
+              pinOffsets={pinOffsets}
+              columnWidths={columnWidths}
             />
           ) : (
             <tbody>
@@ -841,7 +958,7 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                 <GridRow
                   key={fr.id}
                   flatRow={fr}
-                  columns={columns}
+                  columns={visibleColumns}
                   selectable={selectable}
                   selected={state.selectedIds.has(fr.id)}
                   onToggle={state.toggleRow}
@@ -853,9 +970,54 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                   selectedCells={selectedCells}
                   onCellMouseDown={handleCellMouseDown}
                   onCellMouseEnter={handleCellMouseEnter}
+                  pinOffsets={pinOffsets}
+                  columnWidths={columnWidths}
                 />
               ))}
             </tbody>
+          )}
+          {showFooter && (
+            // 집계 푸터 — visible 행 기준. 컬럼별 aggregate 결과를 td에 표시.
+            //   sticky bottom: 가로 스크롤 시 푸터가 항상 보이도록.
+            <tfoot className="sticky bottom-0 z-10 bg-surface">
+              <tr>
+                {selectable && <td className="w-10 border-t border-border-default px-3 py-2" />}
+                {visibleColumns.map((col) => {
+                  const result = computeAggregate(
+                    col,
+                    visibleFlatRows.map((fr) => fr.row),
+                  );
+                  const pin = pinOffsets[col.id];
+                  return (
+                    <td
+                      key={col.id}
+                      className={cn(
+                        'border-t border-border-default px-3 py-2 font-medium text-foreground',
+                        col.align === 'right' && 'text-right',
+                        col.align === 'center' && 'text-center',
+                        (!col.align || col.align === 'left') && 'text-left',
+                        pin && 'bg-background',
+                      )}
+                      style={{
+                        position: pin ? 'sticky' : undefined,
+                        left: pin?.left,
+                        right: pin?.right,
+                        zIndex: pin ? 11 : undefined,
+                      }}
+                    >
+                      {result == null
+                        ? ''
+                        : typeof result === 'number'
+                          ? // 소수점 2자리까지만 표시 (avg 결과 등)
+                            Number.isInteger(result)
+                            ? result.toLocaleString()
+                            : result.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                          : (result as React.ReactNode)}
+                    </td>
+                  );
+                })}
+              </tr>
+            </tfoot>
           )}
         </table>
       </div>
@@ -931,6 +1093,69 @@ function TreeAffix({ level, hasChildren, expanded, onToggle }: TreeAffixProps) {
 // 행 1개 렌더 (체크박스 + 컬럼 셀들)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * 컬럼 표시/숨김 popover — 우상단 ⚙️ 버튼에서 펼침.
+ * column.hideable=false인 컬럼은 표시 안 됨.
+ * 바깥 클릭 / Esc → onClose.
+ */
+function ColumnVisibilityMenu<TRow>({
+  columns,
+  visibility,
+  onToggle,
+  onClose,
+}: {
+  columns: GridColumn<TRow>[];
+  visibility: Record<string, boolean>;
+  onToggle: (columnId: string) => void;
+  onClose: () => void;
+}) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) onClose();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+
+  const hideableCols = columns.filter((c) => c.hideable !== false);
+
+  return (
+    <div
+      ref={ref}
+      role="dialog"
+      aria-label="컬럼 표시 설정"
+      className="absolute right-2 top-full z-20 mt-1 min-w-[180px] border border-border-default bg-background py-1 shadow-md"
+    >
+      {hideableCols.map((c) => {
+        const visible = visibility[c.id] !== false;
+        const label = typeof c.header === 'string' ? c.header : c.id;
+        return (
+          <label
+            key={c.id}
+            className="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs text-foreground hover:bg-surface"
+          >
+            <input
+              type="checkbox"
+              checked={visible}
+              onChange={() => onToggle(c.id)}
+              className="h-3.5 w-3.5"
+            />
+            <span>{label}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
 interface GridRowProps<TRow> {
   flatRow: FlatRow<TRow>;
   columns: GridColumn<TRow>[];
@@ -949,6 +1174,10 @@ interface GridRowProps<TRow> {
   /** multi-select 모드 mouseenter — 드래그 중 사각형 갱신. */
   onCellMouseEnter: (rowId: RowId, columnId: string) => void;
   height?: number;
+  /** pin 위치 맵 — columnId → { left|right offset, isEdge }. 없으면 모두 unpinned. */
+  pinOffsets?: Record<string, { left?: number; right?: number; isEdge?: boolean }>;
+  /** 리사이즈로 변경된 컬럼 폭 — cell width 적용용. */
+  columnWidths?: Record<string, number>;
 }
 
 function GridRow<TRow>({
@@ -966,6 +1195,8 @@ function GridRow<TRow>({
   onCellMouseDown,
   onCellMouseEnter,
   height,
+  pinOffsets,
+  columnWidths,
 }: GridRowProps<TRow>) {
   const { row, id, level, hasChildren, expanded } = flatRow;
   return (
@@ -992,6 +1223,10 @@ function GridRow<TRow>({
         const cellKeyStr = `${id}${col.id}`;
         const isMultiSelected = selectedCells.has(cellKeyStr);
         const isFirstCol = colIdx === 0;
+        const pin = pinOffsets?.[col.id];
+        const userCellStyle = col.cellStyle?.(value, row);
+        const userCellClass = col.cellClassName?.(value, row);
+        const effectiveWidth = columnWidths?.[col.id] ?? col.width;
 
         return (
           <td
@@ -1009,7 +1244,20 @@ function GridRow<TRow>({
               align === 'right' && 'text-right',
               align === 'center' && 'text-center',
               (!align || align === 'left') && 'text-left',
+              // pin: 불투명 배경 필수 (sticky 시 뒤 행이 비치지 않게) + 안쪽 경계선
+              pin && 'bg-background',
+              pin?.left !== undefined && pin.isEdge && 'border-r border-border-strong',
+              pin?.right !== undefined && pin.isEdge && 'border-l border-border-strong',
+              userCellClass,
             )}
+            style={{
+              width: effectiveWidth,
+              position: pin ? 'sticky' : undefined,
+              left: pin?.left,
+              right: pin?.right,
+              zIndex: pin ? 2 : undefined,
+              ...userCellStyle,
+            }}
           >
             {tree && isFirstCol ? (
               <span className="flex items-center">
@@ -1071,6 +1319,8 @@ interface VirtualizedBodyProps<TRow> {
   selectedCells: Set<string>;
   onCellMouseDown: (rowId: RowId, columnId: string, e: React.MouseEvent) => void;
   onCellMouseEnter: (rowId: RowId, columnId: string) => void;
+  pinOffsets?: Record<string, { left?: number; right?: number; isEdge?: boolean }>;
+  columnWidths?: Record<string, number>;
 }
 
 function VirtualizedBody<TRow>({
@@ -1089,6 +1339,8 @@ function VirtualizedBody<TRow>({
   selectedCells,
   onCellMouseDown,
   onCellMouseEnter,
+  pinOffsets,
+  columnWidths,
 }: VirtualizedBodyProps<TRow>) {
   const items = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
@@ -1125,6 +1377,8 @@ function VirtualizedBody<TRow>({
             onCellMouseDown={onCellMouseDown}
             onCellMouseEnter={onCellMouseEnter}
             height={rowHeight}
+            pinOffsets={pinOffsets}
+            columnWidths={columnWidths}
           />
         );
       })}
