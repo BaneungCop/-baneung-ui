@@ -887,4 +887,114 @@ describe('Grid', () => {
       expect(r2?.name).toBe('포도');
     });
   });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // quickFilter / multi-column sort / column resize
+  // ───────────────────────────────────────────────────────────────────────────
+
+  it('quickFilter: 모든 컬럼에서 부분 일치(case-insensitive) 검색', () => {
+    const data: Row[] = [
+      { id: 1, name: 'Apple', price: 1000 },
+      { id: 2, name: 'Banana', price: 2500 },
+      { id: 3, name: 'Apricot', price: 1500 },
+    ];
+    const { rerender } = render(<Grid columns={columns} data={data} quickFilter="ap" />);
+    expect(screen.getByText('Apple')).toBeInTheDocument();
+    expect(screen.getByText('Apricot')).toBeInTheDocument();
+    expect(screen.queryByText('Banana')).not.toBeInTheDocument();
+    // 숫자 컬럼도 검색됨 — '2500' → Banana만 매치
+    rerender(<Grid columns={columns} data={data} quickFilter="2500" />);
+    expect(screen.queryByText('Apple')).not.toBeInTheDocument();
+    expect(screen.getByText('Banana')).toBeInTheDocument();
+  });
+
+  it('quickFilter 빈 문자열은 필터 없음', () => {
+    render(<Grid columns={columns} data={sampleData} quickFilter="" />);
+    expect(screen.getByText('사과')).toBeInTheDocument();
+    expect(screen.getByText('바나나')).toBeInTheDocument();
+    expect(screen.getByText('체리')).toBeInTheDocument();
+  });
+
+  it('다중 컬럼 정렬: Shift+클릭으로 2차 정렬 추가, 순서 번호 표시', async () => {
+    const user = userEvent.setup();
+    const data: Row[] = [
+      { id: 1, name: 'B', price: 100 },
+      { id: 2, name: 'A', price: 200 },
+      { id: 3, name: 'A', price: 100 },
+      { id: 4, name: 'B', price: 200 },
+    ];
+    const sortableCols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', sortable: true },
+      { id: 'price', header: '가격', accessor: 'price', sortable: true },
+    ];
+    render(<Grid columns={sortableCols} data={data} getRowId={(r) => r.id} />);
+
+    // 1차: name asc
+    await user.click(screen.getByRole('columnheader', { name: /이름/ }));
+    // 2차: Shift+price → multi-sort 추가
+    await user.keyboard('{Shift>}');
+    await user.click(screen.getByRole('columnheader', { name: /가격/ }));
+    await user.keyboard('{/Shift}');
+
+    // name asc, 같은 name 안에서 price asc
+    const allRows = document.querySelectorAll('tbody tr');
+    const order = Array.from(allRows).map((r) => {
+      const tds = r.querySelectorAll('td');
+      return `${tds[0]?.textContent}-${tds[1]?.textContent}`;
+    });
+    expect(order).toEqual(['A-100', 'A-200', 'B-100', 'B-200']);
+  });
+
+  it('다중 컬럼 정렬: 일반 클릭(Shift 없음)은 단일 정렬로 초기화', async () => {
+    const user = userEvent.setup();
+    const sortableCols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name', sortable: true },
+      { id: 'price', header: '가격', accessor: 'price', sortable: true },
+    ];
+    render(<Grid columns={sortableCols} data={sampleData} getRowId={(r) => r.id} />);
+
+    // Shift+name → asc, Shift+price 추가 → 2개 정렬
+    await user.click(screen.getByRole('columnheader', { name: /이름/ }));
+    await user.keyboard('{Shift>}');
+    await user.click(screen.getByRole('columnheader', { name: /가격/ }));
+    await user.keyboard('{/Shift}');
+    // 일반 클릭 → 단일 정렬로 리셋 (sortStates 길이 1)
+    await user.click(screen.getByRole('columnheader', { name: /이름/ }));
+    // 데이터 정렬은 name 기준으로만 — 바나나가 ㅂ < ㅅ < ㅊ로 '바나나' 가 첫 행이 됨
+    const allRows = document.querySelectorAll('tbody tr');
+    const firstName = allRows[0]?.querySelectorAll('td')[0]?.textContent;
+    expect(firstName).toBe('바나나');
+  });
+
+  it('컬럼 리사이즈: resizable=true 시 헤더에 separator 핸들 렌더', () => {
+    const { container } = render(<Grid columns={columns} data={sampleData} resizable />);
+    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
+    expect(handles.length).toBe(2);
+  });
+
+  it('컬럼 리사이즈: column.resizable=false인 컬럼은 핸들 제외', () => {
+    const partialCols: GridColumn<Row>[] = [
+      { id: 'name', header: '이름', accessor: 'name' },
+      { id: 'price', header: '가격', accessor: 'price', resizable: false },
+    ];
+    const { container } = render(<Grid columns={partialCols} data={sampleData} resizable />);
+    const handles = container.querySelectorAll('[role="separator"][aria-orientation="vertical"]');
+    expect(handles.length).toBe(1);
+  });
+
+  it('컬럼 리사이즈: mousedown→move→up 시 onColumnResize 콜백 호출', () => {
+    const onResize = vi.fn();
+    const { container } = render(
+      <Grid columns={columns} data={sampleData} resizable onColumnResize={onResize} />,
+    );
+    const firstHandle = container.querySelector(
+      '[role="separator"][aria-orientation="vertical"]',
+    ) as HTMLElement;
+    fireEvent.mouseDown(firstHandle, { clientX: 100 });
+    fireEvent.mouseMove(document, { clientX: 150 });
+    fireEvent.mouseUp(document);
+
+    expect(onResize).toHaveBeenCalledTimes(1);
+    expect(onResize.mock.calls[0]?.[0]).toBe('name');
+  });
 });

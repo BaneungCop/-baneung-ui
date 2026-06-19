@@ -7,7 +7,12 @@ import { EditableCell } from './editable-cell';
 import { FilterPopover } from './filter-popover';
 import { GridPagination } from './pagination';
 import { SelectionCheckbox } from './selection-checkbox';
-import { applySortAndFilter, collectUniqueValues, nextSortState } from './sort-filter';
+import {
+  applySortAndFilter,
+  collectUniqueValues,
+  nextMultiSortStates,
+  nextSortState,
+} from './sort-filter';
 import { collectExpandableIds, flattenTree, type FlatRow } from './tree-utils';
 import { useGridState } from './use-grid-state';
 import { exportXlsx as exportXlsxHelper } from './xlsx';
@@ -145,6 +150,9 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     cellSelection = 'single',
     clearOnDelete = false,
     clipboard = false,
+    quickFilter,
+    resizable = false,
+    onColumnResize,
     className,
     ...props
   }: GridProps<TRow>,
@@ -214,20 +222,90 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
     [onPageChange],
   );
 
-  // 1d. sort / filter 상태 — filter는 컬럼별 "제외" 값 Set.
-  const [sortState, setSortState] = React.useState<GridSortState | null>(null);
+  // 1d. sort / filter 상태 — 다중 정렬을 위해 배열로 관리 (단일 정렬은 길이 1).
+  const [sortStates, setSortStates] = React.useState<GridSortState[]>([]);
   const [filters, setFilters] = React.useState<Record<string, Set<string>>>({});
   // 필터 popover anchor — funnel 버튼의 clientRect를 캡처해 Portal로 띄움.
   const [openFilter, setOpenFilter] = React.useState<{
     colId: string;
     anchorRect: { left: number; top: number; bottom: number; right: number };
   } | null>(null);
-  const toggleSort = React.useCallback((columnId: string) => {
-    setSortState((prev) => nextSortState(prev, columnId));
+  /**
+   * 헤더 클릭으로 정렬 토글.
+   * - 일반 클릭: 해당 컬럼만 단일 정렬 (3-state: 없음 → asc → desc → 없음). 기존 다중 정렬은 초기화.
+   * - Shift+클릭: 다중 정렬 — 기존 배열에 추가/토글/제거 (asc → desc → 제거).
+   */
+  const toggleSort = React.useCallback((columnId: string, multi: boolean) => {
+    setSortStates((prev) => {
+      if (multi) return nextMultiSortStates(prev, columnId);
+      // 단일 토글: prev가 길이 1이고 같은 컬럼이면 그 안에서 토글, 아니면 새 단일 배열
+      const single = prev.length === 1 ? prev[0]! : null;
+      const next = nextSortState(single && single.columnId === columnId ? single : null, columnId);
+      return next ? [next] : [];
+    });
   }, []);
   const applyFilter = React.useCallback((columnId: string, excluded: Set<string>) => {
     setFilters((prev) => ({ ...prev, [columnId]: excluded }));
   }, []);
+
+  // 1e. 컬럼 폭 — 리사이즈 결과를 저장. column.width를 override.
+  const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
+  // 드래그 중인 상태 — mousedown ~ mouseup 사이만 유효.
+  const resizingRef = React.useRef<{
+    columnId: string;
+    startX: number;
+    startWidth: number;
+    minWidth: number;
+    maxWidth: number | undefined;
+  } | null>(null);
+  /**
+   * 리사이즈 핸들 mousedown — 드래그 시작.
+   * - 시작 시점의 헤더 셀 폭을 측정 (column.width 또는 columnWidths 또는 실제 px)
+   * - 전역 mousemove로 폭 갱신, mouseup으로 종료 + onColumnResize 콜백.
+   */
+  const handleResizeMouseDown = React.useCallback(
+    (e: React.MouseEvent, col: GridColumn<TRow>) => {
+      e.preventDefault();
+      e.stopPropagation(); // sortable th onClick과 충돌 방지
+      const th = (e.currentTarget as HTMLElement).closest('th') as HTMLTableCellElement | null;
+      const rect = th?.getBoundingClientRect();
+      const startWidth = columnWidths[col.id] ?? rect?.width ?? 100;
+      resizingRef.current = {
+        columnId: col.id,
+        startX: e.clientX,
+        startWidth,
+        minWidth: col.minWidth ?? 60,
+        maxWidth: col.maxWidth,
+      };
+    },
+    [columnWidths],
+  );
+  React.useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const ctx = resizingRef.current;
+      if (!ctx) return;
+      const delta = e.clientX - ctx.startX;
+      let next = ctx.startWidth + delta;
+      if (next < ctx.minWidth) next = ctx.minWidth;
+      if (ctx.maxWidth !== undefined && next > ctx.maxWidth) next = ctx.maxWidth;
+      setColumnWidths((prev) =>
+        prev[ctx.columnId] === next ? prev : { ...prev, [ctx.columnId]: Math.round(next) },
+      );
+    };
+    const onUp = () => {
+      const ctx = resizingRef.current;
+      if (!ctx) return;
+      resizingRef.current = null;
+      // 외부 영속화 콜백 — 최종 폭만 알림.
+      onColumnResize?.(ctx.columnId, columnWidths[ctx.columnId] ?? ctx.startWidth);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, [onColumnResize, columnWidths]);
 
   // 3. 화면에 보일 행 — 트리 모드면 flattenTree, 아니면 state.rows를 FlatRow로 wrap.
   //    그 후 filter + sort를 적용 (트리 모드는 sort skip — hierarchy 보존).
@@ -242,8 +320,19 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
             hasChildren: false,
             expanded: false,
           }));
-    return applySortAndFilter(base, columns, filters, sortState, tree);
-  }, [tree, getChildren, data, expandedIds, state.rows, resolveRowId, columns, filters, sortState]);
+    return applySortAndFilter(base, columns, filters, sortStates, tree, quickFilter);
+  }, [
+    tree,
+    getChildren,
+    data,
+    expandedIds,
+    state.rows,
+    resolveRowId,
+    columns,
+    filters,
+    sortStates,
+    quickFilter,
+  ]);
 
   // 4. 페이지네이션 적용
   const pageCount = pageSize > 0 ? Math.max(1, Math.ceil(allFlatRows.length / pageSize)) : 1;
@@ -616,37 +705,39 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                 </th>
               )}
               {columns.map((col) => {
-                const isSorted = sortState?.columnId === col.id;
+                const sortIdx = sortStates.findIndex((s) => s.columnId === col.id);
+                const isSorted = sortIdx >= 0;
+                const sortDir = isSorted ? sortStates[sortIdx]!.direction : null;
                 const sortIcon = !col.sortable
                   ? null
                   : !isSorted
                     ? '↕'
-                    : sortState!.direction === 'asc'
+                    : sortDir === 'asc'
                       ? '▲'
                       : '▼';
                 const filterActive = (filters[col.id]?.size ?? 0) > 0;
                 const isFilterOpen = openFilter?.colId === col.id;
+                const isColResizable = resizable && col.resizable !== false;
+                const effectiveWidth = columnWidths[col.id] ?? col.width;
                 return (
                   <th
                     key={col.id}
                     scope="col"
-                    aria-sort={
-                      !isSorted
-                        ? 'none'
-                        : sortState!.direction === 'asc'
-                          ? 'ascending'
-                          : 'descending'
-                    }
+                    aria-sort={!isSorted ? 'none' : sortDir === 'asc' ? 'ascending' : 'descending'}
                     className={cn(
-                      // relative — FilterPopover absolute 위치 기준점.
+                      // relative — FilterPopover absolute 위치 기준점, resize 핸들 absolute 기준점.
                       'relative border-b border-border-default px-3 py-2 font-medium text-foreground',
                       col.sortable && 'cursor-pointer select-none hover:bg-surface-strong',
                       col.align === 'right' && 'text-right',
                       col.align === 'center' && 'text-center',
                       (!col.align || col.align === 'left') && 'text-left',
                     )}
-                    style={{ width: col.width }}
-                    onClick={col.sortable ? () => toggleSort(col.id) : undefined}
+                    style={{
+                      width: effectiveWidth,
+                      minWidth: col.minWidth,
+                      maxWidth: col.maxWidth,
+                    }}
+                    onClick={col.sortable ? (e) => toggleSort(col.id, e.shiftKey) : undefined}
                   >
                     <span className="inline-flex items-center gap-1">
                       {col.header}
@@ -659,6 +750,15 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                           )}
                         >
                           {sortIcon}
+                        </span>
+                      )}
+                      {isSorted && sortStates.length > 1 && (
+                        // 다중 정렬일 때만 순서 번호 표시
+                        <span
+                          aria-hidden="true"
+                          className="text-[10px] leading-none text-foreground-subtle"
+                        >
+                          {sortIdx + 1}
                         </span>
                       )}
                       {col.filterable && (
@@ -694,6 +794,16 @@ export const Grid = React.forwardRef(function GridInner<TRow = Record<string, un
                         </button>
                       )}
                     </span>
+                    {isColResizable && (
+                      // 리사이즈 핸들 — 헤더 우측 4px 영역. cursor: col-resize.
+                      <span
+                        role="separator"
+                        aria-orientation="vertical"
+                        aria-label={`${typeof col.header === 'string' ? col.header : col.id} 컬럼 폭 조절`}
+                        onMouseDown={(e) => handleResizeMouseDown(e, col)}
+                        className="absolute right-0 top-0 z-10 h-full w-1 cursor-col-resize select-none hover:bg-border-strong active:bg-border-strong"
+                      />
+                    )}
                   </th>
                 );
               })}

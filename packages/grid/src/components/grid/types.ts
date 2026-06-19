@@ -15,6 +15,15 @@ export interface GridColumn<TRow = Record<string, unknown>> {
   accessor: keyof TRow | ((row: TRow) => unknown);
   /** 셀 너비. 숫자면 px, 문자열이면 CSS 그대로 전달. */
   width?: number | string;
+  /** 리사이즈 시 최소 폭 (px). 기본 60. */
+  minWidth?: number;
+  /** 리사이즈 시 최대 폭 (px). 기본 없음. */
+  maxWidth?: number;
+  /**
+   * 이 컬럼만 리사이즈 비활성 (Grid 전체 `resizable=true`일 때 개별 예외).
+   * 기본은 Grid의 `resizable` 값을 따름.
+   */
+  resizable?: boolean;
   /** 컬럼 정렬 (left | center | right). 숫자 컬럼은 보통 right 권장. */
   align?: 'left' | 'center' | 'right';
   /**
@@ -65,7 +74,7 @@ export interface GridColumn<TRow = Record<string, unknown>> {
   filterable?: boolean;
 }
 
-/** Sort 상태 — 한 번에 한 컬럼만 (multi-column sort는 후속 버전). */
+/** Sort 상태 — 단일 컬럼 정렬. 다중 컬럼 정렬은 `GridSortState[]` 배열로. */
 export interface GridSortState {
   columnId: string;
   direction: 'asc' | 'desc';
@@ -160,6 +169,27 @@ export interface GridProps<TRow = Record<string, unknown>> extends Omit<
    * accessor가 string key인 컬럼만 paste로 입력됨 (함수 accessor는 set 불가).
    */
   clipboard?: boolean;
+  /**
+   * 전역 검색어 — 모든 visible 컬럼의 값에 대해 부분 일치(case-insensitive) 검색.
+   * 매칭되는 행만 표시. 컬럼별 필터·정렬과 함께 적용.
+   *
+   * controlled — 외부 상태로 관리. 그리드 외부의 검색 input과 연결.
+   */
+  quickFilter?: string;
+  /**
+   * 컬럼 리사이즈 활성화. 헤더 우측 경계 드래그로 폭 조절.
+   * 개별 컬럼은 `column.resizable=false`로 예외 처리.
+   *
+   * 폭 범위: `column.minWidth ?? 60` ~ `column.maxWidth ?? Infinity`.
+   *
+   * 변경된 폭은 내부 상태에 저장. 외부에서 영속화하려면 `onColumnResize` 콜백 사용.
+   */
+  resizable?: boolean;
+  /**
+   * 컬럼 폭 변경 시 호출. `column.width`보다 우선 적용된 px 값.
+   * localStorage 등에 저장 후 재방문 시 복원하는 데 사용.
+   */
+  onColumnResize?: (columnId: string, widthPx: number) => void;
   /**
    * Tree(계층) 모드. 첫 컬럼에 caret + 들여쓰기를 자동 삽입해 펼침/접힘 가능한
    * 트리뷰로 렌더한다. `getChildren`이 함께 필요.

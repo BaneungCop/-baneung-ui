@@ -29,21 +29,27 @@ function toFilterKey(v: unknown): string {
 }
 
 /**
- * filter + sort를 차례로 적용.
+ * filter + quickFilter + multi-column sort를 차례로 적용.
  *
- * filter 상태: `Record<columnId, Set<excludedValueKey>>` — 빈 set이면 필터 없음.
+ * 우선순위:
+ * 1. 컬럼별 제외 필터 (popover 체크박스 결과)
+ * 2. quickFilter — 모든 visible 컬럼에 대한 부분 일치 (case-insensitive)
+ * 3. multi-column sort — 배열의 앞쪽 컬럼이 1차 정렬, 동률 시 2차 컬럼으로 tie-break
  *
  * - 트리 모드는 sort skip (부모-자식 구조 보존).
+ * - sort가 단일 GridSortState로 들어오면 길이 1 배열로 정규화 (backward compat).
  */
 export function applySortAndFilter<TRow>(
   rows: FlatRow<TRow>[],
   columns: GridColumn<TRow>[],
   filters: Record<string, Set<string>>,
-  sort: GridSortState | null,
+  sort: GridSortState | GridSortState[] | null,
   tree: boolean,
+  quickFilter?: string,
 ): FlatRow<TRow>[] {
   let result = rows;
 
+  // 1. 컬럼별 제외 필터
   const active = Object.entries(filters).filter(([, s]) => s.size > 0);
   if (active.length > 0) {
     result = result.filter((fr) =>
@@ -55,13 +61,35 @@ export function applySortAndFilter<TRow>(
     );
   }
 
+  // 2. quickFilter — 모든 컬럼에 대해 부분 일치 검색 (case-insensitive)
+  const q = quickFilter?.trim().toLowerCase();
+  if (q) {
+    result = result.filter((fr) =>
+      columns.some((col) => {
+        const v = getValue(col, fr.row);
+        if (v == null) return false;
+        // Date는 ISO 변환 후 검색
+        const str = v instanceof Date ? v.toISOString() : String(v);
+        return str.toLowerCase().includes(q);
+      }),
+    );
+  }
+
+  // 3. multi-column sort
   if (sort && !tree) {
-    const col = columns.find((c) => c.id === sort.columnId);
-    if (col) {
-      const dir = sort.direction === 'asc' ? 1 : -1;
-      result = [...result].sort(
-        (a, b) => compareValues(getValue(col, a.row), getValue(col, b.row)) * dir,
-      );
+    const sortList = Array.isArray(sort) ? sort : [sort];
+    const validSorts = sortList
+      .map((s) => ({ s, col: columns.find((c) => c.id === s.columnId) }))
+      .filter((x): x is { s: GridSortState; col: GridColumn<TRow> } => Boolean(x.col));
+    if (validSorts.length > 0) {
+      result = [...result].sort((a, b) => {
+        for (const { s, col } of validSorts) {
+          const dir = s.direction === 'asc' ? 1 : -1;
+          const cmp = compareValues(getValue(col, a.row), getValue(col, b.row)) * dir;
+          if (cmp !== 0) return cmp;
+        }
+        return 0;
+      });
     }
   }
 
@@ -76,6 +104,28 @@ export function nextSortState(
   if (!current || current.columnId !== columnId) return { columnId, direction: 'asc' };
   if (current.direction === 'asc') return { columnId, direction: 'desc' };
   return null;
+}
+
+/**
+ * 다중 컬럼 정렬 토글 — Shift+클릭 시 호출.
+ *
+ * - 클릭한 컬럼이 정렬 배열에 없으면 끝에 'asc'로 추가
+ * - 'asc'였으면 'desc'로 전환 (같은 위치 유지)
+ * - 'desc'였으면 배열에서 제거
+ *
+ * Shift 안 누른 일반 클릭은 nextSortState로 단일 토글 → 호출자가 단일 배열로 set.
+ */
+export function nextMultiSortStates(current: GridSortState[], columnId: string): GridSortState[] {
+  const idx = current.findIndex((s) => s.columnId === columnId);
+  if (idx === -1) return [...current, { columnId, direction: 'asc' }];
+  const existing = current[idx]!;
+  if (existing.direction === 'asc') {
+    const next = [...current];
+    next[idx] = { columnId, direction: 'desc' };
+    return next;
+  }
+  // 'desc' → 제거
+  return current.filter((_, i) => i !== idx);
 }
 
 /**
