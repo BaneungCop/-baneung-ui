@@ -3,7 +3,7 @@
 > 바능(Baneung) 디자인 시스템 토큰 — CSS / JSON / TS 동시 export (Single Source of Truth)
 
 [![npm](https://img.shields.io/npm/v/@baneung-pack/tokens.svg)](https://www.npmjs.com/package/@baneung-pack/tokens)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE)
 
 **📖 데모 / 컴포넌트 카탈로그**: https://baneung-ui-docs-op7v.vercel.app
 
@@ -102,4 +102,4 @@ const path = require.resolve('@baneung-pack/tokens/json');
 
 ## 라이선스
 
-[MIT](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)
+[Apache-2.0](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)

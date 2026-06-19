@@ -3,7 +3,7 @@
 > 바능(Baneung) 디자인 시스템 — 각진 디자인의 React 컴포넌트 라이브러리
 
 [![CI](https://github.com/baneung-developer/-baneung-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/baneung-developer/-baneung-ui/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 
 **📖 데모 / 컴포넌트 카탈로그**: https://baneung-ui-docs-op7v.vercel.app
 
@@ -149,4 +149,4 @@ CI에서 모든 PR은 다음을 통과해야 머지 가능:
 
 ## 라이선스
 
-[MIT](./LICENSE) © 바능(Baneung)
+[Apache-2.0](./LICENSE) © 바능(Baneung)

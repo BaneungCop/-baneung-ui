@@ -2,6 +2,7 @@
   "name": "@baneung-pack/tokens",
   "version": "1.0.2",
   "private": false,
+  "license": "Apache-2.0",
   "description": "바능 디자인 시스템 토큰 — CSS / JSON / TS 동시 export (SSOT)",
   "type": "module",
   "main": "./dist/tokens.cjs",
@@ -18,7 +19,9 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsx scripts/build.ts",
