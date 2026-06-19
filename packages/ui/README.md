@@ -3,7 +3,7 @@
 > 바능(Baneung) 디자인 시스템 — 각진 디자인의 React 컴포넌트 라이브러리
 
 [![npm](https://img.shields.io/npm/v/@baneung-pack/ui.svg)](https://www.npmjs.com/package/@baneung-pack/ui)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/BaneungCop/-baneung-ui/blob/master/LICENSE)
 
 **📖 데모 / 컴포넌트 카탈로그**: https://baneung-ui-docs-op7v.vercel.app
 
@@ -142,10 +142,10 @@ import './globals.css';
 
 ## 링크
 
-- **GitHub**: [AhanSehoon/-baneung-ui](https://github.com/AhanSehoon/-baneung-ui)
-- **Issues**: [Bug & Feature requests](https://github.com/AhanSehoon/-baneung-ui/issues)
-- **CHANGELOG**: [최신 변경사항](https://github.com/AhanSehoon/-baneung-ui/blob/master/packages/ui/CHANGELOG.md)
+- **GitHub**: [BaneungCop/-baneung-ui](https://github.com/BaneungCop/-baneung-ui)
+- **Issues**: [Bug & Feature requests](https://github.com/BaneungCop/-baneung-ui/issues)
+- **CHANGELOG**: [최신 변경사항](https://github.com/BaneungCop/-baneung-ui/blob/master/packages/ui/CHANGELOG.md)
 
 ## 라이선스
 
-[Apache-2.0](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)
+[Apache-2.0](https://github.com/BaneungCop/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)

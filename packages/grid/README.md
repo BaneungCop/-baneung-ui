@@ -3,7 +3,7 @@
 > 바능 디자인 시스템 데이터 그리드 — virtualization 토글 + 내장 페이지네이션
 
 [![npm](https://img.shields.io/npm/v/@baneung-pack/grid.svg)](https://www.npmjs.com/package/@baneung-pack/grid)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/BaneungCop/-baneung-ui/blob/master/LICENSE)
 
 **📖 데모 / 컴포넌트 카탈로그**: https://baneung-ui-docs-op7v.vercel.app
 
@@ -235,9 +235,9 @@ const data: Node[] = [
 
 ## 링크
 
-- **GitHub**: [AhanSehoon/-baneung-ui](https://github.com/AhanSehoon/-baneung-ui)
-- **Issues**: [Bug & Feature requests](https://github.com/AhanSehoon/-baneung-ui/issues)
+- **GitHub**: [BaneungCop/-baneung-ui](https://github.com/BaneungCop/-baneung-ui)
+- **Issues**: [Bug & Feature requests](https://github.com/BaneungCop/-baneung-ui/issues)
 
 ## 라이선스
 
-[Apache-2.0](https://github.com/AhanSehoon/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)
+[Apache-2.0](https://github.com/BaneungCop/-baneung-ui/blob/master/LICENSE) © 바능(Baneung)
