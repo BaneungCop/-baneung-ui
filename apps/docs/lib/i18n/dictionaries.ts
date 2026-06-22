@@ -168,6 +168,23 @@ const ko: Dict = {
   'editorDemo.readonly': 'readOnly={true} — 편집 불가, 표시 전용 모드.',
   'editorDemo.full': '모든 기능 활성 + ref API 시연 (getHTML / setHTML / insertHTML / focus).',
   'editorDemo.props': 'Editor 컴포넌트의 모든 props와 ref API.',
+  // 컴포넌트 detail 페이지
+  'componentShell.backToList': '← 컴포넌트 목록',
+  'componentShell.exampleHeading': '예제',
+  'componentShell.installHeading': '설치 / Import',
+  'componentShell.apiHeading': 'API',
+  'componentShell.subpathNote':
+    '서브패스 import는 트리쉐이킹 친화 — 사용하지 않는 다른 컴포넌트는 번들에 포함되지 않습니다.',
+  // API 표
+  'api.property': 'Property',
+  'api.description': '설명',
+  'api.type': 'Type',
+  'api.default': '기본값',
+  'api.version': 'Version',
+  'api.empty': '노출 props 없음 (children만 받습니다).',
+  // 코드 보기 토글
+  'exampleSection.showCode': '코드 보기',
+  'exampleSection.hideCode': '코드 숨기기',
 };
 
 const en: Dict = {
@@ -335,6 +352,23 @@ const en: Dict = {
   'editorDemo.full':
     'All features enabled + ref API demo (getHTML / setHTML / insertHTML / focus).',
   'editorDemo.props': 'All props and ref API of the Editor component.',
+  // Component detail page
+  'componentShell.backToList': '← Back to components',
+  'componentShell.exampleHeading': 'Example',
+  'componentShell.installHeading': 'Install / Import',
+  'componentShell.apiHeading': 'API',
+  'componentShell.subpathNote':
+    'Subpath imports are tree-shaking friendly — unused components are excluded from the bundle.',
+  // API table
+  'api.property': 'Property',
+  'api.description': 'Description',
+  'api.type': 'Type',
+  'api.default': 'Default',
+  'api.version': 'Version',
+  'api.empty': 'No exposed props (accepts children only).',
+  // Show code toggle
+  'exampleSection.showCode': 'Show code',
+  'exampleSection.hideCode': 'Hide code',
 };
 
 export const dictionaries: Record<Locale, Dict> = { ko, en };

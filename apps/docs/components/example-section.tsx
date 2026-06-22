@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Card, CardContent, Separator, cn } from '@baneung-pack/ui';
 
 import { CodeBlock } from '@/components/code-block';
+import { useI18n } from '@/components/i18n-provider';
 
 interface ExampleSectionProps {
   Example: React.ComponentType;
@@ -19,6 +20,7 @@ interface ExampleSectionProps {
  */
 export function ExampleSection({ Example, code }: ExampleSectionProps) {
   const [showCode, setShowCode] = React.useState(false);
+  const { t } = useI18n();
 
   return (
     <Card variant="outlined">
@@ -40,7 +42,7 @@ export function ExampleSection({ Example, code }: ExampleSectionProps) {
             )}
           >
             <span aria-hidden="true">{showCode ? '∧' : '∨'}</span>
-            <span>{showCode ? '코드 숨기기' : '코드 보기'}</span>
+            <span>{showCode ? t('exampleSection.hideCode') : t('exampleSection.showCode')}</span>
           </button>
           {showCode ? (
             <>
