@@ -59,18 +59,14 @@ export default function TokensPage() {
       <Separator />
 
       <section className="flex flex-col gap-4">
-        <Heading level={2}>시맨틱 컬러</Heading>
-        <Muted>
-          라이트/다크 모드는{' '}
-          <code className="font-mono text-xs">[data-theme=&quot;dark&quot;]</code>로 자동 cascade.
-          헤더 우측의 토글로 확인하세요.
-        </Muted>
+        <Heading level={2}>{t('tokens.semanticColorsHeading')}</Heading>
+        <Muted>{t('tokens.semanticColorsDesc')}</Muted>
         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {semanticColors.map((c) => (
             <Card key={c.name} variant="outlined" className="overflow-hidden">
               <div className="h-16" style={{ backgroundColor: `var(${c.cssVar})` }} />
               <CardHeader className="p-3">
-                <CardTitle className="text-sm">{c.label}</CardTitle>
+                <CardTitle className="text-sm">{t(`tokens.color.${c.name}`)}</CardTitle>
                 <Muted className="text-xs font-mono">{c.cssVar}</Muted>
               </CardHeader>
             </Card>
@@ -81,18 +77,20 @@ export default function TokensPage() {
       <Separator />
 
       <section className="flex flex-col gap-4">
-        <Heading level={2}>타이포그래피</Heading>
-        <Muted>한·영 단일 폰트: Pretendard Variable</Muted>
+        <Heading level={2}>{t('tokens.typoHeading')}</Heading>
+        <Muted>{t('tokens.typoDesc')}</Muted>
         <Card variant="outlined">
           <CardContent className="flex flex-col gap-3 p-6">
-            {typeScale.map((t) => (
+            {typeScale.map((ts) => (
               <div
-                key={t.name}
+                key={ts.name}
                 className="flex items-baseline gap-4 border-b border-border-subtle pb-2 last:border-0"
               >
-                <span className="w-16 font-mono text-xs text-foreground-muted">{t.name}</span>
-                <span className="w-12 font-mono text-xs text-foreground-subtle">{t.size}</span>
-                <span style={{ fontSize: t.size }}>대한민국 — Baneung 디자인 시스템</span>
+                <span className="w-16 font-mono text-xs text-foreground-muted">{ts.name}</span>
+                <span className="w-12 font-mono text-xs text-foreground-subtle">{ts.size}</span>
+                <span style={{ fontSize: ts.size }}>
+                  Baneung Design System — 바능 디자인 시스템
+                </span>
               </div>
             ))}
           </CardContent>
@@ -102,8 +100,8 @@ export default function TokensPage() {
       <Separator />
 
       <section className="flex flex-col gap-4">
-        <Heading level={2}>라디우스</Heading>
-        <Muted>각진 디자인 강제 — 0/2/4 세 단계만.</Muted>
+        <Heading level={2}>{t('tokens.radiusHeading')}</Heading>
+        <Muted>{t('tokens.radiusDesc')}</Muted>
         <div className="flex gap-3">
           {radiusScale.map((r) => (
             <Card key={r.name} variant="outlined">
@@ -124,8 +122,8 @@ export default function TokensPage() {
       <Separator />
 
       <section className="flex flex-col gap-4">
-        <Heading level={2}>스페이싱</Heading>
-        <Muted>4px 베이스. space-1(4px) ~ space-32(128px).</Muted>
+        <Heading level={2}>{t('tokens.spacingHeading')}</Heading>
+        <Muted>{t('tokens.spacingDesc')}</Muted>
         <Card variant="outlined">
           <CardContent className="flex flex-col gap-2 p-6">
             {[1, 2, 4, 6, 8, 12, 16, 24, 32].map((n) => (

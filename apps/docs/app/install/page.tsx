@@ -28,26 +28,23 @@ export default function InstallPage() {
 
       <section className="flex flex-col gap-4">
         <Heading level={2} className="text-2xl">
-          패키지 개요
+          {t('install.packagesOverview')}
         </Heading>
         <ul className="flex flex-col gap-2 text-sm">
           <li>
-            <code>@baneung-pack/tokens</code> — CSS / JSON / TS 디자인 토큰 (SSOT). 모든 패키지의
-            기반.
+            <code>@baneung-pack/tokens</code> — {t('install.pkg.tokens')}
           </li>
           <li>
-            <code>@baneung-pack/ui</code> — 58개 React 컴포넌트 (Radix 기반).
+            <code>@baneung-pack/ui</code> — {t('install.pkg.ui')}
           </li>
           <li>
-            <code>@baneung-pack/grid</code> — 데이터 그리드 (가상화, 정렬·필터, Excel 호환).
+            <code>@baneung-pack/grid</code> — {t('install.pkg.grid')}
           </li>
           <li>
-            <code>@baneung-pack/editor</code> — 리치 텍스트 WYSIWYG 에디터 (의존성 0).
+            <code>@baneung-pack/editor</code> — {t('install.pkg.editor')}
           </li>
         </ul>
-        <Muted className="text-xs">
-          공통 peer deps: React <code>^18 || ^19</code>, React DOM <code>^18 || ^19</code>.
-        </Muted>
+        <Muted className="text-xs">{t('install.commonPeerDeps')}</Muted>
       </section>
 
       <Separator />
@@ -89,10 +86,7 @@ import tokens from '@baneung-pack/tokens/tokens.json';`}</code>
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          ui / grid / editor 패키지에 이미 포함돼 있어 별도 설치는 필요 없습니다. 토큰만 직접 쓰고
-          싶을 때만 단독 설치.
-        </Muted>
+        <Muted className="text-xs">{t('install.tokensNote')}</Muted>
       </section>
 
       <Separator />
@@ -118,40 +112,34 @@ yarn add @baneung-pack/ui`}</code>
         </Card>
 
         <Heading level={3} className="text-lg">
-          스타일 임포트
+          {t('install.styleImport')}
         </Heading>
         <Card>
           <CardContent>
             <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
-              <code>{`// app/layout.tsx — 한 번만 로드
+              <code>{`// app/layout.tsx
 import '@baneung-pack/ui/styles.css';`}</code>
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          ui의 styles는 <code>@layer baneung</code>에 격리됩니다. Grid·Editor를 함께 쓰면 layer가
-          자동 머지됩니다.
-        </Muted>
+        <Muted className="text-xs">{t('install.uiLayerNote')}</Muted>
 
         <Heading level={3} className="text-lg">
-          CSS 격리 (소비자 Tailwind 사용 시)
+          {t('install.cssIsolation')}
         </Heading>
         <Card>
           <CardContent>
             <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
-              <code>{`// 소비자 globals.css — preflight 제외하고 utilities만 import
+              <code>{`// globals.css — utilities only (skip preflight)
 @import 'tailwindcss/theme';
 @import 'tailwindcss/utilities';
-/* @import 'tailwindcss/preflight'; ← 의도적으로 제외 (라이브러리가 이미 제공) */
+/* @import 'tailwindcss/preflight'; */
 
 @source "./app/**/*.{ts,tsx}";`}</code>
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          소비자가 Tailwind를 자체 임포트할 때 preflight↔라이브러리 utility 충돌을 회피하는 권장
-          패턴.
-        </Muted>
+        <Muted className="text-xs">{t('install.uiTailwindNote')}</Muted>
       </section>
 
       <Separator />
@@ -175,14 +163,10 @@ yarn add @baneung-pack/grid`}</code>
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          내부 의존: <code>@tanstack/react-virtual</code> (가상화),{' '}
-          <code>class-variance-authority</code>, <code>clsx</code>, <code>tailwind-merge</code>.
-          Excel 내보내기 사용 시 추가로 <code>exceljs</code> (peer-optional) 설치 권장.
-        </Muted>
+        <Muted className="text-xs">{t('install.gridDepsNote')}</Muted>
 
         <Heading level={3} className="text-lg">
-          스타일 임포트
+          {t('install.styleImport')}
         </Heading>
         <Card>
           <CardContent>
@@ -194,7 +178,7 @@ import '@baneung-pack/grid/styles.css';`}</code>
         </Card>
 
         <Heading level={3} className="text-lg">
-          기본 사용
+          {t('install.basicUsage')}
         </Heading>
         <Card>
           <CardContent>
@@ -245,13 +229,10 @@ yarn add @baneung-pack/editor`}</code>
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          외부 에디터 라이브러리 없이 동작 — 런타임 의존성은 <code>clsx</code>·
-          <code>tailwind-merge</code> 둘뿐.
-        </Muted>
+        <Muted className="text-xs">{t('install.editorDepsNote')}</Muted>
 
         <Heading level={3} className="text-lg">
-          스타일 임포트
+          {t('install.styleImport')}
         </Heading>
         <Card>
           <CardContent>
@@ -279,11 +260,7 @@ export default function MyPage() {
             </pre>
           </CardContent>
         </Card>
-        <Muted className="text-xs">
-          Next.js App Router에서는 상태를 다루는 페이지/컴포넌트에{' '}
-          <code>&apos;use client&apos;</code>가 필요합니다 (패키지 자체에는 <code>use client</code>
-          가 주입되어 있습니다).
-        </Muted>
+        <Muted className="text-xs">{t('install.editorClientNote')}</Muted>
       </section>
 
       <Separator />
@@ -291,33 +268,33 @@ export default function MyPage() {
       <section className="flex flex-col gap-3">
         <Card>
           <CardHeader>
-            <CardTitle>다음 단계</CardTitle>
+            <CardTitle>{t('install.nextSteps')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="flex flex-col gap-1 text-sm">
               <li>
                 <Link href="/components" className="underline">
-                  컴포넌트 카탈로그
+                  {t('install.next.catalog')}
                 </Link>{' '}
-                — UI 58개 컴포넌트
+                — {t('install.next.catalogDesc')}
               </li>
               <li>
                 <Link href="/grid/basic" className="underline">
-                  Grid 가이드
+                  {t('install.next.grid')}
                 </Link>{' '}
-                — 데이터 그리드 데모/Props
+                — {t('install.next.gridDesc')}
               </li>
               <li>
                 <Link href="/editor/basic" className="underline">
-                  Editor 가이드
+                  {t('install.next.editor')}
                 </Link>{' '}
-                — 리치 텍스트 에디터 데모/Props
+                — {t('install.next.editorDesc')}
               </li>
               <li>
                 <Link href="/tokens" className="underline">
-                  디자인 토큰
+                  {t('install.next.tokens')}
                 </Link>{' '}
-                — 컬러/스페이싱/타이포
+                — {t('install.next.tokensDesc')}
               </li>
             </ul>
           </CardContent>
