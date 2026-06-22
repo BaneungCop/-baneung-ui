@@ -8,6 +8,7 @@ import { Badge, Button, Heading, Item, Kbd, Muted, Separator, cn } from '@baneun
 
 import { CommandPalette } from '@/components/command-palette';
 import { useTheme } from '@/components/theme-provider';
+import { componentMetadata } from '@/lib/components-metadata';
 
 interface NavItem {
   /** 페이지 link. 없으면 toggle-only(자식 메뉴 펼침/접힘 버튼)로 동작. */
@@ -35,7 +36,14 @@ const navSections: { label: string; items: NavItem[] }[] = [
         // href 없음 → toggle-only. 클릭 시 자식 메뉴 펼침/접힘.
         label: 'UI',
         version: 'v1.0.11',
-        children: [{ href: '/components', label: '컴포넌트' }],
+        children: [
+          { href: '/components', label: '카탈로그 (전체 보기)' },
+          // 58개 컴포넌트 — metadata에서 자동 생성 (Foundation → ... → Data Display 순서 유지).
+          ...componentMetadata.map((m) => ({
+            href: `/components/${m.slug}`,
+            label: m.title,
+          })),
+        ],
       },
       {
         // href 없음 → toggle-only. 클릭 시 자식 메뉴 펼침/접힘.
