@@ -1,4 +1,5 @@
 import { DemoPage } from '@/components/demo-page';
+import { pickGridProps } from '@/lib/grid-api';
 import { keyboardNavCode } from '@/lib/grid-demo-code';
 import { KeyboardNavDemo } from '@/lib/grid-phase3-demos';
 
@@ -9,6 +10,7 @@ export default function Page() {
       leadKey="gridDemo.keyboardNav"
       Example={KeyboardNavDemo}
       code={keyboardNavCode}
+      api={[{ title: 'GridProps', rows: pickGridProps(['cellSelection', 'clearOnDelete']) }]}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { DemoPage } from '@/components/demo-page';
+import { pickEditorProps } from '@/lib/editor-api';
 import { imageCode } from '@/lib/editor-demo-code';
 import { ImageDemo } from '@/lib/editor-demos';
 
@@ -9,6 +10,7 @@ export default function Page() {
       leadKey="editorDemo.image"
       Example={ImageDemo}
       code={imageCode}
+      api={[{ title: 'EditorProps', rows: pickEditorProps(['onImageUpload']) }]}
     />
   );
 }

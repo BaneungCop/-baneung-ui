@@ -1,4 +1,5 @@
 import { DemoPage } from '@/components/demo-page';
+import { pickGridProps } from '@/lib/grid-api';
 import { basicCode } from '@/lib/grid-demo-code';
 import { BasicDemo } from '@/lib/grid-demos';
 
@@ -9,6 +10,7 @@ export default function Page() {
       leadKey="gridDemo.basic"
       Example={BasicDemo}
       code={basicCode}
+      api={[{ title: 'GridProps', rows: pickGridProps(['columns', 'data', 'getRowId']) }]}
     />
   );
 }

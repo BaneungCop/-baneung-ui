@@ -1,4 +1,5 @@
 import { DemoPage } from '@/components/demo-page';
+import { pickGridProps } from '@/lib/grid-api';
 import { contextMenuCode } from '@/lib/grid-demo-code';
 import { ContextMenuDemo } from '@/lib/grid-phase3-demos';
 
@@ -9,6 +10,7 @@ export default function Page() {
       leadKey="gridDemo.contextMenu"
       Example={ContextMenuDemo}
       code={contextMenuCode}
+      api={[{ title: 'GridProps', rows: pickGridProps(['contextMenu']) }]}
     />
   );
 }

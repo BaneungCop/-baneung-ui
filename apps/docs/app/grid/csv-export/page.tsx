@@ -1,4 +1,5 @@
 import { DemoPage } from '@/components/demo-page';
+import { pickGridHandleMethods } from '@/lib/grid-api';
 import { csvExportCode } from '@/lib/grid-demo-code';
 import { CsvExportDemo } from '@/lib/grid-demos';
 
@@ -9,6 +10,9 @@ export default function Page() {
       leadKey="gridDemo.csvExport"
       Example={CsvExportDemo}
       code={csvExportCode}
+      apiHandles={[
+        { title: 'GridHandle', rows: pickGridHandleMethods(['exportCsv', 'getSavedData']) },
+      ]}
     />
   );
 }
