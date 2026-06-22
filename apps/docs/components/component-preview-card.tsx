@@ -5,8 +5,10 @@ import * as React from 'react';
 
 import { Card, CardDescription, CardHeader, CardTitle, Heading, Muted, cn } from '@baneung-pack/ui';
 
+import { useI18n } from '@/components/i18n-provider';
 import { allComponents, type ComponentSpec } from '@/lib/components';
 import { componentPreviews } from '@/lib/components/previews';
+import { componentDescriptionsEn } from '@/lib/i18n/component-descriptions';
 
 /**
  * 컴포넌트 카드 1개 — 상단 라이브 프리뷰 + 하단 메타.
@@ -26,8 +28,12 @@ import { componentPreviews } from '@/lib/components/previews';
  * - 큰 컴포넌트(DataTable, Calendar 등)는 클리핑되어 일부만 보임
  */
 function PreviewCard({ spec }: { spec: ComponentSpec }): React.ReactElement {
+  const { locale } = useI18n();
   // 1-instance 프리뷰가 정의돼 있으면 그걸 우선 사용, 없으면 전체 Example 사용
   const Preview = componentPreviews[spec.slug] ?? spec.Example;
+  // locale=en 일 때 영문 description으로 교체 (없으면 한국어 fallback)
+  const description =
+    locale === 'en' ? (componentDescriptionsEn[spec.slug] ?? spec.description) : spec.description;
   return (
     <div className="group relative">
       <Card
@@ -58,7 +64,7 @@ function PreviewCard({ spec }: { spec: ComponentSpec }): React.ReactElement {
         <CardHeader className="flex-1">
           <CardTitle className="text-base">{spec.title}</CardTitle>
           <CardDescription className="text-xs leading-relaxed line-clamp-2">
-            {spec.description}
+            {description}
           </CardDescription>
         </CardHeader>
       </Card>
