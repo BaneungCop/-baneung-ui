@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -13,6 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from '@baneung-pack/ui';
+
+import { useI18n } from '@/components/i18n-provider';
 
 const checklist = [
   '키보드만으로 모든 동작 가능 (Tab, Shift+Tab, Enter, Space, Esc, 화살표)',
@@ -38,11 +42,12 @@ const shortcuts = [
 ];
 
 export default function AccessibilityPage() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>접근성</Heading>
-        <Lead>WCAG 2.1 AA는 협상 불가. 모든 컴포넌트가 다음 체크리스트를 충족합니다.</Lead>
+        <Heading level={1}>{t('a11y.title')}</Heading>
+        <Lead>{t('a11y.lead')}</Lead>
       </header>
 
       <Separator />

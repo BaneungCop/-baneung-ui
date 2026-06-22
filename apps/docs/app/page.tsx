@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Badge,
   Button,
@@ -12,16 +14,19 @@ import {
   cn,
 } from '@baneung-pack/ui';
 
+import { useI18n } from '@/components/i18n-provider';
+
 const variants = ['primary', 'secondary', 'outline', 'ghost', 'destructive'] as const;
 const sizes = ['sm', 'md', 'lg'] as const;
 
 export default function HomePage() {
+  const { t } = useI18n();
   return (
     <main className={cn('mx-auto max-w-3xl px-8 py-16', 'flex flex-col gap-10')}>
       <header className="flex flex-col gap-2">
-        <Heading level={1}>@baneung-pack/ui</Heading>
-        <Lead>바능 디자인 시스템 — 각진 디자인, 절제된 컬러, 강한 타이포 위계.</Lead>
-        <Muted>Phase 4 — Buttons &amp; Toggles 데모</Muted>
+        <Heading level={1}>{t('intro.title')}</Heading>
+        <Lead>{t('intro.lead')}</Lead>
+        <Muted>Buttons &amp; Toggles 데모</Muted>
       </header>
 
       <Separator />

@@ -7,6 +7,7 @@ import * as React from 'react';
 import { Badge, Button, Heading, Item, Kbd, Muted, Separator, cn } from '@baneung-pack/ui';
 
 import { CommandPalette } from '@/components/command-palette';
+import { useI18n } from '@/components/i18n-provider';
 import { useTheme } from '@/components/theme-provider';
 import { componentMetadata } from '@/lib/components-metadata';
 
@@ -20,82 +21,84 @@ interface NavItem {
   children?: { href: string; label: string }[];
 }
 
-const navSections: { label: string; items: NavItem[] }[] = [
+/**
+ * 사이드바 nav 정의 — `label`은 i18n 키. 렌더 시 `t(label)`로 번역.
+ * UI 자식의 컴포넌트 이름(Typography 등)은 고유 명칭이라 번역 안 함.
+ */
+const navSections: { labelKey: string; items: NavItem[] }[] = [
   {
-    label: '시작하기',
+    labelKey: 'nav.gettingStarted',
     items: [
-      { href: '/', label: '소개' },
-      { href: '/install', label: 'Install' },
-      { href: '/tokens', label: '디자인 토큰' },
+      { href: '/', label: 'nav.intro' },
+      { href: '/install', label: 'nav.install' },
+      { href: '/tokens', label: 'nav.tokens' },
     ],
   },
   {
-    label: '패키지',
+    labelKey: 'nav.packages',
     items: [
       {
-        // href 없음 → toggle-only. 클릭 시 자식 메뉴 펼침/접힘.
+        // href 없음 → toggle-only. 'UI'는 패키지 이름이라 번역 안 함.
         label: 'UI',
         version: 'v1.0.11',
         children: [
-          { href: '/components', label: '카탈로그 (전체 보기)' },
+          { href: '/components', label: 'nav.catalog' },
           // 58개 컴포넌트 — metadata에서 자동 생성 (Foundation → ... → Data Display 순서 유지).
           ...componentMetadata.map((m) => ({
             href: `/components/${m.slug}`,
-            label: m.title,
+            label: m.title, // 컴포넌트 고유 명칭은 번역 X
           })),
         ],
       },
       {
-        // href 없음 → toggle-only. 클릭 시 자식 메뉴 펼침/접힘.
         label: 'Grid',
         version: 'v0.9.1',
         children: [
-          { href: '/grid/props', label: 'Props' },
-          { href: '/grid/basic', label: '기본 사용' },
-          { href: '/grid/custom-renderer', label: '커스텀 렌더러' },
-          { href: '/grid/virtualized', label: '가상화 모드' },
-          { href: '/grid/pagination', label: '내장 페이지네이션' },
-          { href: '/grid/external-pagination', label: '외부 페이지네이션' },
-          { href: '/grid/editing', label: '인라인 편집 · 선택 · ref API' },
-          { href: '/grid/tree', label: 'Tree (계층) 모드' },
-          { href: '/grid/editors-sort-filter', label: '빌트인 에디터 · 정렬 · 필터' },
-          { href: '/grid/row-operations', label: '행 추가 · 삭제 · 다중 셀 선택' },
-          { href: '/grid/csv-export', label: 'CSV 다운로드' },
-          { href: '/grid/quick-filter', label: '빠른 검색' },
-          { href: '/grid/multi-sort-resize', label: '다중 정렬 · 컬럼 폭 조절' },
-          { href: '/grid/column-visibility', label: '컬럼 표시 설정' },
-          { href: '/grid/column-pin', label: '컬럼 고정 (좌/우)' },
-          { href: '/grid/column-reorder', label: '컬럼 순서 변경' },
-          { href: '/grid/footer-aggregate', label: '합계 행' },
-          { href: '/grid/conditional-style', label: '조건부 셀 강조' },
-          { href: '/grid/keyboard-nav', label: '키보드로 셀 이동' },
-          { href: '/grid/context-menu', label: '우클릭 메뉴' },
-          { href: '/grid/excel', label: 'Excel 내보내기 · 클립보드' },
-          { href: '/grid/save-view', label: '설정 자동 저장' },
-          { href: '/grid/all-features', label: '관리자 화면 통합 예제' },
+          { href: '/grid/props', label: 'nav.grid.props' },
+          { href: '/grid/basic', label: 'nav.grid.basic' },
+          { href: '/grid/custom-renderer', label: 'nav.grid.customRenderer' },
+          { href: '/grid/virtualized', label: 'nav.grid.virtualized' },
+          { href: '/grid/pagination', label: 'nav.grid.pagination' },
+          { href: '/grid/external-pagination', label: 'nav.grid.externalPagination' },
+          { href: '/grid/editing', label: 'nav.grid.editing' },
+          { href: '/grid/tree', label: 'nav.grid.tree' },
+          { href: '/grid/editors-sort-filter', label: 'nav.grid.editorsSortFilter' },
+          { href: '/grid/row-operations', label: 'nav.grid.rowOperations' },
+          { href: '/grid/csv-export', label: 'nav.grid.csvExport' },
+          { href: '/grid/quick-filter', label: 'nav.grid.quickFilter' },
+          { href: '/grid/multi-sort-resize', label: 'nav.grid.multiSortResize' },
+          { href: '/grid/column-visibility', label: 'nav.grid.columnVisibility' },
+          { href: '/grid/column-pin', label: 'nav.grid.columnPin' },
+          { href: '/grid/column-reorder', label: 'nav.grid.columnReorder' },
+          { href: '/grid/footer-aggregate', label: 'nav.grid.footerAggregate' },
+          { href: '/grid/conditional-style', label: 'nav.grid.conditionalStyle' },
+          { href: '/grid/keyboard-nav', label: 'nav.grid.keyboardNav' },
+          { href: '/grid/context-menu', label: 'nav.grid.contextMenu' },
+          { href: '/grid/excel', label: 'nav.grid.excel' },
+          { href: '/grid/save-view', label: 'nav.grid.saveView' },
+          { href: '/grid/all-features', label: 'nav.grid.allFeatures' },
         ],
       },
       {
-        // href 없음 → toggle-only. 클릭 시 자식 메뉴 펼침/접힘.
         label: 'Editor',
         version: 'v0.1.1',
         children: [
-          { href: '/editor/props', label: 'Props' },
-          { href: '/editor/basic', label: '기본 사용' },
-          { href: '/editor/controlled', label: '제어 · HTML 출력' },
-          { href: '/editor/image', label: '이미지 붙여넣기 · 드롭' },
-          { href: '/editor/custom-toolbar', label: '커스텀 툴바' },
-          { href: '/editor/readonly', label: '읽기 전용' },
-          { href: '/editor/full', label: '전체 기능 · ref API' },
+          { href: '/editor/props', label: 'nav.editor.props' },
+          { href: '/editor/basic', label: 'nav.editor.basic' },
+          { href: '/editor/controlled', label: 'nav.editor.controlled' },
+          { href: '/editor/image', label: 'nav.editor.image' },
+          { href: '/editor/custom-toolbar', label: 'nav.editor.customToolbar' },
+          { href: '/editor/readonly', label: 'nav.editor.readonly' },
+          { href: '/editor/full', label: 'nav.editor.full' },
         ],
       },
     ],
   },
   {
-    label: '가이드',
+    labelKey: 'nav.guide',
     items: [
-      { href: '/accessibility', label: '접근성' },
-      { href: '/versions', label: 'Versions' },
+      { href: '/accessibility', label: 'nav.accessibility' },
+      { href: '/versions', label: 'nav.versions' },
     ],
   },
 ];
@@ -123,6 +126,7 @@ function autoExpandedLabels(pathname: string): Set<string> {
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
+  const { locale, toggleLocale, t } = useI18n();
   const [paletteOpen, setPaletteOpen] = React.useState(false);
   // 사용자 수동 토글 + 자동 펼침을 통합한 expanded label 집합.
   const [expandedLabels, setExpandedLabels] = React.useState<Set<string>>(() =>
@@ -179,8 +183,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
         <nav className="flex-1 overflow-y-auto p-3">
           {navSections.map((section) => (
-            <div key={section.label} className="mb-4">
-              <Muted className="px-3 text-xs uppercase tracking-wide">{section.label}</Muted>
+            <div key={section.labelKey} className="mb-4">
+              <Muted className="px-3 text-xs uppercase tracking-wide">{t(section.labelKey)}</Muted>
               <ul className="mt-1 flex flex-col">
                 {section.items.map((item) => {
                   const isLink = !!item.href;
@@ -192,10 +196,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                     <li key={item.label}>
                       {isLink ? (
                         <Item asChild selected={isActive} className="px-3">
-                          <Link href={item.href!}>{item.label}</Link>
+                          <Link href={item.href!}>{t(item.label)}</Link>
                         </Item>
                       ) : (
-                        // toggle-only: 자식 메뉴 펼침/접힘 버튼
+                        // toggle-only: 자식 메뉴 펼침/접힘 버튼 (패키지 이름은 번역 X)
                         <Item asChild className="px-3">
                           <button
                             type="button"
@@ -203,7 +207,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                             onClick={() => toggleLabel(item.label)}
                             className="flex w-full items-center justify-between gap-2 whitespace-nowrap"
                           >
-                            {/* 패키지명 + 버전 뱃지 — 한 줄에 모두 표시 (줄바꿈 금지) */}
                             <span className="flex min-w-0 items-center gap-1.5 truncate">
                               <span className="text-sm font-medium">{item.label}</span>
                               {item.version && (
@@ -233,7 +236,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                             return (
                               <li key={child.href}>
                                 <Item asChild selected={childIsActive} className="px-3 text-xs">
-                                  <Link href={child.href}>{child.label}</Link>
+                                  <Link href={child.href}>{t(child.label)}</Link>
                                 </Item>
                               </li>
                             );
@@ -276,11 +279,21 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               )}
               aria-label="명령 팔레트 열기"
             >
-              <span>검색</span>
+              <span>{t('header.search')}</span>
               <Kbd>⌘ K</Kbd>
             </button>
             <Separator orientation="vertical" className="h-6" />
-            <Button variant="ghost" size="sm" onClick={toggle} aria-label="테마 토글">
+            {/* 언어 토글 — 테마 버튼 좌측에 배치 */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLocale}
+              aria-label={t('header.languageToggle')}
+              className="font-medium"
+            >
+              {locale === 'ko' ? 'EN' : 'KO'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={toggle} aria-label={t('header.themeToggle')}>
               {theme === 'dark' ? '☀' : '☾'}
             </Button>
           </div>

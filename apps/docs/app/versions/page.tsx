@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Badge,
   Card,
@@ -10,6 +12,8 @@ import {
   Muted,
   Separator,
 } from '@baneung-pack/ui';
+
+import { useI18n } from '@/components/i18n-provider';
 
 type VersionType = 'major' | 'minor' | 'patch';
 
@@ -437,6 +441,7 @@ function VersionTypeBadge({ type }: { type: VersionType }) {
 }
 
 function PackageHistorySection({ history }: { history: PackageHistory }) {
+  const { t } = useI18n();
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
@@ -445,7 +450,7 @@ function PackageHistorySection({ history }: { history: PackageHistory }) {
         </Heading>
         <div className="flex items-center gap-2">
           <Muted className="text-xs">
-            현재: <strong className="text-foreground">v{history.current}</strong>
+            {t('versions.current')}: <strong className="text-foreground">v{history.current}</strong>
           </Muted>
           <a
             href={history.npmUrl}
@@ -482,18 +487,12 @@ function PackageHistorySection({ history }: { history: PackageHistory }) {
 }
 
 export default function VersionsPage() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Versions</Heading>
-        <Lead>
-          바능 디자인 시스템 패키지의 릴리스 히스토리. 첫 출시부터 현재까지 각 버전에서 어떤 것들이
-          추가/변경됐는지 정리.
-        </Lead>
-        <Muted className="text-xs">
-          버전 표기: 빨강 = MAJOR (호환성 깨짐) · 회색 = MINOR (기능 추가) · 외곽선 = PATCH (버그
-          수정/문서).
-        </Muted>
+        <Heading level={1}>{t('versions.title')}</Heading>
+        <Lead>{t('versions.lead')}</Lead>
       </header>
 
       <Separator />

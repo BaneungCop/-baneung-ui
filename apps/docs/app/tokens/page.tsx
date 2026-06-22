@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Card,
   CardContent,
@@ -8,6 +10,8 @@ import {
   Muted,
   Separator,
 } from '@baneung-pack/ui';
+
+import { useI18n } from '@/components/i18n-provider';
 
 const semanticColors = [
   { name: 'canvas', label: '바탕', cssVar: '--color-bg-canvas' },
@@ -44,13 +48,12 @@ const radiusScale = [
 ];
 
 export default function TokensPage() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>디자인 토큰</Heading>
-        <Lead>
-          모든 컴포넌트가 참조하는 단일 진실 공급원(SSOT). CSS 변수, JSON, TS 동시 export.
-        </Lead>
+        <Heading level={1}>{t('tokens.title')}</Heading>
+        <Lead>{t('tokens.lead')}</Lead>
       </header>
 
       <Separator />

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 import {
@@ -11,12 +13,15 @@ import {
   Separator,
 } from '@baneung-pack/ui';
 
+import { useI18n } from '@/components/i18n-provider';
+
 export default function InstallPage() {
+  const { t } = useI18n();
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Install</Heading>
-        <Lead>바능 디자인 시스템 패키지 설치 가이드. 필요한 패키지만 골라서 설치하세요.</Lead>
+        <Heading level={1}>{t('install.title')}</Heading>
+        <Lead>{t('install.lead')}</Lead>
       </header>
 
       <Separator />

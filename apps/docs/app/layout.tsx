@@ -1,5 +1,6 @@
 import { GoogleTagManager } from '@next/third-parties/google';
 
+import { I18nProvider } from '@/components/i18n-provider';
 import { SiteShell } from '@/components/site-shell';
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -38,7 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
       <body className="bg-canvas text-foreground antialiased">
         <ThemeProvider>
-          <SiteShell>{children}</SiteShell>
+          <I18nProvider>
+            <SiteShell>{children}</SiteShell>
+          </I18nProvider>
         </ThemeProvider>
       </body>
     </html>
