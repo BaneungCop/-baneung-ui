@@ -44,6 +44,36 @@ const ko: Dict = {
   'nav.grid.excel': 'Excel 내보내기 · 클립보드',
   'nav.grid.saveView': '설정 자동 저장',
   'nav.grid.allFeatures': '관리자 화면 통합 예제',
+  // Chart 자식 (2-level: 차트 종류 > 변형)
+  'nav.chart.props': 'Props',
+  'nav.chart.bar': '막대 차트',
+  'nav.chart.bar.basic': '기본',
+  'nav.chart.bar.stacked': '누적',
+  'nav.chart.bar.horizontal': '가로 막대',
+  'nav.chart.bar.positiveNegative': '양수/음수',
+  'nav.chart.bar.koreanFormat': '한글 숫자 포맷',
+  'nav.chart.bar.mixed': '혼합 (Pareto)',
+  'nav.chart.bar.mixedSimple': '혼합 (단순)',
+  'nav.chart.line': '선 차트',
+  'nav.chart.line.basic': '기본',
+  'nav.chart.line.smooth': '곡선 보간',
+  'nav.chart.area': '영역 차트',
+  'nav.chart.area.basic': '기본',
+  'nav.chart.area.stacked': '누적',
+  'nav.chart.scatter': '산점도 차트',
+  'nav.chart.scatter.basic': '기본',
+  'nav.chart.scatter.shapes': '모양 변형',
+  'nav.chart.radar': '레이더 차트',
+  'nav.chart.radar.basic': '기본',
+  'nav.chart.radar.filled': '채움만',
+  'nav.chart.radar.outline': '외곽선만',
+  'nav.chart.waterfall': '폭포 차트',
+  'nav.chart.flow': '플로우 차트',
+  'nav.chart.flow.basic': '기본',
+  'nav.chart.flow.custom': '커스텀 엣지',
+  'nav.chart.flow.workflow': '워크플로',
+  'nav.chart.pie': '파이 차트',
+  'nav.chart.doughnut': '도넛 차트',
   // Editor 자식
   'nav.editor.props': 'Props',
   'nav.editor.basic': '기본 사용',
@@ -157,6 +187,42 @@ const ko: Dict = {
     '행 추가 (above/below active) · 선택 행 삭제 · 다중 셀 드래그 선택 + Delete로 클리어.',
   'gridDemo.csvExport':
     'ref.exportCsv(filename) — 편집 반영 후 다운로드. 변경분만/전체 둘 다 export 가능.',
+  // Chart 데모 lead
+  'chartDemo.bar':
+    '카테고리별 비교에 적합한 막대 차트. xKey + yKeys로 시리즈를 지정합니다. stacked / horizontal 옵션 지원.',
+  'chartDemo.barStacked': '누적 막대 (stacked=true)',
+  'chartDemo.barHorizontal': '가로 막대 (horizontal=true)',
+  'chartDemo.barPositiveNegative':
+    '양수/음수 혼합 — 데이터에 음수만 있으면 자동으로 0 기준선 아래로 그려짐',
+  'chartDemo.barKoreanFormat':
+    '한글 숫자 포맷 (valueFormat="korean") — 큰 수치를 자동으로 만/억/조 단위로 표시. tooltip · 막대 위 라벨 · y축 tick 모두 일관 적용. 접근성 sr-only 테이블도 자동 포함.',
+  'chartDemo.line':
+    '시계열 등 연속 데이터에 적합한 선 차트. smooth로 곡선 보간, showDots로 데이터 포인트 표시.',
+  'chartDemo.lineSmooth': '곡선 보간 (smooth=true)',
+  'chartDemo.area':
+    '누적 추세·시장 점유율 변화 등에 적합한 영역 차트. stacked + fillOpacity 조절 가능.',
+  'chartDemo.areaStacked': '누적 영역 (stacked=true)',
+  'chartDemo.mixed':
+    '막대 + 선 혼합 차트. 우측 보조 y축 옵션으로 Pareto, 매출+누적% 등 듀얼 스케일 표현 가능.',
+  'chartDemo.mixedSimple': '듀얼 축 없는 단순 mix (좌측 축 공유)',
+  'chartDemo.waterfall':
+    '누적 변화 시각화 — 각 막대는 이전 누적값에서 시작해 양수(녹색)/음수(빨강)만큼 위·아래로 이동. 시작/끝 total(파랑)은 0부터 풀바.',
+  'chartDemo.scatter':
+    '산점도 — 두 변수의 상관관계 시각화. `groupKey`로 데이터를 자동 그룹핑해 시리즈별 다른 색 점으로 렌더.',
+  'chartDemo.scatterShapes':
+    '시리즈별 다른 모양 — `pointStyle` 배열로 색약 사용자도 형태로 구분 가능 (개발팀=▲, 디자인팀=◆)',
+  'chartDemo.radar':
+    '레이더 차트 — 여러 축의 값을 방사형으로 비교. 각 데이터 행이 하나의 radar 모양이 되며 시리즈별로 채움 영역이 겹쳐서 그려짐. 개발자 역량 평가 시나리오.',
+  'chartDemo.radarFilled': '외곽선 없이 채움만 (showLine={false} + fillOpacity={0.45})',
+  'chartDemo.radarOutline': '외곽선만 (fillOpacity={0}) — 시리즈 간 비교가 더 명확',
+  'chartDemo.flow':
+    '플로우 차트 — SVG 기반 노드-엣지 그래프. 내장 4종 edge(straight/bezier/step/smoothstep) + 사용자가 path 함수를 등록해 임의 모양 edge 추가. 마우스 드래그로 캔버스 pan 가능.',
+  'chartDemo.flowCustom':
+    '커스텀 edge — `edgeTypes` prop에 path 함수 등록 ({sourceX, sourceY, targetX, targetY, ...} → SVG path d). 여기선 wavy(사인파)와 arc(반원) 두 가지 사용자 정의.',
+  'chartDemo.flowWorkflow':
+    '분기/병합 워크플로 — 결제 승인 시나리오. 노드별 색상, animated edge로 진행 강조, dashed edge로 거절 경로 차별화.',
+  'chartDemo.pie': '부분/전체 비율을 표시하는 파이 차트. innerRadius로 도넛 변환 가능.',
+  'chartDemo.doughnut': '도넛 차트 — PieChart wrapper. thickness로 가운데 빈 비율 조절.',
   // Editor 데모 lead
   'editorDemo.basic':
     '컨트롤되지 않은 기본 사용 — defaultValue로 초기 HTML 설정. 사용자가 자유롭게 편집.',
@@ -191,6 +257,10 @@ const ko: Dict = {
   'install.pkg.ui': '58개 React 컴포넌트 (Radix 기반).',
   'install.pkg.grid': '데이터 그리드 (가상화, 정렬·필터, Excel 호환).',
   'install.pkg.editor': '리치 텍스트 WYSIWYG 에디터 (의존성 0).',
+  'install.pkg.chart':
+    '차트 라이브러리 — Canvas(chart.js) 기반 (Bar / Line / Area / Pie / Doughnut).',
+  'install.chartDepsNote':
+    'chart.js ^4.4.0과 react-chartjs-2 ^5.2.0을 peer dependency로 함께 설치해야 합니다. Canvas 기반이라 대량 데이터 포인트에서 가볍게 동작합니다.',
   'install.next.catalog': '컴포넌트 카탈로그',
   'install.next.catalogDesc': 'UI 58개 컴포넌트',
   'install.next.grid': 'Grid 가이드',
@@ -282,6 +352,36 @@ const en: Dict = {
   'nav.grid.excel': 'Excel export · clipboard',
   'nav.grid.saveView': 'Auto-save view',
   'nav.grid.allFeatures': 'Admin screen — all features',
+  // Chart children
+  'nav.chart.props': 'Props',
+  'nav.chart.bar': 'Bar chart',
+  'nav.chart.bar.basic': 'Basic',
+  'nav.chart.bar.stacked': 'Stacked',
+  'nav.chart.bar.horizontal': 'Horizontal',
+  'nav.chart.bar.positiveNegative': 'Positive / negative',
+  'nav.chart.bar.koreanFormat': 'Korean number format',
+  'nav.chart.bar.mixed': 'Mixed (Pareto)',
+  'nav.chart.bar.mixedSimple': 'Mixed (simple)',
+  'nav.chart.line': 'Line chart',
+  'nav.chart.line.basic': 'Basic',
+  'nav.chart.line.smooth': 'Smooth interpolation',
+  'nav.chart.area': 'Area chart',
+  'nav.chart.area.basic': 'Basic',
+  'nav.chart.area.stacked': 'Stacked',
+  'nav.chart.scatter': 'Scatter chart',
+  'nav.chart.scatter.basic': 'Basic',
+  'nav.chart.scatter.shapes': 'Shape variants',
+  'nav.chart.radar': 'Radar chart',
+  'nav.chart.radar.basic': 'Basic',
+  'nav.chart.radar.filled': 'Fill only',
+  'nav.chart.radar.outline': 'Outline only',
+  'nav.chart.waterfall': 'Waterfall chart',
+  'nav.chart.flow': 'Flow chart',
+  'nav.chart.flow.basic': 'Basic',
+  'nav.chart.flow.custom': 'Custom edges',
+  'nav.chart.flow.workflow': 'Workflow',
+  'nav.chart.pie': 'Pie chart',
+  'nav.chart.doughnut': 'Doughnut chart',
   // Editor children
   'nav.editor.props': 'Props',
   'nav.editor.basic': 'Basic usage',
@@ -400,6 +500,43 @@ const en: Dict = {
     'Add row (above/below active) · delete selected rows · multi-cell drag select + Delete to clear.',
   'gridDemo.csvExport':
     'ref.exportCsv(filename) — downloads after edits are applied. Export changed-only or full data.',
+  // Chart demo leads
+  'chartDemo.bar':
+    'Bar chart for category comparison. Specify series via xKey + yKeys. Supports stacked / horizontal.',
+  'chartDemo.barStacked': 'Stacked bars (stacked=true)',
+  'chartDemo.barHorizontal': 'Horizontal bars (horizontal=true)',
+  'chartDemo.barPositiveNegative':
+    'Positive/negative mix — bars below the zero line render automatically from negative data',
+  'chartDemo.barKoreanFormat':
+    'Korean number format (valueFormat="korean") — large numbers auto-formatted as 만/억/조 units. Applied uniformly across tooltip, value labels, and y-axis ticks. Accessibility sr-only table included.',
+  'chartDemo.line':
+    'Line chart for continuous data (time series, etc.). Smooth via monotone interpolation; toggle dots with showDots.',
+  'chartDemo.lineSmooth': 'Smooth interpolation (smooth=true)',
+  'chartDemo.area':
+    'Area chart for cumulative trends, market share over time, etc. Supports stacked + fillOpacity.',
+  'chartDemo.areaStacked': 'Stacked areas (stacked=true)',
+  'chartDemo.mixed':
+    'Bar + Line mixed chart. Optional right y-axis enables dual-scale views like Pareto (sales + cumulative %).',
+  'chartDemo.mixedSimple': 'Simple mix without dual axis (shared left axis)',
+  'chartDemo.waterfall':
+    'Cumulative-change visualization — each bar starts where the previous ended, going up (green) or down (red). Start/end totals (blue) are full bars from zero.',
+  'chartDemo.scatter':
+    'Scatter chart — visualize correlation between two variables. `groupKey` auto-groups rows into separate colored series.',
+  'chartDemo.scatterShapes':
+    'Different shapes per series — `pointStyle` array makes series distinguishable by form for colorblind users (Dev=▲, Design=◆)',
+  'chartDemo.radar':
+    'Radar chart — compare values across multiple axes radially. Each row becomes one radar shape; series overlap with translucent fill. Developer skill assessment scenario.',
+  'chartDemo.radarFilled': 'Fill only, no outline (showLine={false} + fillOpacity={0.45})',
+  'chartDemo.radarOutline': 'Outline only (fillOpacity={0}) — cleaner cross-series comparison',
+  'chartDemo.flow':
+    'Flow chart — SVG node-edge graph. 4 built-in edge types (straight/bezier/step/smoothstep) plus user-defined path functions for any shape. Mouse-drag to pan the canvas.',
+  'chartDemo.flowCustom':
+    'Custom edges — register path functions via `edgeTypes` prop ({sourceX, sourceY, ...} → SVG path d string). Shown here: wavy (sine) and arc (semicircle).',
+  'chartDemo.flowWorkflow':
+    'Branching workflow — payment approval scenario. Per-node colors, animated edges for in-flight steps, dashed edges for rejection path.',
+  'chartDemo.pie': 'Pie chart for part-of-whole proportions. Set innerRadius to make a doughnut.',
+  'chartDemo.doughnut':
+    'Doughnut chart — a PieChart wrapper. Adjust the inner ratio with thickness.',
   // Editor demo leads
   'editorDemo.basic':
     'Uncontrolled basic usage — set initial HTML via defaultValue. Users edit freely.',
@@ -435,6 +572,10 @@ const en: Dict = {
   'install.pkg.ui': '58 React components (Radix-based).',
   'install.pkg.grid': 'Data grid (virtualization, sort/filter, Excel compatible).',
   'install.pkg.editor': 'Rich text WYSIWYG editor (zero dependencies).',
+  'install.pkg.chart':
+    'Chart library — Canvas-based on chart.js (Bar / Line / Area / Pie / Doughnut).',
+  'install.chartDepsNote':
+    'Install chart.js ^4.4.0 and react-chartjs-2 ^5.2.0 alongside as peer dependencies. Canvas-based — light on large datasets.',
   'install.next.catalog': 'Component catalog',
   'install.next.catalogDesc': '58 UI components',
   'install.next.grid': 'Grid guide',

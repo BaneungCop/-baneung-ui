@@ -24,14 +24,15 @@ import { useI18n } from '@/components/i18n-provider';
 import { useTheme } from '@/components/theme-provider';
 import { componentMetadata } from '@/lib/components-metadata';
 
+/** 사이드바 메뉴 항목 — children이 재귀적이라 임의 깊이 nesting 가능. */
 interface NavItem {
   /** 페이지 link. 없으면 toggle-only(자식 메뉴 펼침/접힘 버튼)로 동작. */
   href?: string;
   label: string;
   /** 옵션 — 라벨 우측에 표시할 버전 뱃지 (예: 'v1.0.11'). */
   version?: string;
-  /** 옵션 — 이 항목 아래 들여쓰기로 표시할 하위 메뉴. */
-  children?: { href: string; label: string }[];
+  /** 옵션 — 이 항목 아래 들여쓰기로 표시할 하위 메뉴. NavItem 재귀로 임의 깊이 가능. */
+  children?: NavItem[];
 }
 
 /**
@@ -93,6 +94,66 @@ const navSections: { labelKey: string; items: NavItem[] }[] = [
         ],
       },
       {
+        label: 'Chart',
+        version: 'v0.3.0',
+        children: [
+          { href: '/chart/props', label: 'nav.chart.props' },
+          // 막대 차트 — variants를 모두 sub-pages로. Mixed도 막대 카테고리 산하로 이동.
+          {
+            label: 'nav.chart.bar',
+            children: [
+              { href: '/chart/bar', label: 'nav.chart.bar.basic' },
+              { href: '/chart/bar/stacked', label: 'nav.chart.bar.stacked' },
+              { href: '/chart/bar/horizontal', label: 'nav.chart.bar.horizontal' },
+              { href: '/chart/bar/positive-negative', label: 'nav.chart.bar.positiveNegative' },
+              { href: '/chart/bar/korean-format', label: 'nav.chart.bar.koreanFormat' },
+              { href: '/chart/bar/mixed', label: 'nav.chart.bar.mixed' },
+              { href: '/chart/bar/mixed-simple', label: 'nav.chart.bar.mixedSimple' },
+            ],
+          },
+          {
+            label: 'nav.chart.line',
+            children: [
+              { href: '/chart/line', label: 'nav.chart.line.basic' },
+              { href: '/chart/line/smooth', label: 'nav.chart.line.smooth' },
+            ],
+          },
+          {
+            label: 'nav.chart.area',
+            children: [
+              { href: '/chart/area', label: 'nav.chart.area.basic' },
+              { href: '/chart/area/stacked', label: 'nav.chart.area.stacked' },
+            ],
+          },
+          {
+            label: 'nav.chart.scatter',
+            children: [
+              { href: '/chart/scatter', label: 'nav.chart.scatter.basic' },
+              { href: '/chart/scatter/shapes', label: 'nav.chart.scatter.shapes' },
+            ],
+          },
+          {
+            label: 'nav.chart.radar',
+            children: [
+              { href: '/chart/radar', label: 'nav.chart.radar.basic' },
+              { href: '/chart/radar/filled', label: 'nav.chart.radar.filled' },
+              { href: '/chart/radar/outline', label: 'nav.chart.radar.outline' },
+            ],
+          },
+          { href: '/chart/waterfall', label: 'nav.chart.waterfall' },
+          {
+            label: 'nav.chart.flow',
+            children: [
+              { href: '/chart/flow', label: 'nav.chart.flow.basic' },
+              { href: '/chart/flow/custom', label: 'nav.chart.flow.custom' },
+              { href: '/chart/flow/workflow', label: 'nav.chart.flow.workflow' },
+            ],
+          },
+          { href: '/chart/pie', label: 'nav.chart.pie' },
+          { href: '/chart/doughnut', label: 'nav.chart.doughnut' },
+        ],
+      },
+      {
         label: 'Editor',
         version: 'v0.1.1',
         children: [
@@ -116,13 +177,25 @@ const navSections: { labelKey: string; items: NavItem[] }[] = [
   },
 ];
 
-/** 현재 path 기준 — 자식 중 하나가 활성인 parent label 집합. */
+/**
+ * 현재 path 기준 — 자식(또는 그 후손) 중 하나가 활성인 모든 parent label 집합.
+ * 재귀로 모든 nesting level을 확장해서 활성 페이지까지 가는 경로의 부모를 전부 펼침.
+ */
 function autoExpandedLabels(pathname: string): Set<string> {
   const set = new Set<string>();
-  for (const section of navSections) {
-    for (const item of section.items) {
-      if (item.children?.some((c) => pathname === c.href)) set.add(item.label);
+  /** item 또는 그 후손이 현재 path와 일치하면 true. 일치하면 이 item의 label도 set에 추가. */
+  function walk(item: NavItem): boolean {
+    if (item.href === pathname) return true;
+    if (!item.children) return false;
+    let matched = false;
+    for (const c of item.children) {
+      if (walk(c)) matched = true;
     }
+    if (matched) set.add(item.label);
+    return matched;
+  }
+  for (const section of navSections) {
+    for (const item of section.items) walk(item);
   }
   return set;
 }
@@ -194,77 +267,76 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   /**
    * 네비게이션 트리 — 사이드바와 모바일 시트가 공유.
    * onItemClick은 모바일 시트에서 자식 링크 클릭 시 시트를 닫는 용도.
+   *
+   * 재귀 렌더 — children이 또 children을 가지면 깊이별 들여쓰기로 자동 확장.
+   * 현재 사용: 패키지 > Chart > BarChart > [stacked, horizontal, ...] (3-level).
    */
+  const renderItem = (item: NavItem, depth: number, onItemClick?: () => void): React.ReactNode => {
+    const isLink = !!item.href;
+    const isActive = isLink && pathname === item.href;
+    const isExpanded = item.children ? expandedLabels.has(item.label) : false;
+    const showChildren = item.children && isExpanded;
+    // 깊이별 들여쓰기 + 글자 크기 — depth 0(패키지)부터 시작.
+    const textSize = depth >= 2 ? 'text-xs' : depth === 1 ? 'text-xs' : 'text-sm';
+    const linkClass = cn('px-3', textSize);
+
+    // toggle-only 버튼은 항상 두꺼운 글씨로 그룹 헤더 느낌.
+    return (
+      <li key={item.label}>
+        {isLink ? (
+          <Item asChild selected={isActive} className={linkClass}>
+            <Link href={item.href!} onClick={onItemClick}>
+              {t(item.label)}
+            </Link>
+          </Item>
+        ) : (
+          <Item asChild className={linkClass}>
+            <button
+              type="button"
+              aria-expanded={isExpanded}
+              onClick={() => toggleLabel(item.label)}
+              className="flex w-full items-center justify-between gap-2 whitespace-nowrap"
+            >
+              <span className="flex min-w-0 items-center gap-1.5 truncate">
+                <span className={cn('font-medium', depth === 0 ? 'text-sm' : 'text-xs')}>
+                  {depth === 0 ? item.label : t(item.label)}
+                </span>
+                {item.version && (
+                  <Badge variant="secondary" className="text-[10px]">
+                    {item.version}
+                  </Badge>
+                )}
+              </span>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 16 16"
+                className={cn(
+                  'h-4 w-4 shrink-0 text-foreground-muted transition-transform duration-fast ease-standard',
+                  isExpanded && 'rotate-90',
+                )}
+                fill="currentColor"
+              >
+                <path d="M6 4l4 4-4 4V4z" />
+              </svg>
+            </button>
+          </Item>
+        )}
+        {showChildren && (
+          <ul className="ml-4 mt-1 flex flex-col border-l border-border-subtle">
+            {item.children!.map((child) => renderItem(child, depth + 1, onItemClick))}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
   const renderNavTree = (onItemClick?: () => void) => (
     <nav className="flex-1 overflow-y-auto p-3">
       {navSections.map((section) => (
         <div key={section.labelKey} className="mb-4">
           <Muted className="px-3 text-xs uppercase tracking-wide">{t(section.labelKey)}</Muted>
           <ul className="mt-1 flex flex-col">
-            {section.items.map((item) => {
-              const isLink = !!item.href;
-              const isActive = isLink && pathname === item.href;
-              const isExpanded = item.children ? expandedLabels.has(item.label) : false;
-              const showChildren = item.children && isExpanded;
-
-              return (
-                <li key={item.label}>
-                  {isLink ? (
-                    <Item asChild selected={isActive} className="px-3">
-                      <Link href={item.href!} onClick={onItemClick}>
-                        {t(item.label)}
-                      </Link>
-                    </Item>
-                  ) : (
-                    // toggle-only: 자식 메뉴 펼침/접힘 버튼 (패키지 이름은 번역 X)
-                    <Item asChild className="px-3">
-                      <button
-                        type="button"
-                        aria-expanded={isExpanded}
-                        onClick={() => toggleLabel(item.label)}
-                        className="flex w-full items-center justify-between gap-2 whitespace-nowrap"
-                      >
-                        <span className="flex min-w-0 items-center gap-1.5 truncate">
-                          <span className="text-sm font-medium">{item.label}</span>
-                          {item.version && (
-                            <Badge variant="secondary" className="text-[10px]">
-                              {item.version}
-                            </Badge>
-                          )}
-                        </span>
-                        <svg
-                          aria-hidden="true"
-                          viewBox="0 0 16 16"
-                          className={cn(
-                            'h-4 w-4 shrink-0 text-foreground-muted transition-transform duration-fast ease-standard',
-                            isExpanded && 'rotate-90',
-                          )}
-                          fill="currentColor"
-                        >
-                          <path d="M6 4l4 4-4 4V4z" />
-                        </svg>
-                      </button>
-                    </Item>
-                  )}
-                  {showChildren && (
-                    <ul className="ml-4 mt-1 flex flex-col border-l border-border-subtle">
-                      {item.children!.map((child) => {
-                        const childIsActive = pathname === child.href;
-                        return (
-                          <li key={child.href}>
-                            <Item asChild selected={childIsActive} className="px-3 text-xs">
-                              <Link href={child.href} onClick={onItemClick}>
-                                {t(child.label)}
-                              </Link>
-                            </Item>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </li>
-              );
-            })}
+            {section.items.map((item) => renderItem(item, 0, onItemClick))}
           </ul>
         </div>
       ))}

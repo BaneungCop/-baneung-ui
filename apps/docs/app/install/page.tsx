@@ -43,6 +43,9 @@ export default function InstallPage() {
           <li>
             <code>@baneung-pack/editor</code> — {t('install.pkg.editor')}
           </li>
+          <li>
+            <code>@baneung-pack/chart</code> — {t('install.pkg.chart')}
+          </li>
         </ul>
         <Muted className="text-xs">{t('install.commonPeerDeps')}</Muted>
       </section>
@@ -261,6 +264,70 @@ export default function MyPage() {
           </CardContent>
         </Card>
         <Muted className="text-xs">{t('install.editorClientNote')}</Muted>
+      </section>
+
+      <Separator />
+
+      {/* ─────────────────────────────── chart ─────────────────────────────── */}
+      <section className="flex flex-col gap-4">
+        <Heading level={2} className="text-2xl">
+          @baneung-pack/chart
+        </Heading>
+        <Card>
+          <CardContent>
+            <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
+              <code>{`# pnpm
+pnpm add @baneung-pack/chart chart.js react-chartjs-2
+
+# npm
+npm install @baneung-pack/chart chart.js react-chartjs-2
+
+# yarn
+yarn add @baneung-pack/chart chart.js react-chartjs-2`}</code>
+            </pre>
+          </CardContent>
+        </Card>
+        <Muted className="text-xs">{t('install.chartDepsNote')}</Muted>
+
+        <Heading level={3} className="text-lg">
+          {t('install.styleImport')}
+        </Heading>
+        <Card>
+          <CardContent>
+            <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
+              <code>{`// app/layout.tsx
+import '@baneung-pack/chart/styles.css';`}</code>
+            </pre>
+          </CardContent>
+        </Card>
+
+        <Heading level={3} className="text-lg">
+          {t('install.basicUsage')}
+        </Heading>
+        <Card>
+          <CardContent>
+            <pre className="overflow-x-auto bg-surface p-3 text-xs font-mono">
+              <code>{`import { BarChart } from '@baneung-pack/chart';
+
+const data = [
+  { month: '1월', revenue: 1200, profit: 300 },
+  { month: '2월', revenue: 1500, profit: 400 },
+];
+
+export default function MyPage() {
+  return (
+    <BarChart
+      data={data}
+      xKey="month"
+      yKeys={['revenue', 'profit']}
+      labels={{ revenue: '매출', profit: '이익' }}
+      height={300}
+    />
+  );
+}`}</code>
+            </pre>
+          </CardContent>
+        </Card>
       </section>
 
       <Separator />

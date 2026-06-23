@@ -15,6 +15,7 @@ import type { Metadata } from 'next';
 import '@baneung-pack/ui/styles.css';
 import '@baneung-pack/grid/styles.css';
 import '@baneung-pack/editor/styles.css';
+import '@baneung-pack/chart/styles.css';
 import './globals.css';
 
 export const metadata: Metadata = {
