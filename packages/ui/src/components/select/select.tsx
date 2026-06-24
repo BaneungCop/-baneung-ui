@@ -140,6 +140,28 @@ export function Select(props: SelectProps): React.ReactElement {
   const [search, setSearch] = React.useState('');
 
   /**
+   * Dialog / Sheet (Radix Dialog 기반) 안에서 Select가 열릴 때 옵션 리스트의
+   * 스크롤이 동작하지 않는 문제 회피.
+   *
+   * 원인: Radix Dialog는 `react-remove-scroll`을 적용해 document-level capture
+   * 단계에서 자기 트리 밖의 wheel/touchmove를 preventDefault한다.
+   * Popover.Portal의 기본 container는 document.body라서 portal된 옵션 리스트가
+   * Dialog의 scroll-lock 허용 영역 바깥에 위치 → 휠 스크롤이 차단됨.
+   *
+   * 해법: 트리거의 가장 가까운 [role="dialog"] 조상(Dialog/Sheet/Drawer)을 찾아
+   * 그쪽으로 portal. Dialog 트리 내부면 react-remove-scroll이 허용함.
+   * Dialog 안이 아니면 container 미지정 → 기본대로 document.body 사용.
+   */
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const [portalContainer, setPortalContainer] = React.useState<HTMLElement | undefined>(undefined);
+  React.useEffect(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const dialog = trigger.closest('[role="dialog"]');
+    if (dialog instanceof HTMLElement) setPortalContainer(dialog);
+  }, []);
+
+  /**
    * Dialog/Drawer/Sheet 등 부모 FocusScope 안에서 Select를 열 때,
    * Popover.Content는 portal로 document.body에 렌더되므로 부모 FocusScope가
    * "범위 밖"으로 인지하고 trigger로 포커스를 되돌릴 수 있다.
@@ -213,6 +235,7 @@ export function Select(props: SelectProps): React.ReactElement {
       }}
     >
       <PopoverPrimitive.Trigger
+        ref={triggerRef}
         id={id}
         type="button"
         role="combobox"
@@ -240,7 +263,7 @@ export function Select(props: SelectProps): React.ReactElement {
         </span>
         <ChevronDown />
       </PopoverPrimitive.Trigger>
-      <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Portal container={portalContainer}>
         <PopoverPrimitive.Content
           align="start"
           sideOffset={4}
