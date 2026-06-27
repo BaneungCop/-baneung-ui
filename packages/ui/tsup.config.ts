@@ -55,10 +55,14 @@ async function injectUseClient(distDir: string) {
   );
 }
 
-export default defineConfig({
+export default defineConfig((options) => ({
   entry: ['src/index.ts', 'src/components/*/index.ts'],
   format: ['esm', 'cjs'],
-  dts: true,
+  // 프로덕션 build에서는 tsup(rollup-plugin-dts)으로 ~70개 진입점의 타입을 롤업하면
+  // 힙을 7~8GB까지 써서 Vercel(8GB 컨테이너)에서 OOM/SIGKILL이 난다.
+  // 그래서 build는 .d.ts를 `tsc --emitDeclarationOnly`로 따로 생성하고(메모리 효율 ↑),
+  // 메모리가 넉넉한 로컬 watch(dev)에서만 tsup dts로 라이브 타입을 만든다.
+  dts: Boolean(options.watch),
   clean: true,
   sourcemap: true,
   treeshake: true,
@@ -74,4 +78,4 @@ export default defineConfig({
       stdio: 'inherit',
     });
   },
-});
+}));

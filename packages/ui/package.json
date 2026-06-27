@@ -321,7 +321,7 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsup",
+    "build": "tsup && tsc -p tsconfig.json --emitDeclarationOnly",
     "dev": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsup --watch",
     "lint": "eslint src --max-warnings 0",
     "typecheck": "tsc --noEmit",
