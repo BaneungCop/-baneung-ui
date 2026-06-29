@@ -33,14 +33,14 @@ export default function CircularTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>CircularText</Heading>
-        <Lead>원형 경로를 따라 배치된 텍스트가 회전. 배지·도장·CD 라벨·스피너 라벨에 활용.</Lead>
+        <Heading level={1}>{t('effect.demo.circularText.title')}</Heading>
+        <Lead>{t('effect.demo.circularText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-[300px] items-center justify-center border border-border-default bg-surface p-6">
@@ -57,11 +57,11 @@ export default function CircularTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트 (마침표/구분자로 마무리 권장)">
+            <Control label={t('effect.demo.circularText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={60} />
             </Control>
 
-            <Control label="회전 방향">
+            <Control label={t('effect.demo.circularText.control.direction')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -80,7 +80,7 @@ export default function CircularTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`반지름 (${radius}px)`}>
+            <Control label={`${t('effect.demo.circularText.control.radius')} (${radius}px)`}>
               <input
                 type="range"
                 min={30}
@@ -91,7 +91,7 @@ export default function CircularTextDemoPage() {
               />
             </Control>
 
-            <Control label={`회전 속도 (${durationMs}ms)`}>
+            <Control label={`${t('effect.demo.circularText.control.duration')} (${durationMs}ms)`}>
               <input
                 type="range"
                 min={1000}
@@ -103,7 +103,9 @@ export default function CircularTextDemoPage() {
               />
             </Control>
 
-            <Control label={`시작 각도 (${startAngleDeg}°)`}>
+            <Control
+              label={`${t('effect.demo.circularText.control.startAngle')} (${startAngleDeg}°)`}
+            >
               <input
                 type="range"
                 min={0}
@@ -114,7 +116,7 @@ export default function CircularTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.circularText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={10}
@@ -125,7 +127,7 @@ export default function CircularTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.circularText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -137,14 +139,14 @@ export default function CircularTextDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.circularText.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -198,7 +200,7 @@ export default function CircularTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

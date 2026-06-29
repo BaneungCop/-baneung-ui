@@ -36,14 +36,14 @@ export default function GravityTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>GravityText</Heading>
-        <Lead>글자가 중력에 떨어지거나 흩어지는 물리 효과. mount/hover/inView 트리거 지원.</Lead>
+        <Heading level={1}>{t('effect.demo.gravityText.title')}</Heading>
+        <Lead>{t('effect.demo.gravityText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-[260px] items-center justify-center border border-border-default bg-surface p-6">
@@ -68,11 +68,11 @@ export default function GravityTextDemoPage() {
           )}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.gravityText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={40} />
             </Control>
 
-            <Control label="트리거">
+            <Control label={t('effect.demo.gravityText.control.trigger')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -98,7 +98,7 @@ export default function GravityTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`Duration (${duration}ms)`}>
+            <Control label={`${t('effect.demo.gravityText.control.duration')} (${duration}ms)`}>
               <input
                 type="range"
                 min={500}
@@ -110,7 +110,7 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Stagger (${stagger}ms)`}>
+            <Control label={`${t('effect.demo.gravityText.control.stagger')} (${stagger}ms)`}>
               <input
                 type="range"
                 min={0}
@@ -122,7 +122,9 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Spread (${spread.toFixed(2)})`}>
+            <Control
+              label={`${t('effect.demo.gravityText.control.spread')} (${spread.toFixed(2)})`}
+            >
               <input
                 type="range"
                 min={0}
@@ -134,7 +136,7 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Gravity (${gravity}px)`}>
+            <Control label={`${t('effect.demo.gravityText.control.gravity')} (${gravity}px)`}>
               <input
                 type="range"
                 min={80}
@@ -146,7 +148,7 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Rotation (${rotation}°)`}>
+            <Control label={`${t('effect.demo.gravityText.control.rotation')} (${rotation}°)`}>
               <input
                 type="range"
                 min={0}
@@ -157,7 +159,7 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.gravityText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={20}
@@ -168,7 +170,7 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.gravityText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -180,14 +182,14 @@ export default function GravityTextDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.gravityText.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -250,7 +252,7 @@ export default function GravityTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

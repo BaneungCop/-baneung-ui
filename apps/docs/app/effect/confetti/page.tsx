@@ -44,17 +44,14 @@ function ConfettiDemoContent() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Confetti</Heading>
-        <Lead>
-          <code>ConfettiProvider</code> + <code>useConfetti()</code> 명령형 트리거. 결제 완료·성공·
-          축하 순간용. Canvas 기반, 0 dependency.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.confetti.title')}</Heading>
+        <Lead>{t('effect.demo.confetti.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>발사 트리거</CardTitle>
+          <CardTitle>{t('effect.demo.confetti.sectionFire')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex flex-wrap gap-3">
@@ -137,7 +134,9 @@ function ConfettiDemoContent() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label={`입자 개수 (${particleCount})`}>
+            <Control
+              label={`${t('effect.demo.confetti.control.particleCount')} (${particleCount})`}
+            >
               <input
                 type="range"
                 min={20}
@@ -148,7 +147,7 @@ function ConfettiDemoContent() {
                 className="w-full"
               />
             </Control>
-            <Control label={`Spread (${spread}°)`}>
+            <Control label={`${t('effect.demo.confetti.control.spread')} (${spread}°)`}>
               <input
                 type="range"
                 min={20}
@@ -158,7 +157,7 @@ function ConfettiDemoContent() {
                 className="w-full"
               />
             </Control>
-            <Control label="입자 모양">
+            <Control label={t('effect.demo.confetti.control.shape')}>
               <div className="flex gap-2">
                 {(['square', 'circle', 'ribbon'] as ConfettiShape[]).map((s) => (
                   <Button
@@ -172,7 +171,7 @@ function ConfettiDemoContent() {
                 ))}
               </div>
             </Control>
-            <Control label="색상 (콤마 구분)">
+            <Control label={t('effect.demo.confetti.control.colors')}>
               <Input value={colors} onChange={(e) => setColors(e.target.value)} />
             </Control>
           </div>
@@ -181,7 +180,7 @@ function ConfettiDemoContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

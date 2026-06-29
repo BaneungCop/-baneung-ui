@@ -29,17 +29,14 @@ export default function SpotlightTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>SpotlightText</Heading>
-        <Lead>
-          커서 주변의 글자만 밝아지고 나머지는 어두워지는 스포트라이트 효과. 다크 배경에서 가장
-          인상적.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.spotlightText.title')}</Heading>
+        <Lead>{t('effect.demo.spotlightText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           {/* 다크 배경 — 스포트라이트는 다크에서 가장 잘 보임 */}
@@ -59,11 +56,11 @@ export default function SpotlightTextDemoPage() {
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.spotlightText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={80} />
             </Control>
 
-            <Control label={`반경 (${radius}px)`}>
+            <Control label={`${t('effect.demo.spotlightText.control.radius')} (${radius}px)`}>
               <input
                 type="range"
                 min={40}
@@ -75,7 +72,9 @@ export default function SpotlightTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Dim opacity (${dimOpacity.toFixed(2)})`}>
+            <Control
+              label={`${t('effect.demo.spotlightText.control.dimOpacity')} (${dimOpacity.toFixed(2)})`}
+            >
               <input
                 type="range"
                 min={0}
@@ -87,7 +86,7 @@ export default function SpotlightTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.spotlightText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={16}
@@ -98,7 +97,7 @@ export default function SpotlightTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.spotlightText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -110,27 +109,27 @@ export default function SpotlightTextDemoPage() {
               />
             </Control>
 
-            <Control label="베이스 색 (dim)">
+            <Control label={t('effect.demo.spotlightText.control.baseColor')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="베이스 색"
+                  aria-label={t('effect.demo.spotlightText.baseColorAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
             </Control>
 
-            <Control label="하이라이트 색">
+            <Control label={t('effect.demo.spotlightText.control.highlightColor')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={highlightColor}
                   onChange={(e) => setHighlightColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="하이라이트 색"
+                  aria-label={t('effect.demo.spotlightText.highlightColorAria')}
                 />
                 <Input value={highlightColor} onChange={(e) => setHighlightColor(e.target.value)} />
               </div>
@@ -177,7 +176,7 @@ export default function SpotlightTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

@@ -40,17 +40,14 @@ export default function ScrambleTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>ScrambleText</Heading>
-        <Lead>
-          랜덤 글자가 빠르게 깜빡이다가 한 글자씩 자리를 찾아가는 해킹/디코딩 효과. 매트릭스/터미널
-          느낌의 등장 연출.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.scrambleText.title')}</Heading>
+        <Lead>{t('effect.demo.scrambleText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div
@@ -71,11 +68,11 @@ export default function ScrambleTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.scrambleText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={60} />
             </Control>
 
-            <Control label="모드">
+            <Control label={t('effect.demo.scrambleText.control.mode')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -94,7 +91,7 @@ export default function ScrambleTextDemoPage() {
               </div>
             </Control>
 
-            <Control label="글자 풀 (스크램블 소스)">
+            <Control label={t('effect.demo.scrambleText.control.charPool')}>
               <div className="flex flex-col gap-2">
                 <Input
                   value={characters}
@@ -117,7 +114,9 @@ export default function ScrambleTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`Reveal 속도 (${revealSpeed}ms/char)`}>
+            <Control
+              label={`${t('effect.demo.scrambleText.control.revealSpeed')} (${revealSpeed}ms/char)`}
+            >
               <input
                 type="range"
                 min={20}
@@ -129,7 +128,9 @@ export default function ScrambleTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Scramble 주기 (${scrambleSpeed}ms)`}>
+            <Control
+              label={`${t('effect.demo.scrambleText.control.scrambleSpeed')} (${scrambleSpeed}ms)`}
+            >
               <input
                 type="range"
                 min={16}
@@ -141,7 +142,7 @@ export default function ScrambleTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.scrambleText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={14}
@@ -152,7 +153,7 @@ export default function ScrambleTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.scrambleText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -164,14 +165,14 @@ export default function ScrambleTextDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.scrambleText.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -229,7 +230,7 @@ export default function ScrambleTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

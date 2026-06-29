@@ -32,16 +32,14 @@ export default function StepperDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Stepper</Heading>
-        <Lead>
-          다단계 진행 표시기. 가로/세로, 연결선이 단계 전환에 부드럽게 채워짐. 클릭 이동 콜백 지원.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.stepper.title')}</Heading>
+        <Lead>{t('effect.demo.stepper.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>Horizontal — 체크아웃 예시 (클릭으로 이동)</CardTitle>
+          <CardTitle>{t('effect.demo.stepper.sectionHorizontal')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <Stepper steps={CHECKOUT_STEPS} current={current} onStepClick={setCurrent} />
@@ -73,7 +71,7 @@ export default function StepperDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Vertical</CardTitle>
+          <CardTitle>{t('effect.demo.stepper.sectionVertical')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="max-w-sm">
@@ -84,7 +82,7 @@ export default function StepperDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>크기 변형</CardTitle>
+          <CardTitle>{t('effect.demo.stepper.sectionSize')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           <div>
@@ -110,7 +108,7 @@ export default function StepperDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>색상 변형</CardTitle>
+          <CardTitle>{t('effect.demo.stepper.sectionColor')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <Stepper steps={SHORT_STEPS} current={1} activeColor="#3B716C" />
@@ -122,7 +120,7 @@ export default function StepperDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

@@ -28,17 +28,14 @@ export default function AnimatedButtonDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>AnimatedButton</Heading>
-        <Lead>
-          idle → loading → success/error 상태가 부드럽게 모핑되는 버튼. <code>onClick</code>이
-          Promise면 자동 처리, 아니면 <code>status</code> prop으로 외부 제어.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.animatedButton.title')}</Heading>
+        <Lead>{t('effect.demo.animatedButton.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>1. Promise 자동 모드</CardTitle>
+          <CardTitle>{t('effect.demo.animatedButton.sectionPromise')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-foreground-muted">
@@ -77,7 +74,7 @@ export default function AnimatedButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>2. 외부 제어 모드</CardTitle>
+          <CardTitle>{t('effect.demo.animatedButton.sectionControlled')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm text-foreground-muted">
@@ -105,7 +102,7 @@ export default function AnimatedButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>3. 크기 / variant</CardTitle>
+          <CardTitle>{t('effect.demo.animatedButton.sectionSizeVariant')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
@@ -137,7 +134,7 @@ export default function AnimatedButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

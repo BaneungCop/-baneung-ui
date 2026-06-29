@@ -288,6 +288,28 @@ const ko: Dict = {
   'api.default': '기본값',
   'api.version': 'Version',
   'api.empty': '노출 props 없음 (children만 받습니다).',
+  // ── Props 페이지 (chart / grid / editor) ──
+  'propsPage.method': '메서드',
+  'propsPage.returns': '반환',
+  'propsPage.chart.title': 'Chart · Props',
+  'propsPage.chart.lead':
+    '@baneung-pack/chart의 전체 props 레퍼런스 (Bar / Line / Area / Pie / Doughnut).',
+  'propsPage.chart.baseSection': 'ChartBaseProps (공통)',
+  'propsPage.grid.title': 'Grid · Props',
+  'propsPage.grid.lead':
+    '@baneung-pack/grid의 전체 props와 GridColumn 필드, GridHandle ref API 레퍼런스.',
+  'propsPage.grid.columnFields': 'GridColumn 필드',
+  'propsPage.grid.handleMethods': 'GridHandle (ref API)',
+  'propsPage.grid.cellSelectionNote':
+    '💡 cellSelection ("none" | "single" | "multi")과 selectable은 별개 축입니다. cellSelection은 그리드 셀의 시각 선택, selectable은 체크박스 기반 행 선택.',
+  'propsPage.editor.title': 'Editor · Props',
+  'propsPage.editor.lead': 'Editor 컴포넌트의 props, ref 핸들 메서드, 툴바 항목 레퍼런스.',
+  'propsPage.editor.handleHeading': 'EditorHandle (ref)',
+  'propsPage.editor.handleNote': 'useRef<EditorHandle>로 명령형 API에 접근합니다.',
+  'propsPage.editor.toolbarHeading': 'ToolbarItem',
+  'propsPage.editor.toolbarNote':
+    'toolbar prop에 넣을 수 있는 항목들. 2차원 배열로 그룹을 나눕니다.',
+  'propsPage.editor.itemColumn': '항목',
   // 코드 보기 토글
   'exampleSection.showCode': '코드 보기',
   'exampleSection.hideCode': '코드 숨기기',
@@ -370,6 +392,307 @@ const ko: Dict = {
     '애니메이션을 위해 쪼개진 글자/채널 span은 `aria-hidden="true"` — 보조 기술에 노출되지 않습니다.',
   'a11y.motion.touch':
     'hover 기반 인터랙션(VariableFontHover/SpotlightText/GravityText hover trigger)은 터치 디바이스에서는 자연스럽게 비활성 — 콘텐츠 접근 불가능하게 만들지 않습니다.',
+
+  // 홈 페이지
+  'home.tagline': '판교에서 만든 디자인 시스템 — UI · Grid · Chart · Editor.',
+  'home.taglineSub': '각진 디자인, WCAG AA 접근성, 한글 우선.',
+  'home.cta.explore': '패키지 둘러보기 →',
+  'home.cta.install': '설치 가이드',
+  'home.loading': '로딩 중…',
+
+  // 소개 페이지 — Buttons & Toggles 데모
+  'intro.demoSubtitle': 'Buttons & Toggles 데모',
+  'intro.section.variantSize': 'Button — variant × size',
+  'intro.section.loading': 'Loading + asChild',
+  'intro.section.buttonGroup': 'ButtonGroup',
+  'intro.section.toggle': 'Toggle & ToggleGroup',
+  'intro.label.variantSize': 'variant \\ size',
+  'intro.btn.saving': '저장 중',
+  'intro.btn.github': 'GitHub로 이동',
+  'intro.btn.prev': '이전',
+  'intro.btn.current': '현재',
+  'intro.btn.next': '다음',
+  'intro.toggle.bold': '굵게',
+  'intro.toggle.align': '정렬',
+  'intro.toggle.left': '왼쪽',
+  'intro.toggle.center': '가운데',
+  'intro.toggle.right': '오른쪽',
+  'intro.toggle.format': '포맷',
+  'intro.aria.pagination': '페이지 이동',
+  'intro.aria.vertical': '세로 그룹',
+  'intro.footer.readyBadge': '출시 준비',
+
+  // 토큰 페이지 — 타입 스케일 샘플 문구
+  'tokens.typeSample': 'Baneung Design System — 바능 디자인 시스템',
+
+  // 컴포넌트 데모 페이지 공통 라벨 (effect / 기타)
+  'demo.livePreview': '라이브 미리보기',
+  'demo.controls': '컨트롤',
+  'demo.code': '코드',
+  'demo.props': 'Props',
+
+  // ── Effect demo pages — shared labels ──
+  'effect.demo.usage': '사용',
+  'effect.demo.colorPickerAria': '색상 선택',
+
+  // ── Effect demo pages — per-page header / lead / control labels ──
+  // typewriter
+  'effect.demo.typewriter.title': 'Typewriter',
+  'effect.demo.typewriter.lead':
+    '한 글자씩 등장하는 텍스트 + 깜빡이는 커서. 1회 또는 무한 루프 모드, 크기·색·굵기·커서를 자유롭게 커스터마이즈.',
+  'effect.demo.typewriter.control.text': '텍스트',
+  'effect.demo.typewriter.control.mode': '모드',
+  'effect.demo.typewriter.control.fontSize': '글자 크기',
+  'effect.demo.typewriter.control.fontWeight': '굵기',
+  'effect.demo.typewriter.control.color': '색상',
+  'effect.demo.typewriter.control.cursorChar': '커서 글자 (비우면 막대)',
+  'effect.demo.typewriter.modeOnce': '1회',
+  'effect.demo.typewriter.modeLoop': 'Loop',
+  'effect.demo.typewriter.textPlaceholder': '표시할 텍스트',
+  'effect.demo.typewriter.cursorPlaceholder': '예: _, |, ▌, █',
+  'effect.demo.typewriter.restart': '↻ 처음부터 다시',
+
+  // rotating-words
+  'effect.demo.rotatingWords.title': 'RotatingWords',
+  'effect.demo.rotatingWords.lead':
+    '고정 문구 뒤의 단어만 위로 슬라이드 + 페이드로 순환. 히어로 카피의 "We build [apps]" 같은 패턴.',
+  'effect.demo.rotatingWords.control.words': '단어 (콤마로 구분)',
+  'effect.demo.rotatingWords.control.mode': '모드',
+  'effect.demo.rotatingWords.control.interval': '체류 시간',
+  'effect.demo.rotatingWords.control.transition': '전환 시간',
+  'effect.demo.rotatingWords.control.fontSize': '글자 크기',
+  'effect.demo.rotatingWords.control.fontWeight': '굵기',
+  'effect.demo.rotatingWords.control.color': '색상',
+  'effect.demo.rotatingWords.modeOnce': '1회',
+  'effect.demo.rotatingWords.modeLoop': 'Loop',
+
+  // scramble-text
+  'effect.demo.scrambleText.title': 'ScrambleText',
+  'effect.demo.scrambleText.lead':
+    '랜덤 글자가 빠르게 깜빡이다가 한 글자씩 자리를 찾아가는 해킹/디코딩 효과. 매트릭스/터미널 느낌의 등장 연출.',
+  'effect.demo.scrambleText.control.text': '텍스트',
+  'effect.demo.scrambleText.control.mode': '모드',
+  'effect.demo.scrambleText.control.charPool': '글자 풀 (스크램블 소스)',
+  'effect.demo.scrambleText.control.revealSpeed': 'Reveal 속도',
+  'effect.demo.scrambleText.control.scrambleSpeed': 'Scramble 주기',
+  'effect.demo.scrambleText.control.fontSize': '글자 크기',
+  'effect.demo.scrambleText.control.fontWeight': '굵기',
+  'effect.demo.scrambleText.control.color': '색상',
+
+  // split-text-reveal
+  'effect.demo.splitTextReveal.title': 'SplitTextReveal',
+  'effect.demo.splitTextReveal.lead':
+    '글자 또는 단어 단위로 순차적으로 페이드 + 슬라이드 인. 마운트 또는 스크롤로 들어올 때 발사.',
+  'effect.demo.splitTextReveal.livePreviewMount': '라이브 미리보기 (mount 트리거)',
+  'effect.demo.splitTextReveal.inViewSection': 'inView 트리거 (스크롤 reveal)',
+  'effect.demo.splitTextReveal.control.text': '텍스트',
+  'effect.demo.splitTextReveal.control.splitUnit': '분할 단위',
+  'effect.demo.splitTextReveal.control.stagger': 'Stagger',
+  'effect.demo.splitTextReveal.control.duration': 'Duration',
+  'effect.demo.splitTextReveal.control.fontSize': '글자 크기',
+  'effect.demo.splitTextReveal.control.fontWeight': '굵기',
+  'effect.demo.splitTextReveal.control.color': '색상',
+
+  // count-up
+  'effect.demo.countUp.title': 'CountUp',
+  'effect.demo.countUp.lead':
+    '숫자가 부드럽게 증가/감소하는 카운터. 통계 섹션·KPI·achievement 카드에 사용. 마운트 또는 스크롤 진입 시 발사.',
+  'effect.demo.countUp.inViewSection': 'inView 트리거 — KPI 섹션',
+  'effect.demo.countUp.control.from': 'From',
+  'effect.demo.countUp.control.to': 'To',
+  'effect.demo.countUp.control.duration': 'Duration',
+  'effect.demo.countUp.control.decimals': '소수점 자리수',
+  'effect.demo.countUp.control.separator': '천 단위 구분자',
+  'effect.demo.countUp.control.prefixSuffix': 'Prefix / Suffix',
+  'effect.demo.countUp.control.fontSize': '글자 크기',
+  'effect.demo.countUp.control.fontWeight': '굵기',
+  'effect.demo.countUp.control.color': '색상',
+
+  // gradient-text
+  'effect.demo.gradientText.title': 'GradientText',
+  'effect.demo.gradientText.lead':
+    '그라데이션이 글자 위를 흐르거나 반짝이며 지나가는 효과. 히어로 타이틀·CTA 강조에 사용.',
+  'effect.demo.gradientText.control.text': '텍스트',
+  'effect.demo.gradientText.control.mode': '모드',
+  'effect.demo.gradientText.control.direction': '흐름 방향',
+  'effect.demo.gradientText.control.duration': 'Duration',
+  'effect.demo.gradientText.control.flowColors': 'Flow 색상 (콤마로 구분)',
+  'effect.demo.gradientText.control.shimmerBase': 'Shimmer 베이스 색',
+  'effect.demo.gradientText.control.shimmerLight': 'Shimmer 빛 색상',
+  'effect.demo.gradientText.control.fontSize': '글자 크기',
+  'effect.demo.gradientText.control.fontWeight': '굵기',
+  'effect.demo.gradientText.shimmerBaseAria': '베이스 색 선택',
+  'effect.demo.gradientText.shimmerLightAria': '빛 색상 선택',
+
+  // blur-in-text
+  'effect.demo.blurInText.title': 'BlurInText',
+  'effect.demo.blurInText.lead':
+    '흐릿한 상태에서 선명해지며 등장하는 텍스트 효과. 마운트 또는 스크롤 진입 시 발사.',
+  'effect.demo.blurInText.livePreviewMount': '라이브 미리보기 (mount 트리거)',
+  'effect.demo.blurInText.control.text': '텍스트',
+  'effect.demo.blurInText.control.splitUnit': '분할 단위',
+  'effect.demo.blurInText.control.stagger': 'Stagger',
+  'effect.demo.blurInText.control.duration': 'Duration',
+  'effect.demo.blurInText.control.blurAmount': 'Blur 강도',
+  'effect.demo.blurInText.control.fontSize': '글자 크기',
+  'effect.demo.blurInText.control.fontWeight': '굵기',
+  'effect.demo.blurInText.control.color': '색상',
+
+  // wavy-text
+  'effect.demo.wavyText.title': 'WavyText',
+  'effect.demo.wavyText.lead':
+    '글자들이 파도치듯(또는 통통 튀듯) 무한 반복하는 효과. 위상 차이로 자연스러운 파동 연출.',
+  'effect.demo.wavyText.control.text': '텍스트',
+  'effect.demo.wavyText.control.mode': '모드',
+  'effect.demo.wavyText.control.amplitude': '진폭',
+  'effect.demo.wavyText.control.duration': 'Duration',
+  'effect.demo.wavyText.control.phaseStep': 'Phase step',
+  'effect.demo.wavyText.control.fontSize': '글자 크기',
+  'effect.demo.wavyText.control.fontWeight': '굵기',
+  'effect.demo.wavyText.control.color': '색상',
+
+  // glitch-text
+  'effect.demo.glitchText.title': 'GlitchText',
+  'effect.demo.glitchText.lead':
+    'RGB 채널이 어긋나는 글리치 효과. 강도(intensity) 조절 가능, 항상 또는 hover 시에만 트리거.',
+  'effect.demo.glitchText.control.text': '텍스트',
+  'effect.demo.glitchText.control.trigger': '트리거',
+  'effect.demo.glitchText.control.intensity': 'Intensity',
+  'effect.demo.glitchText.control.speed': 'Speed',
+  'effect.demo.glitchText.control.redChannel': '적색 채널',
+  'effect.demo.glitchText.control.cyanChannel': '청록 채널',
+  'effect.demo.glitchText.control.fontSize': '글자 크기',
+  'effect.demo.glitchText.control.fontWeight': '굵기',
+  'effect.demo.glitchText.control.baseColor': '베이스 색',
+
+  // variable-font-hover
+  'effect.demo.variableFontHover.title': 'VariableFontHover',
+  'effect.demo.variableFontHover.lead':
+    '마우스 커서가 지나가는 글자만 굵어지는 효과. Pretendard Variable / Inter Variable 등 가변 폰트와 함께 쓸 때 부드럽게 보간됨.',
+  'effect.demo.variableFontHover.control.text': '텍스트',
+  'effect.demo.variableFontHover.control.minWeight': '최소 굵기',
+  'effect.demo.variableFontHover.control.maxWeight': '최대 굵기',
+  'effect.demo.variableFontHover.control.radius': '반경',
+  'effect.demo.variableFontHover.control.transition': '전환',
+  'effect.demo.variableFontHover.control.fontSize': '글자 크기',
+  'effect.demo.variableFontHover.control.color': '색상',
+
+  // circular-text
+  'effect.demo.circularText.title': 'CircularText',
+  'effect.demo.circularText.lead':
+    '원형 경로를 따라 배치된 텍스트가 회전. 배지·도장·CD 라벨·스피너 라벨에 활용.',
+  'effect.demo.circularText.control.text': '텍스트 (마침표/구분자로 마무리 권장)',
+  'effect.demo.circularText.control.direction': '회전 방향',
+  'effect.demo.circularText.control.radius': '반지름',
+  'effect.demo.circularText.control.duration': '회전 속도',
+  'effect.demo.circularText.control.startAngle': '시작 각도',
+  'effect.demo.circularText.control.fontSize': '글자 크기',
+  'effect.demo.circularText.control.fontWeight': '굵기',
+  'effect.demo.circularText.control.color': '색상',
+
+  // gravity-text
+  'effect.demo.gravityText.title': 'GravityText',
+  'effect.demo.gravityText.lead':
+    '글자가 중력에 떨어지거나 흩어지는 물리 효과. mount/hover/inView 트리거 지원.',
+  'effect.demo.gravityText.control.text': '텍스트',
+  'effect.demo.gravityText.control.trigger': '트리거',
+  'effect.demo.gravityText.control.duration': 'Duration',
+  'effect.demo.gravityText.control.stagger': 'Stagger',
+  'effect.demo.gravityText.control.spread': 'Spread',
+  'effect.demo.gravityText.control.gravity': 'Gravity',
+  'effect.demo.gravityText.control.rotation': 'Rotation',
+  'effect.demo.gravityText.control.fontSize': '글자 크기',
+  'effect.demo.gravityText.control.fontWeight': '굵기',
+  'effect.demo.gravityText.control.color': '색상',
+
+  // spotlight-text
+  'effect.demo.spotlightText.title': 'SpotlightText',
+  'effect.demo.spotlightText.lead':
+    '커서 주변의 글자만 밝아지고 나머지는 어두워지는 스포트라이트 효과. 다크 배경에서 가장 인상적.',
+  'effect.demo.spotlightText.control.text': '텍스트',
+  'effect.demo.spotlightText.control.radius': '반경',
+  'effect.demo.spotlightText.control.dimOpacity': 'Dim opacity',
+  'effect.demo.spotlightText.control.fontSize': '글자 크기',
+  'effect.demo.spotlightText.control.fontWeight': '굵기',
+  'effect.demo.spotlightText.control.baseColor': '베이스 색 (dim)',
+  'effect.demo.spotlightText.control.highlightColor': '하이라이트 색',
+  'effect.demo.spotlightText.baseColorAria': '베이스 색',
+  'effect.demo.spotlightText.highlightColorAria': '하이라이트 색',
+
+  // ripple
+  'effect.demo.ripple.title': 'Ripple',
+  'effect.demo.ripple.lead':
+    '자식 요소를 감싸 클릭 위치에서 물결이 퍼지는 효과를 입혀주는 래퍼. 버튼·카드·아이콘 등 어디든 적용 가능.',
+  'effect.demo.ripple.sectionButton': '버튼에 적용',
+  'effect.demo.ripple.sectionCard': '카드 / 큰 영역에 적용',
+  'effect.demo.ripple.sectionOptions': '옵션 컨트롤',
+  'effect.demo.ripple.control.color': 'Ripple 색상 (RGBA 권장)',
+  'effect.demo.ripple.control.duration': 'Duration',
+
+  // confetti
+  'effect.demo.confetti.title': 'Confetti',
+  'effect.demo.confetti.lead':
+    'ConfettiProvider + useConfetti() 명령형 트리거. 결제 완료·성공·축하 순간용. Canvas 기반, 0 dependency.',
+  'effect.demo.confetti.sectionFire': '발사 트리거',
+  'effect.demo.confetti.control.particleCount': '입자 개수',
+  'effect.demo.confetti.control.spread': 'Spread',
+  'effect.demo.confetti.control.shape': '입자 모양',
+  'effect.demo.confetti.control.colors': '색상 (콤마 구분)',
+
+  // animated-button
+  'effect.demo.animatedButton.title': 'AnimatedButton',
+  'effect.demo.animatedButton.lead':
+    'idle → loading → success/error 상태가 부드럽게 모핑되는 버튼. onClick이 Promise면 자동 처리, 아니면 status prop으로 외부 제어.',
+  'effect.demo.animatedButton.sectionPromise': '1. Promise 자동 모드',
+  'effect.demo.animatedButton.sectionControlled': '2. 외부 제어 모드',
+  'effect.demo.animatedButton.sectionSizeVariant': '3. 크기 / variant',
+
+  // animated-tabs
+  'effect.demo.animatedTabs.title': 'AnimatedTabs',
+  'effect.demo.animatedTabs.lead':
+    '활성 탭 인디케이터가 부드럽게 미끄러지는 탭. controlled/uncontrolled · ArrowLeft/Right 키 · role="tablist/tab/tabpanel" ARIA 완비.',
+  'effect.demo.animatedTabs.sectionHorizontal': 'Horizontal (기본, Uncontrolled)',
+  'effect.demo.animatedTabs.sectionVertical': 'Vertical orientation',
+  'effect.demo.animatedTabs.sectionControlled': 'Controlled',
+  'effect.demo.animatedTabs.sectionSizeColor': '크기 / 색상',
+
+  // copy-button
+  'effect.demo.copyButton.title': 'CopyButton',
+  'effect.demo.copyButton.lead':
+    '클릭 시 navigator.clipboard로 복사 + 아이콘이 copy → check로 모핑. 일정 시간 후 자동 복원, "Copied!" 툴팁 옵션.',
+  'effect.demo.copyButton.sectionCodeBlock': '코드 블록 + Copy',
+
+  // like-button
+  'effect.demo.likeButton.title': 'LikeButton',
+  'effect.demo.likeButton.lead':
+    '클릭 시 하트가 채워지며 주변에 작은 입자가 터지는 burst 애니메이션. controlled/uncontrolled · 카운트 표시 · 키보드 토글.',
+  'effect.demo.likeButton.sectionControlled': 'Controlled + count 자동 증감',
+  'effect.demo.likeButton.sectionSize': '크기 변형',
+  'effect.demo.likeButton.sectionColor': '색상 변형',
+  'effect.demo.likeButton.sectionBurst': 'burst 입자 개수',
+  'effect.demo.likeButton.sectionDisabled': '비활성화',
+
+  // star-rating
+  'effect.demo.starRating.title': 'StarRating',
+  'effect.demo.starRating.lead':
+    '별점 입력. hover preview · half-star · controlled/uncontrolled · 키보드 (Arrow / Home / End) · readOnly 모드.',
+  'effect.demo.starRating.sectionControlled': 'Controlled (정수)',
+  'effect.demo.starRating.sectionHalfStar': 'Half-star (0.5 단위)',
+  'effect.demo.starRating.sectionSize': '크기 변형',
+  'effect.demo.starRating.sectionMax10': '10점 만점',
+  'effect.demo.starRating.sectionColor': '색상 커스터마이즈',
+  'effect.demo.starRating.sectionReadOnly': 'readOnly (표시 전용)',
+  'effect.demo.starRating.sectionDisabled': '비활성화',
+  'effect.demo.starRating.sectionKeyboard': '키보드 접근성',
+
+  // stepper
+  'effect.demo.stepper.title': 'Stepper',
+  'effect.demo.stepper.lead':
+    '다단계 진행 표시기. 가로/세로, 연결선이 단계 전환에 부드럽게 채워짐. 클릭 이동 콜백 지원.',
+  'effect.demo.stepper.sectionHorizontal': 'Horizontal — 체크아웃 예시 (클릭으로 이동)',
+  'effect.demo.stepper.sectionVertical': 'Vertical',
+  'effect.demo.stepper.sectionSize': '크기 변형',
+  'effect.demo.stepper.sectionColor': '색상 변형',
 };
 
 const en: Dict = {
@@ -659,6 +982,29 @@ const en: Dict = {
   'api.default': 'Default',
   'api.version': 'Version',
   'api.empty': 'No exposed props (accepts children only).',
+  // ── Props pages (chart / grid / editor) ──
+  'propsPage.method': 'Method',
+  'propsPage.returns': 'Returns',
+  'propsPage.chart.title': 'Chart · Props',
+  'propsPage.chart.lead':
+    'Reference for all props of @baneung-pack/chart (Bar / Line / Area / Pie / Doughnut).',
+  'propsPage.chart.baseSection': 'ChartBaseProps (shared)',
+  'propsPage.grid.title': 'Grid · Props',
+  'propsPage.grid.lead':
+    'Reference for all props of @baneung-pack/grid, the GridColumn fields, and the GridHandle ref API.',
+  'propsPage.grid.columnFields': 'GridColumn fields',
+  'propsPage.grid.handleMethods': 'GridHandle (ref API)',
+  'propsPage.grid.cellSelectionNote':
+    '💡 cellSelection ("none" | "single" | "multi") and selectable are independent axes — cellSelection is for visual cell selection, selectable is for checkbox-based row selection.',
+  'propsPage.editor.title': 'Editor · Props',
+  'propsPage.editor.lead':
+    'Reference for Editor component props, ref handle methods, and toolbar items.',
+  'propsPage.editor.handleHeading': 'EditorHandle (ref)',
+  'propsPage.editor.handleNote': 'Use useRef<EditorHandle> to access the imperative API.',
+  'propsPage.editor.toolbarHeading': 'ToolbarItem',
+  'propsPage.editor.toolbarNote':
+    'Items you can put in the toolbar prop. Use a 2D array to group them.',
+  'propsPage.editor.itemColumn': 'Item',
   // Show code toggle
   'exampleSection.showCode': 'Show code',
   'exampleSection.hideCode': 'Hide code',
@@ -742,6 +1088,307 @@ const en: Dict = {
     'Letter / channel spans split for animation use `aria-hidden="true"` — invisible to assistive tech.',
   'a11y.motion.touch':
     'Hover-based interactions (VariableFontHover / SpotlightText / GravityText hover trigger) are naturally inactive on touch devices — content is never made inaccessible.',
+
+  // Home page
+  'home.tagline': 'A design system from Pangyo — UI · Grid · Chart · Editor.',
+  'home.taglineSub': 'Sharp/angular design, WCAG AA accessibility, Korean-first.',
+  'home.cta.explore': 'Explore packages →',
+  'home.cta.install': 'Install guide',
+  'home.loading': 'Loading…',
+
+  // Intro page — Buttons & Toggles demo
+  'intro.demoSubtitle': 'Buttons & Toggles demo',
+  'intro.section.variantSize': 'Button — variant × size',
+  'intro.section.loading': 'Loading + asChild',
+  'intro.section.buttonGroup': 'ButtonGroup',
+  'intro.section.toggle': 'Toggle & ToggleGroup',
+  'intro.label.variantSize': 'variant \\ size',
+  'intro.btn.saving': 'Saving',
+  'intro.btn.github': 'Open GitHub',
+  'intro.btn.prev': 'Prev',
+  'intro.btn.current': 'Current',
+  'intro.btn.next': 'Next',
+  'intro.toggle.bold': 'Bold',
+  'intro.toggle.align': 'Align',
+  'intro.toggle.left': 'Left',
+  'intro.toggle.center': 'Center',
+  'intro.toggle.right': 'Right',
+  'intro.toggle.format': 'Format',
+  'intro.aria.pagination': 'Pagination',
+  'intro.aria.vertical': 'Vertical group',
+  'intro.footer.readyBadge': 'Ready',
+
+  // Tokens page — type scale sample text
+  'tokens.typeSample': 'Baneung Design System — 바능 디자인 시스템',
+
+  // Demo page common labels (effect / etc.)
+  'demo.livePreview': 'Live preview',
+  'demo.controls': 'Controls',
+  'demo.code': 'Code',
+  'demo.props': 'Props',
+
+  // ── Effect demo pages — shared labels ──
+  'effect.demo.usage': 'Usage',
+  'effect.demo.colorPickerAria': 'Pick color',
+
+  // ── Effect demo pages — per-page header / lead / control labels ──
+  // typewriter
+  'effect.demo.typewriter.title': 'Typewriter',
+  'effect.demo.typewriter.lead':
+    'Text that appears one character at a time with a blinking cursor. One-shot or infinite loop mode, with full control over size, color, weight, and cursor.',
+  'effect.demo.typewriter.control.text': 'Text',
+  'effect.demo.typewriter.control.mode': 'Mode',
+  'effect.demo.typewriter.control.fontSize': 'Font size',
+  'effect.demo.typewriter.control.fontWeight': 'Weight',
+  'effect.demo.typewriter.control.color': 'Color',
+  'effect.demo.typewriter.control.cursorChar': 'Cursor char (empty = bar)',
+  'effect.demo.typewriter.modeOnce': 'Once',
+  'effect.demo.typewriter.modeLoop': 'Loop',
+  'effect.demo.typewriter.textPlaceholder': 'Text to display',
+  'effect.demo.typewriter.cursorPlaceholder': 'e.g. _, |, ▌, █',
+  'effect.demo.typewriter.restart': '↻ Restart from beginning',
+
+  // rotating-words
+  'effect.demo.rotatingWords.title': 'RotatingWords',
+  'effect.demo.rotatingWords.lead':
+    'Cycles only the trailing word with a slide-up + fade transition. Pattern like the hero copy "We build [apps]".',
+  'effect.demo.rotatingWords.control.words': 'Words (comma-separated)',
+  'effect.demo.rotatingWords.control.mode': 'Mode',
+  'effect.demo.rotatingWords.control.interval': 'Dwell time',
+  'effect.demo.rotatingWords.control.transition': 'Transition time',
+  'effect.demo.rotatingWords.control.fontSize': 'Font size',
+  'effect.demo.rotatingWords.control.fontWeight': 'Weight',
+  'effect.demo.rotatingWords.control.color': 'Color',
+  'effect.demo.rotatingWords.modeOnce': 'Once',
+  'effect.demo.rotatingWords.modeLoop': 'Loop',
+
+  // scramble-text
+  'effect.demo.scrambleText.title': 'ScrambleText',
+  'effect.demo.scrambleText.lead':
+    'Random characters flicker quickly and then settle into place one by one — a hacking / decoding effect. Matrix / terminal feel on entry.',
+  'effect.demo.scrambleText.control.text': 'Text',
+  'effect.demo.scrambleText.control.mode': 'Mode',
+  'effect.demo.scrambleText.control.charPool': 'Char pool (scramble source)',
+  'effect.demo.scrambleText.control.revealSpeed': 'Reveal speed',
+  'effect.demo.scrambleText.control.scrambleSpeed': 'Scramble interval',
+  'effect.demo.scrambleText.control.fontSize': 'Font size',
+  'effect.demo.scrambleText.control.fontWeight': 'Weight',
+  'effect.demo.scrambleText.control.color': 'Color',
+
+  // split-text-reveal
+  'effect.demo.splitTextReveal.title': 'SplitTextReveal',
+  'effect.demo.splitTextReveal.lead':
+    'Sequentially fade + slide-in by character or word. Triggers on mount or when scrolled into view.',
+  'effect.demo.splitTextReveal.livePreviewMount': 'Live preview (mount trigger)',
+  'effect.demo.splitTextReveal.inViewSection': 'inView trigger (scroll reveal)',
+  'effect.demo.splitTextReveal.control.text': 'Text',
+  'effect.demo.splitTextReveal.control.splitUnit': 'Split unit',
+  'effect.demo.splitTextReveal.control.stagger': 'Stagger',
+  'effect.demo.splitTextReveal.control.duration': 'Duration',
+  'effect.demo.splitTextReveal.control.fontSize': 'Font size',
+  'effect.demo.splitTextReveal.control.fontWeight': 'Weight',
+  'effect.demo.splitTextReveal.control.color': 'Color',
+
+  // count-up
+  'effect.demo.countUp.title': 'CountUp',
+  'effect.demo.countUp.lead':
+    'Number counter that smoothly counts up or down. For stats sections, KPIs, and achievement cards. Fires on mount or when scrolled into view.',
+  'effect.demo.countUp.inViewSection': 'inView trigger — KPI section',
+  'effect.demo.countUp.control.from': 'From',
+  'effect.demo.countUp.control.to': 'To',
+  'effect.demo.countUp.control.duration': 'Duration',
+  'effect.demo.countUp.control.decimals': 'Decimal places',
+  'effect.demo.countUp.control.separator': 'Thousands separator',
+  'effect.demo.countUp.control.prefixSuffix': 'Prefix / Suffix',
+  'effect.demo.countUp.control.fontSize': 'Font size',
+  'effect.demo.countUp.control.fontWeight': 'Weight',
+  'effect.demo.countUp.control.color': 'Color',
+
+  // gradient-text
+  'effect.demo.gradientText.title': 'GradientText',
+  'effect.demo.gradientText.lead':
+    'Gradients that flow over the text or sweep across as a shimmer. Used to emphasize hero titles and CTAs.',
+  'effect.demo.gradientText.control.text': 'Text',
+  'effect.demo.gradientText.control.mode': 'Mode',
+  'effect.demo.gradientText.control.direction': 'Flow direction',
+  'effect.demo.gradientText.control.duration': 'Duration',
+  'effect.demo.gradientText.control.flowColors': 'Flow colors (comma-separated)',
+  'effect.demo.gradientText.control.shimmerBase': 'Shimmer base color',
+  'effect.demo.gradientText.control.shimmerLight': 'Shimmer light color',
+  'effect.demo.gradientText.control.fontSize': 'Font size',
+  'effect.demo.gradientText.control.fontWeight': 'Weight',
+  'effect.demo.gradientText.shimmerBaseAria': 'Pick base color',
+  'effect.demo.gradientText.shimmerLightAria': 'Pick light color',
+
+  // blur-in-text
+  'effect.demo.blurInText.title': 'BlurInText',
+  'effect.demo.blurInText.lead':
+    'Text effect that comes into focus from a blurred state. Fires on mount or when scrolled into view.',
+  'effect.demo.blurInText.livePreviewMount': 'Live preview (mount trigger)',
+  'effect.demo.blurInText.control.text': 'Text',
+  'effect.demo.blurInText.control.splitUnit': 'Split unit',
+  'effect.demo.blurInText.control.stagger': 'Stagger',
+  'effect.demo.blurInText.control.duration': 'Duration',
+  'effect.demo.blurInText.control.blurAmount': 'Blur amount',
+  'effect.demo.blurInText.control.fontSize': 'Font size',
+  'effect.demo.blurInText.control.fontWeight': 'Weight',
+  'effect.demo.blurInText.control.color': 'Color',
+
+  // wavy-text
+  'effect.demo.wavyText.title': 'WavyText',
+  'effect.demo.wavyText.lead':
+    'Characters that wave (or bounce) in an infinite loop. Phase offsets create a natural wave-like motion.',
+  'effect.demo.wavyText.control.text': 'Text',
+  'effect.demo.wavyText.control.mode': 'Mode',
+  'effect.demo.wavyText.control.amplitude': 'Amplitude',
+  'effect.demo.wavyText.control.duration': 'Duration',
+  'effect.demo.wavyText.control.phaseStep': 'Phase step',
+  'effect.demo.wavyText.control.fontSize': 'Font size',
+  'effect.demo.wavyText.control.fontWeight': 'Weight',
+  'effect.demo.wavyText.control.color': 'Color',
+
+  // glitch-text
+  'effect.demo.glitchText.title': 'GlitchText',
+  'effect.demo.glitchText.lead':
+    'A glitch effect where the RGB channels separate. Intensity is adjustable; always-on or hover-only trigger.',
+  'effect.demo.glitchText.control.text': 'Text',
+  'effect.demo.glitchText.control.trigger': 'Trigger',
+  'effect.demo.glitchText.control.intensity': 'Intensity',
+  'effect.demo.glitchText.control.speed': 'Speed',
+  'effect.demo.glitchText.control.redChannel': 'Red channel',
+  'effect.demo.glitchText.control.cyanChannel': 'Cyan channel',
+  'effect.demo.glitchText.control.fontSize': 'Font size',
+  'effect.demo.glitchText.control.fontWeight': 'Weight',
+  'effect.demo.glitchText.control.baseColor': 'Base color',
+
+  // variable-font-hover
+  'effect.demo.variableFontHover.title': 'VariableFontHover',
+  'effect.demo.variableFontHover.lead':
+    'Characters thicken as the mouse passes over them. Smoothly interpolated when paired with a variable font like Pretendard Variable or Inter Variable.',
+  'effect.demo.variableFontHover.control.text': 'Text',
+  'effect.demo.variableFontHover.control.minWeight': 'Min weight',
+  'effect.demo.variableFontHover.control.maxWeight': 'Max weight',
+  'effect.demo.variableFontHover.control.radius': 'Radius',
+  'effect.demo.variableFontHover.control.transition': 'Transition',
+  'effect.demo.variableFontHover.control.fontSize': 'Font size',
+  'effect.demo.variableFontHover.control.color': 'Color',
+
+  // circular-text
+  'effect.demo.circularText.title': 'CircularText',
+  'effect.demo.circularText.lead':
+    'Text laid out along a circular path that rotates. Useful for badges, stamps, CD labels, and spinner labels.',
+  'effect.demo.circularText.control.text': 'Text (ending with a separator is recommended)',
+  'effect.demo.circularText.control.direction': 'Direction',
+  'effect.demo.circularText.control.radius': 'Radius',
+  'effect.demo.circularText.control.duration': 'Rotation speed',
+  'effect.demo.circularText.control.startAngle': 'Start angle',
+  'effect.demo.circularText.control.fontSize': 'Font size',
+  'effect.demo.circularText.control.fontWeight': 'Weight',
+  'effect.demo.circularText.control.color': 'Color',
+
+  // gravity-text
+  'effect.demo.gravityText.title': 'GravityText',
+  'effect.demo.gravityText.lead':
+    'A physics effect where characters fall under gravity or scatter. Supports mount / hover / inView triggers.',
+  'effect.demo.gravityText.control.text': 'Text',
+  'effect.demo.gravityText.control.trigger': 'Trigger',
+  'effect.demo.gravityText.control.duration': 'Duration',
+  'effect.demo.gravityText.control.stagger': 'Stagger',
+  'effect.demo.gravityText.control.spread': 'Spread',
+  'effect.demo.gravityText.control.gravity': 'Gravity',
+  'effect.demo.gravityText.control.rotation': 'Rotation',
+  'effect.demo.gravityText.control.fontSize': 'Font size',
+  'effect.demo.gravityText.control.fontWeight': 'Weight',
+  'effect.demo.gravityText.control.color': 'Color',
+
+  // spotlight-text
+  'effect.demo.spotlightText.title': 'SpotlightText',
+  'effect.demo.spotlightText.lead':
+    'A spotlight effect — only characters near the cursor brighten while the rest dim. Most striking on a dark background.',
+  'effect.demo.spotlightText.control.text': 'Text',
+  'effect.demo.spotlightText.control.radius': 'Radius',
+  'effect.demo.spotlightText.control.dimOpacity': 'Dim opacity',
+  'effect.demo.spotlightText.control.fontSize': 'Font size',
+  'effect.demo.spotlightText.control.fontWeight': 'Weight',
+  'effect.demo.spotlightText.control.baseColor': 'Base color (dim)',
+  'effect.demo.spotlightText.control.highlightColor': 'Highlight color',
+  'effect.demo.spotlightText.baseColorAria': 'Base color',
+  'effect.demo.spotlightText.highlightColorAria': 'Highlight color',
+
+  // ripple
+  'effect.demo.ripple.title': 'Ripple',
+  'effect.demo.ripple.lead':
+    'A wrapper that adds a click-position ripple effect to its child element. Works on buttons, cards, icons — anywhere.',
+  'effect.demo.ripple.sectionButton': 'Apply to a button',
+  'effect.demo.ripple.sectionCard': 'Apply to a card / large area',
+  'effect.demo.ripple.sectionOptions': 'Option controls',
+  'effect.demo.ripple.control.color': 'Ripple color (RGBA recommended)',
+  'effect.demo.ripple.control.duration': 'Duration',
+
+  // confetti
+  'effect.demo.confetti.title': 'Confetti',
+  'effect.demo.confetti.lead':
+    'ConfettiProvider + useConfetti() imperative trigger. For payment completion, success, or celebration moments. Canvas-based, zero dependencies.',
+  'effect.demo.confetti.sectionFire': 'Fire trigger',
+  'effect.demo.confetti.control.particleCount': 'Particle count',
+  'effect.demo.confetti.control.spread': 'Spread',
+  'effect.demo.confetti.control.shape': 'Particle shape',
+  'effect.demo.confetti.control.colors': 'Colors (comma-separated)',
+
+  // animated-button
+  'effect.demo.animatedButton.title': 'AnimatedButton',
+  'effect.demo.animatedButton.lead':
+    'A button that smoothly morphs through idle → loading → success/error states. If onClick is a Promise it auto-handles, otherwise control externally via the status prop.',
+  'effect.demo.animatedButton.sectionPromise': '1. Promise auto mode',
+  'effect.demo.animatedButton.sectionControlled': '2. External control mode',
+  'effect.demo.animatedButton.sectionSizeVariant': '3. Size / variant',
+
+  // animated-tabs
+  'effect.demo.animatedTabs.title': 'AnimatedTabs',
+  'effect.demo.animatedTabs.lead':
+    'Tabs whose active indicator slides smoothly. controlled/uncontrolled · ArrowLeft/Right keys · full role="tablist/tab/tabpanel" ARIA.',
+  'effect.demo.animatedTabs.sectionHorizontal': 'Horizontal (default, uncontrolled)',
+  'effect.demo.animatedTabs.sectionVertical': 'Vertical orientation',
+  'effect.demo.animatedTabs.sectionControlled': 'Controlled',
+  'effect.demo.animatedTabs.sectionSizeColor': 'Size / color',
+
+  // copy-button
+  'effect.demo.copyButton.title': 'CopyButton',
+  'effect.demo.copyButton.lead':
+    'On click, copies via navigator.clipboard and morphs the icon copy → check. Auto-reverts after a delay; optional "Copied!" tooltip.',
+  'effect.demo.copyButton.sectionCodeBlock': 'Code block + Copy',
+
+  // like-button
+  'effect.demo.likeButton.title': 'LikeButton',
+  'effect.demo.likeButton.lead':
+    'On click, the heart fills with a burst of small particles around it. controlled/uncontrolled · count display · keyboard toggle.',
+  'effect.demo.likeButton.sectionControlled': 'Controlled + auto count increment/decrement',
+  'effect.demo.likeButton.sectionSize': 'Size variants',
+  'effect.demo.likeButton.sectionColor': 'Color variants',
+  'effect.demo.likeButton.sectionBurst': 'Burst particle count',
+  'effect.demo.likeButton.sectionDisabled': 'Disabled',
+
+  // star-rating
+  'effect.demo.starRating.title': 'StarRating',
+  'effect.demo.starRating.lead':
+    'Star rating input. Hover preview · half-star · controlled/uncontrolled · keyboard (Arrow / Home / End) · readOnly mode.',
+  'effect.demo.starRating.sectionControlled': 'Controlled (integer)',
+  'effect.demo.starRating.sectionHalfStar': 'Half-star (0.5 step)',
+  'effect.demo.starRating.sectionSize': 'Size variants',
+  'effect.demo.starRating.sectionMax10': 'Out of 10',
+  'effect.demo.starRating.sectionColor': 'Color customization',
+  'effect.demo.starRating.sectionReadOnly': 'readOnly (display-only)',
+  'effect.demo.starRating.sectionDisabled': 'Disabled',
+  'effect.demo.starRating.sectionKeyboard': 'Keyboard accessibility',
+
+  // stepper
+  'effect.demo.stepper.title': 'Stepper',
+  'effect.demo.stepper.lead':
+    'A multi-step progress indicator. Horizontal/vertical, with the connector smoothly filling between step transitions. Supports a click-to-navigate callback.',
+  'effect.demo.stepper.sectionHorizontal': 'Horizontal — checkout example (click to move)',
+  'effect.demo.stepper.sectionVertical': 'Vertical',
+  'effect.demo.stepper.sectionSize': 'Size variants',
+  'effect.demo.stepper.sectionColor': 'Color variants',
 };
 
 export const dictionaries: Record<Locale, Dict> = { ko, en };

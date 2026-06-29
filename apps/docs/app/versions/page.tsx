@@ -14,6 +14,7 @@ import {
 } from '@baneung-pack/ui';
 
 import { useI18n } from '@/components/i18n-provider';
+import { versionsEn } from '@/lib/i18n/versions-en';
 
 type VersionType = 'major' | 'minor' | 'patch';
 
@@ -542,7 +543,7 @@ function VersionTypeBadge({ type }: { type: VersionType }) {
 }
 
 function PackageHistorySection({ history }: { history: PackageHistory }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between">
@@ -564,24 +565,31 @@ function PackageHistorySection({ history }: { history: PackageHistory }) {
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        {history.entries.map((entry) => (
-          <Card key={entry.version} variant="outlined">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-base">v{entry.version}</CardTitle>
-                <VersionTypeBadge type={entry.type} />
-              </div>
-              <CardDescription className="text-sm text-foreground">{entry.summary}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="flex list-disc flex-col gap-1 pl-5 text-sm text-foreground-muted">
-                {entry.details.map((d, i) => (
-                  <li key={i}>{d}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ))}
+        {history.entries.map((entry) => {
+          // 영문 locale일 때만 versionsEn에서 번역본을 조회. 누락 시 한국어 원본으로 fallback.
+          const translation =
+            locale === 'en' ? versionsEn[`${history.pkg}@${entry.version}`] : undefined;
+          const summary = translation?.summary ?? entry.summary;
+          const details = translation?.details ?? entry.details;
+          return (
+            <Card key={entry.version} variant="outlined">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-base">v{entry.version}</CardTitle>
+                  <VersionTypeBadge type={entry.type} />
+                </div>
+                <CardDescription className="text-sm text-foreground">{summary}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="flex list-disc flex-col gap-1 pl-5 text-sm text-foreground-muted">
+                  {details.map((d, i) => (
+                    <li key={i}>{d}</li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </section>
   );

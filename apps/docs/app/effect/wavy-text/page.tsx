@@ -33,16 +33,14 @@ export default function WavyTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>WavyText</Heading>
-        <Lead>
-          글자들이 파도치듯(또는 통통 튀듯) 무한 반복하는 효과. 위상 차이로 자연스러운 파동 연출.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.wavyText.title')}</Heading>
+        <Lead>{t('effect.demo.wavyText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-32 items-center justify-center border border-border-default bg-surface p-6">
@@ -59,11 +57,11 @@ export default function WavyTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.wavyText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={60} />
             </Control>
 
-            <Control label="모드">
+            <Control label={t('effect.demo.wavyText.control.mode')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -82,7 +80,7 @@ export default function WavyTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`진폭 (${amplitude}em)`}>
+            <Control label={`${t('effect.demo.wavyText.control.amplitude')} (${amplitude}em)`}>
               <input
                 type="range"
                 min={0.05}
@@ -94,7 +92,7 @@ export default function WavyTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Duration (${duration}ms)`}>
+            <Control label={`${t('effect.demo.wavyText.control.duration')} (${duration}ms)`}>
               <input
                 type="range"
                 min={400}
@@ -106,7 +104,9 @@ export default function WavyTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Phase step (${phaseStep.toFixed(2)})`}>
+            <Control
+              label={`${t('effect.demo.wavyText.control.phaseStep')} (${phaseStep.toFixed(2)})`}
+            >
               <input
                 type="range"
                 min={0}
@@ -118,7 +118,7 @@ export default function WavyTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.wavyText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={14}
@@ -129,7 +129,7 @@ export default function WavyTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.wavyText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -141,14 +141,14 @@ export default function WavyTextDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.wavyText.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -193,7 +193,7 @@ export default function WavyTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

@@ -29,17 +29,14 @@ export default function LikeButtonDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>LikeButton</Heading>
-        <Lead>
-          클릭 시 하트가 채워지며 주변에 작은 입자가 터지는 burst 애니메이션. controlled/
-          uncontrolled · 카운트 표시 · 키보드 토글.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.likeButton.title')}</Heading>
+        <Lead>{t('effect.demo.likeButton.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>Controlled + count 자동 증감</CardTitle>
+          <CardTitle>{t('effect.demo.likeButton.sectionControlled')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-8">
           <LikeButton liked={liked} onLikedChange={handleChange} count={count} size="lg" />
@@ -54,7 +51,7 @@ export default function LikeButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>크기 변형</CardTitle>
+          <CardTitle>{t('effect.demo.likeButton.sectionSize')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-8">
           <LikeButton size="sm" defaultLiked count={12} />
@@ -65,7 +62,7 @@ export default function LikeButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>색상 변형</CardTitle>
+          <CardTitle>{t('effect.demo.likeButton.sectionColor')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-6">
           <LikeButton color="#FF2D78" defaultLiked count={1} />
@@ -79,7 +76,7 @@ export default function LikeButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>burst 입자 개수</CardTitle>
+          <CardTitle>{t('effect.demo.likeButton.sectionBurst')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-8">
           <LikeButton burstCount={4} size="lg" />
@@ -90,7 +87,7 @@ export default function LikeButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>비활성화</CardTitle>
+          <CardTitle>{t('effect.demo.likeButton.sectionDisabled')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-6">
           <LikeButton disabled count={0} />
@@ -100,7 +97,7 @@ export default function LikeButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

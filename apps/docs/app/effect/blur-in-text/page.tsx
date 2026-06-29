@@ -34,16 +34,14 @@ export default function BlurInTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>BlurInText</Heading>
-        <Lead>
-          흐릿한 상태에서 선명해지며 등장하는 텍스트 효과. 마운트 또는 스크롤 진입 시 발사.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.blurInText.title')}</Heading>
+        <Lead>{t('effect.demo.blurInText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기 (mount 트리거)</CardTitle>
+          <CardTitle>{t('effect.demo.blurInText.livePreviewMount')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-32 items-center border border-border-default bg-surface p-6">
@@ -61,11 +59,11 @@ export default function BlurInTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.blurInText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={120} />
             </Control>
 
-            <Control label="분할 단위">
+            <Control label={t('effect.demo.blurInText.control.splitUnit')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -91,7 +89,7 @@ export default function BlurInTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`Stagger (${stagger}ms)`}>
+            <Control label={`${t('effect.demo.blurInText.control.stagger')} (${stagger}ms)`}>
               <input
                 type="range"
                 min={0}
@@ -104,7 +102,7 @@ export default function BlurInTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Duration (${duration}ms)`}>
+            <Control label={`${t('effect.demo.blurInText.control.duration')} (${duration}ms)`}>
               <input
                 type="range"
                 min={200}
@@ -116,7 +114,7 @@ export default function BlurInTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Blur 강도 (${blurAmount}px)`}>
+            <Control label={`${t('effect.demo.blurInText.control.blurAmount')} (${blurAmount}px)`}>
               <input
                 type="range"
                 min={2}
@@ -127,7 +125,7 @@ export default function BlurInTextDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.blurInText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={14}
@@ -138,7 +136,7 @@ export default function BlurInTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.blurInText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -150,14 +148,14 @@ export default function BlurInTextDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.blurInText.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -222,7 +220,7 @@ export default function BlurInTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

@@ -35,17 +35,14 @@ export default function CountUpDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>CountUp</Heading>
-        <Lead>
-          숫자가 부드럽게 증가/감소하는 카운터. 통계 섹션·KPI·achievement 카드에 사용. 마운트 또는
-          스크롤 진입 시 발사.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.countUp.title')}</Heading>
+        <Lead>{t('effect.demo.countUp.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-32 items-center justify-center border border-border-default bg-surface p-6">
@@ -65,15 +62,15 @@ export default function CountUpDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Control label="From">
+            <Control label={t('effect.demo.countUp.control.from')}>
               <Input type="number" value={from} onChange={(e) => setFrom(Number(e.target.value))} />
             </Control>
 
-            <Control label="To">
+            <Control label={t('effect.demo.countUp.control.to')}>
               <Input type="number" value={to} onChange={(e) => setTo(Number(e.target.value))} />
             </Control>
 
-            <Control label={`Duration (${duration}ms)`}>
+            <Control label={`${t('effect.demo.countUp.control.duration')} (${duration}ms)`}>
               <input
                 type="range"
                 min={200}
@@ -85,7 +82,7 @@ export default function CountUpDemoPage() {
               />
             </Control>
 
-            <Control label={`소수점 자리수 (${decimals})`}>
+            <Control label={`${t('effect.demo.countUp.control.decimals')} (${decimals})`}>
               <input
                 type="range"
                 min={0}
@@ -96,7 +93,7 @@ export default function CountUpDemoPage() {
               />
             </Control>
 
-            <Control label="천 단위 구분자">
+            <Control label={t('effect.demo.countUp.control.separator')}>
               <div className="flex gap-2">
                 {[',', '.', ' ', ''].map((s) => (
                   <Button
@@ -111,7 +108,7 @@ export default function CountUpDemoPage() {
               </div>
             </Control>
 
-            <Control label="Prefix / Suffix">
+            <Control label={t('effect.demo.countUp.control.prefixSuffix')}>
               <div className="flex gap-2">
                 <Input
                   value={prefix}
@@ -128,7 +125,7 @@ export default function CountUpDemoPage() {
               </div>
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.countUp.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={16}
@@ -139,7 +136,7 @@ export default function CountUpDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.countUp.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -151,14 +148,14 @@ export default function CountUpDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.countUp.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -176,7 +173,7 @@ export default function CountUpDemoPage() {
       {/* inView 트리거 */}
       <Card>
         <CardHeader>
-          <CardTitle>inView 트리거 — KPI 섹션</CardTitle>
+          <CardTitle>{t('effect.demo.countUp.inViewSection')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-4 text-sm text-foreground-muted">
@@ -229,7 +226,7 @@ export default function CountUpDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

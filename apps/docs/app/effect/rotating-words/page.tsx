@@ -38,17 +38,14 @@ export default function RotatingWordsDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>RotatingWords</Heading>
-        <Lead>
-          고정 문구 뒤의 단어만 위로 슬라이드 + 페이드로 순환. 히어로 카피의 &quot;We build
-          [apps]&quot; 같은 패턴.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.rotatingWords.title')}</Heading>
+        <Lead>{t('effect.demo.rotatingWords.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-32 items-center border border-border-default bg-surface p-6 text-xl font-medium">
@@ -65,7 +62,7 @@ export default function RotatingWordsDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="단어 (콤마로 구분)">
+            <Control label={t('effect.demo.rotatingWords.control.words')}>
               <Input
                 value={wordsText}
                 onChange={(e) => setWordsText(e.target.value)}
@@ -73,26 +70,26 @@ export default function RotatingWordsDemoPage() {
               />
             </Control>
 
-            <Control label="모드">
+            <Control label={t('effect.demo.rotatingWords.control.mode')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant={!loop ? 'primary' : 'ghost'}
                   onClick={() => setLoop(false)}
                 >
-                  1회
+                  {t('effect.demo.rotatingWords.modeOnce')}
                 </Button>
                 <Button
                   size="sm"
                   variant={loop ? 'primary' : 'ghost'}
                   onClick={() => setLoop(true)}
                 >
-                  Loop
+                  {t('effect.demo.rotatingWords.modeLoop')}
                 </Button>
               </div>
             </Control>
 
-            <Control label={`체류 시간 (${intervalMs}ms)`}>
+            <Control label={`${t('effect.demo.rotatingWords.control.interval')} (${intervalMs}ms)`}>
               <input
                 type="range"
                 min={500}
@@ -104,7 +101,9 @@ export default function RotatingWordsDemoPage() {
               />
             </Control>
 
-            <Control label={`전환 시간 (${transitionMs}ms)`}>
+            <Control
+              label={`${t('effect.demo.rotatingWords.control.transition')} (${transitionMs}ms)`}
+            >
               <input
                 type="range"
                 min={150}
@@ -116,7 +115,7 @@ export default function RotatingWordsDemoPage() {
               />
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.rotatingWords.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={14}
@@ -127,7 +126,7 @@ export default function RotatingWordsDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.rotatingWords.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -139,14 +138,14 @@ export default function RotatingWordsDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.rotatingWords.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -210,7 +209,7 @@ export default function RotatingWordsDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

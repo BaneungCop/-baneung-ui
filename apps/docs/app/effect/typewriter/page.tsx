@@ -39,18 +39,15 @@ export default function TypewriterDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Typewriter</Heading>
-        <Lead>
-          한 글자씩 등장하는 텍스트 + 깜빡이는 커서. 1회 또는 무한 루프 모드, 크기·색·굵기·커서를
-          자유롭게 커스터마이즈.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.typewriter.title')}</Heading>
+        <Lead>{t('effect.demo.typewriter.lead')}</Lead>
       </header>
       <Separator />
 
       {/* 라이브 컨트롤 */}
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           {/* 미리보기 영역 — 충분한 높이 확보로 줄바꿈 시 흔들림 방지 */}
@@ -68,15 +65,15 @@ export default function TypewriterDemoPage() {
 
           {/* 컨트롤 패널 */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.typewriter.control.text')}>
               <Input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="표시할 텍스트"
+                placeholder={t('effect.demo.typewriter.textPlaceholder')}
               />
             </Control>
 
-            <Control label="모드">
+            <Control label={t('effect.demo.typewriter.control.mode')}>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -84,7 +81,7 @@ export default function TypewriterDemoPage() {
                   variant={!loop ? 'primary' : 'ghost'}
                   onClick={() => setLoop(false)}
                 >
-                  1회
+                  {t('effect.demo.typewriter.modeOnce')}
                 </Button>
                 <Button
                   type="button"
@@ -92,12 +89,12 @@ export default function TypewriterDemoPage() {
                   variant={loop ? 'primary' : 'ghost'}
                   onClick={() => setLoop(true)}
                 >
-                  Loop
+                  {t('effect.demo.typewriter.modeLoop')}
                 </Button>
               </div>
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.typewriter.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={12}
@@ -109,7 +106,7 @@ export default function TypewriterDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.typewriter.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -121,24 +118,24 @@ export default function TypewriterDemoPage() {
               />
             </Control>
 
-            <Control label="색상">
+            <Control label={t('effect.demo.typewriter.control.color')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer rounded-none border border-border-default p-1"
-                  aria-label="색상 선택"
+                  aria-label={t('effect.demo.colorPickerAria')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
             </Control>
 
-            <Control label="커서 글자 (비우면 막대)">
+            <Control label={t('effect.demo.typewriter.control.cursorChar')}>
               <Input
                 value={cursorChar}
                 onChange={(e) => setCursorChar(e.target.value)}
-                placeholder="예: _, |, ▌, █"
+                placeholder={t('effect.demo.typewriter.cursorPlaceholder')}
                 maxLength={3}
               />
             </Control>
@@ -151,7 +148,7 @@ export default function TypewriterDemoPage() {
               size="sm"
               onClick={() => setResetKey((k) => k + 1)}
             >
-              ↻ 처음부터 다시
+              {t('effect.demo.typewriter.restart')}
             </Button>
           </div>
         </CardContent>
@@ -208,7 +205,7 @@ export default function TypewriterDemoPage() {
       {/* 설치 안내는 /install 페이지에 통합 — 여기서는 사용 예제만. */}
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

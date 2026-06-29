@@ -23,17 +23,14 @@ export default function StarRatingDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>StarRating</Heading>
-        <Lead>
-          별점 입력. hover preview · half-star · controlled/uncontrolled · 키보드 (Arrow / Home /
-          End) · readOnly 모드.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.starRating.title')}</Heading>
+        <Lead>{t('effect.demo.starRating.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>Controlled (정수)</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionControlled')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-6">
           <StarRating value={rating} onValueChange={setRating} size="lg" />
@@ -45,7 +42,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Half-star (0.5 단위)</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionHalfStar')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-6">
           <StarRating value={halfRating} onValueChange={setHalfRating} half size="lg" />
@@ -57,7 +54,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>크기 변형</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionSize')}</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-8">
           <StarRating size="sm" defaultValue={3} />
@@ -68,7 +65,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>10점 만점</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionMax10')}</CardTitle>
         </CardHeader>
         <CardContent>
           <StarRating defaultValue={7} max={10} half />
@@ -77,7 +74,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>색상 커스터마이즈</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionColor')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <StarRating defaultValue={3} color="#F59E0B" />
@@ -89,7 +86,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>readOnly (표시 전용)</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionReadOnly')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-3 text-sm text-foreground-muted">
@@ -101,7 +98,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>비활성화</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionDisabled')}</CardTitle>
         </CardHeader>
         <CardContent>
           <StarRating defaultValue={3} disabled />
@@ -110,7 +107,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>키보드 접근성</CardTitle>
+          <CardTitle>{t('effect.demo.starRating.sectionKeyboard')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-3 text-sm text-foreground-muted">
@@ -122,7 +119,7 @@ export default function StarRatingDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

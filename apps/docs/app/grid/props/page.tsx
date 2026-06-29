@@ -55,12 +55,8 @@ function HandleTable({ rows, locale }: { rows: GridHandleMethod[]; locale: 'ko' 
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b border-border-default">
-            <th className="px-3 py-2 text-left font-medium">
-              {locale === 'en' ? 'Method' : '메서드'}
-            </th>
-            <th className="px-3 py-2 text-left font-medium">
-              {locale === 'en' ? 'Returns' : '반환'}
-            </th>
+            <th className="px-3 py-2 text-left font-medium">{t('propsPage.method')}</th>
+            <th className="px-3 py-2 text-left font-medium">{t('propsPage.returns')}</th>
             <th className="px-3 py-2 text-left font-medium">{t('api.description')}</th>
           </tr>
         </thead>
@@ -79,16 +75,12 @@ function HandleTable({ rows, locale }: { rows: GridHandleMethod[]; locale: 'ko' 
 }
 
 export default function GridPropsPage() {
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Grid · Props</Heading>
-        <Lead>
-          {locale === 'en'
-            ? 'Reference for all props of @baneung-pack/grid, the GridColumn fields, and the GridHandle ref API.'
-            : '@baneung-pack/grid의 전체 props와 GridColumn 필드, GridHandle ref API 레퍼런스.'}
-        </Lead>
+        <Heading level={1}>{t('propsPage.grid.title')}</Heading>
+        <Lead>{t('propsPage.grid.lead')}</Lead>
       </header>
 
       <Separator />
@@ -104,7 +96,7 @@ export default function GridPropsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{locale === 'en' ? 'GridColumn fields' : 'GridColumn 필드'}</CardTitle>
+          <CardTitle>{t('propsPage.grid.columnFields')}</CardTitle>
         </CardHeader>
         <CardContent>
           <PropsTable rows={gridColumnFields} locale={locale} />
@@ -113,30 +105,14 @@ export default function GridPropsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>GridHandle (ref API)</CardTitle>
+          <CardTitle>{t('propsPage.grid.handleMethods')}</CardTitle>
         </CardHeader>
         <CardContent>
           <HandleTable rows={gridHandleMethods} locale={locale} />
         </CardContent>
       </Card>
 
-      <Muted className="text-xs">
-        {locale === 'en' ? (
-          <>
-            💡 <code>cellSelection</code> (
-            <code>&apos;none&apos; | &apos;single&apos; | &apos;multi&apos;</code>) and{' '}
-            <code>selectable</code> are independent axes — cellSelection is for visual cell
-            selection, selectable is for checkbox-based row selection.
-          </>
-        ) : (
-          <>
-            💡 <code>cellSelection</code> (
-            <code>&apos;none&apos; | &apos;single&apos; | &apos;multi&apos;</code>)과{' '}
-            <code>selectable</code>은 별개 축입니다. cellSelection은 그리드 셀의 시각 선택,
-            selectable은 체크박스 기반 행 선택.
-          </>
-        )}
-      </Muted>
+      <Muted className="text-xs">{t('propsPage.grid.cellSelectionNote')}</Muted>
     </div>
   );
 }

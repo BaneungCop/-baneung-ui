@@ -69,17 +69,14 @@ export default function AnimatedTabsDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>AnimatedTabs</Heading>
-        <Lead>
-          활성 탭 인디케이터가 부드럽게 미끄러지는 탭. controlled/uncontrolled · ArrowLeft/Right 키
-          · <code>role=&quot;tablist/tab/tabpanel&quot;</code> ARIA 완비.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.animatedTabs.title')}</Heading>
+        <Lead>{t('effect.demo.animatedTabs.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>Horizontal (기본, Uncontrolled)</CardTitle>
+          <CardTitle>{t('effect.demo.animatedTabs.sectionHorizontal')}</CardTitle>
         </CardHeader>
         <CardContent>
           <AnimatedTabs items={TABS} />
@@ -92,7 +89,7 @@ export default function AnimatedTabsDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Vertical orientation</CardTitle>
+          <CardTitle>{t('effect.demo.animatedTabs.sectionVertical')}</CardTitle>
         </CardHeader>
         <CardContent>
           <AnimatedTabs items={TABS} orientation="vertical" />
@@ -101,7 +98,7 @@ export default function AnimatedTabsDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Controlled</CardTitle>
+          <CardTitle>{t('effect.demo.animatedTabs.sectionControlled')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-4 text-xs text-foreground-muted">
@@ -124,7 +121,7 @@ export default function AnimatedTabsDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>크기 / 색상</CardTitle>
+          <CardTitle>{t('effect.demo.animatedTabs.sectionSizeColor')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           <div>
@@ -149,7 +146,7 @@ export default function AnimatedTabsDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

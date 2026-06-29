@@ -26,18 +26,18 @@ export default function HomePage() {
       <header className="flex flex-col gap-2">
         <Heading level={1}>{t('intro.title')}</Heading>
         <Lead>{t('intro.lead')}</Lead>
-        <Muted>Buttons &amp; Toggles 데모</Muted>
+        <Muted>{t('intro.demoSubtitle')}</Muted>
       </header>
 
       <Separator />
 
       <section className="flex flex-col gap-4">
-        <Heading level={2}>Button — variant × size</Heading>
+        <Heading level={2}>{t('intro.section.variantSize')}</Heading>
         <table className="border-collapse">
           <thead>
             <tr>
               <th className="px-3 py-2 text-left text-xs font-medium text-foreground-muted">
-                variant \ size
+                {t('intro.label.variantSize')}
               </th>
               {sizes.map((s) => (
                 <th
@@ -67,26 +67,26 @@ export default function HomePage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <Heading level={2}>Loading + asChild</Heading>
+        <Heading level={2}>{t('intro.section.loading')}</Heading>
         <div className="flex gap-3">
-          <Button loading>저장 중</Button>
+          <Button loading>{t('intro.btn.saving')}</Button>
           <Button asChild variant="outline">
             <a href="https://github.com" rel="noreferrer noopener" target="_blank">
-              GitHub로 이동
+              {t('intro.btn.github')}
             </a>
           </Button>
         </div>
       </section>
 
       <section className="flex flex-col gap-3">
-        <Heading level={2}>ButtonGroup</Heading>
+        <Heading level={2}>{t('intro.section.buttonGroup')}</Heading>
         <div className="flex flex-col gap-3">
-          <ButtonGroup aria-label="페이지 이동">
-            <Button variant="outline">이전</Button>
-            <Button variant="outline">현재</Button>
-            <Button variant="outline">다음</Button>
+          <ButtonGroup aria-label={t('intro.aria.pagination')}>
+            <Button variant="outline">{t('intro.btn.prev')}</Button>
+            <Button variant="outline">{t('intro.btn.current')}</Button>
+            <Button variant="outline">{t('intro.btn.next')}</Button>
           </ButtonGroup>
-          <ButtonGroup orientation="vertical" aria-label="세로 그룹">
+          <ButtonGroup orientation="vertical" aria-label={t('intro.aria.vertical')}>
             <Button variant="outline">A</Button>
             <Button variant="outline">B</Button>
             <Button variant="outline">C</Button>
@@ -95,23 +95,23 @@ export default function HomePage() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <Heading level={2}>Toggle &amp; ToggleGroup</Heading>
+        <Heading level={2}>{t('intro.section.toggle')}</Heading>
         <div className="flex flex-wrap items-center gap-4">
-          <Toggle aria-label="굵게" defaultPressed>
+          <Toggle aria-label={t('intro.toggle.bold')} defaultPressed>
             B
           </Toggle>
-          <ToggleGroup type="single" defaultValue="left" aria-label="정렬">
+          <ToggleGroup type="single" defaultValue="left" aria-label={t('intro.toggle.align')}>
             <ToggleGroupItem variant="outline" value="left">
-              왼쪽
+              {t('intro.toggle.left')}
             </ToggleGroupItem>
             <ToggleGroupItem variant="outline" value="center">
-              가운데
+              {t('intro.toggle.center')}
             </ToggleGroupItem>
             <ToggleGroupItem variant="outline" value="right">
-              오른쪽
+              {t('intro.toggle.right')}
             </ToggleGroupItem>
           </ToggleGroup>
-          <ToggleGroup type="multiple" aria-label="포맷">
+          <ToggleGroup type="multiple" aria-label={t('intro.toggle.format')}>
             <ToggleGroupItem variant="outline" value="bold">
               B
             </ToggleGroupItem>
@@ -128,7 +128,7 @@ export default function HomePage() {
       <Separator />
 
       <footer className="flex items-center gap-2 text-sm text-foreground-subtle">
-        <Badge variant="success">출시 준비</Badge>
+        <Badge variant="success">{t('intro.footer.readyBadge')}</Badge>
         <span>@baneung-pack/ui — Phase 4</span>
       </footer>
     </main>

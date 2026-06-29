@@ -54,9 +54,9 @@ function PropsTable({ rows, locale }: { rows: ChartApiRow[]; locale: 'ko' | 'en'
 }
 
 export default function ChartPropsPage() {
-  const { locale } = useI18n();
+  const { t, locale } = useI18n();
   const sections: { title: string; rows: ChartApiRow[] }[] = [
-    { title: 'ChartBaseProps (공통)', rows: chartBaseProps },
+    { title: t('propsPage.chart.baseSection'), rows: chartBaseProps },
     { title: 'BarChartProps', rows: barChartProps },
     { title: 'LineChartProps', rows: lineChartProps },
     { title: 'AreaChartProps', rows: areaChartProps },
@@ -71,12 +71,8 @@ export default function ChartPropsPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Chart · Props</Heading>
-        <Lead>
-          {locale === 'en'
-            ? 'Reference for all props of @baneung-pack/chart (Bar / Line / Area / Pie / Doughnut).'
-            : '@baneung-pack/chart의 전체 props 레퍼런스 (Bar / Line / Area / Pie / Doughnut).'}
-        </Lead>
+        <Heading level={1}>{t('propsPage.chart.title')}</Heading>
+        <Lead>{t('propsPage.chart.lead')}</Lead>
       </header>
 
       <Separator />

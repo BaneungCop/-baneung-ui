@@ -67,7 +67,7 @@ export function ComponentShell({ spec }: ComponentShellProps) {
 
       <section className="flex flex-col gap-3">
         <Heading level={2}>{t('componentShell.apiHeading')}</Heading>
-        <ApiTable rows={api} />
+        <ApiTable rows={api} slug={slug} />
       </section>
     </div>
   );

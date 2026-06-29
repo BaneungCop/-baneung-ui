@@ -40,16 +40,14 @@ export default function GradientTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>GradientText</Heading>
-        <Lead>
-          그라데이션이 글자 위를 흐르거나 반짝이며 지나가는 효과. 히어로 타이틀·CTA 강조에 사용.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.gradientText.title')}</Heading>
+        <Lead>{t('effect.demo.gradientText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex min-h-32 items-center justify-center border border-border-default bg-surface p-6">
@@ -67,11 +65,11 @@ export default function GradientTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.gradientText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={80} />
             </Control>
 
-            <Control label="모드">
+            <Control label={t('effect.demo.gradientText.control.mode')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -90,7 +88,7 @@ export default function GradientTextDemoPage() {
               </div>
             </Control>
 
-            <Control label="흐름 방향">
+            <Control label={t('effect.demo.gradientText.control.direction')}>
               <div className="flex gap-2">
                 {(['horizontal', 'vertical', 'diagonal'] as Direction[]).map((d) => (
                   <Button
@@ -105,7 +103,7 @@ export default function GradientTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`Duration (${durationMs}ms)`}>
+            <Control label={`${t('effect.demo.gradientText.control.duration')} (${durationMs}ms)`}>
               <input
                 type="range"
                 min={500}
@@ -118,7 +116,7 @@ export default function GradientTextDemoPage() {
             </Control>
 
             {mode === 'flow' ? (
-              <Control label="Flow 색상 (콤마로 구분)">
+              <Control label={t('effect.demo.gradientText.control.flowColors')}>
                 <Input
                   value={colorsText}
                   onChange={(e) => setColorsText(e.target.value)}
@@ -127,26 +125,26 @@ export default function GradientTextDemoPage() {
               </Control>
             ) : (
               <>
-                <Control label="Shimmer 베이스 색">
+                <Control label={t('effect.demo.gradientText.control.shimmerBase')}>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       value={baseColor}
                       onChange={(e) => setBaseColor(e.target.value)}
                       className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                      aria-label="베이스 색 선택"
+                      aria-label={t('effect.demo.gradientText.shimmerBaseAria')}
                     />
                     <Input value={baseColor} onChange={(e) => setBaseColor(e.target.value)} />
                   </div>
                 </Control>
-                <Control label="Shimmer 빛 색상">
+                <Control label={t('effect.demo.gradientText.control.shimmerLight')}>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       value={shimmerColor}
                       onChange={(e) => setShimmerColor(e.target.value)}
                       className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                      aria-label="빛 색상 선택"
+                      aria-label={t('effect.demo.gradientText.shimmerLightAria')}
                     />
                     <Input value={shimmerColor} onChange={(e) => setShimmerColor(e.target.value)} />
                   </div>
@@ -154,7 +152,7 @@ export default function GradientTextDemoPage() {
               </>
             )}
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.gradientText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={16}
@@ -165,7 +163,7 @@ export default function GradientTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.gradientText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -220,7 +218,7 @@ export default function GradientTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

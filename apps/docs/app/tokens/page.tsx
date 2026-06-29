@@ -88,9 +88,7 @@ export default function TokensPage() {
               >
                 <span className="w-16 font-mono text-xs text-foreground-muted">{ts.name}</span>
                 <span className="w-12 font-mono text-xs text-foreground-subtle">{ts.size}</span>
-                <span style={{ fontSize: ts.size }}>
-                  Baneung Design System — 바능 디자인 시스템
-                </span>
+                <span style={{ fontSize: ts.size }}>{t('tokens.typeSample')}</span>
               </div>
             ))}
           </CardContent>

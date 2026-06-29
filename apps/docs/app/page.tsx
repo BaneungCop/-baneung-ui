@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
+import { useI18n } from '@/components/i18n-provider';
+
 /**
  * Canvas 2D scene — client-only (window/canvas 즉시 참조).
  */
@@ -21,6 +23,7 @@ const HomeScene = dynamic(() => import('@/components/home-scene').then((m) => m.
  * 오버레이 최소화: 좌상단 타이틀 + 좌하단 CTA. 조작 안내 등은 의도적으로 생략.
  */
 export default function HomePage() {
+  const { t } = useI18n();
   return (
     <main className="relative h-[calc(100vh-3.5rem)] overflow-hidden bg-white">
       <div className="absolute inset-0">
@@ -55,9 +58,9 @@ export default function HomePage() {
           </span>
         </h1>
         <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-foreground-muted md:max-w-sm md:text-sm">
-          판교에서 만든 디자인 시스템 — UI · Grid · Chart · Editor.
+          {t('home.tagline')}
           <br />
-          각진 디자인, WCAG AA 접근성, 한글 우선.
+          {t('home.taglineSub')}
         </p>
       </div>
 
@@ -67,13 +70,13 @@ export default function HomePage() {
           href="/intro"
           className="inline-flex h-10 items-center border border-foreground bg-white px-5 text-xs font-semibold uppercase tracking-[0.2em] text-foreground transition-colors hover:bg-foreground hover:text-foreground-inverse"
         >
-          패키지 둘러보기 →
+          {t('home.cta.explore')}
         </Link>
         <Link
           href="/install"
           className="inline-flex h-10 items-center px-5 text-xs font-semibold uppercase tracking-[0.2em] text-foreground-muted transition-colors hover:text-foreground"
         >
-          설치 가이드
+          {t('home.cta.install')}
         </Link>
       </div>
     </main>

@@ -34,16 +34,14 @@ export default function GlitchTextDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>GlitchText</Heading>
-        <Lead>
-          RGB 채널이 어긋나는 글리치 효과. 강도(intensity) 조절 가능, 항상 또는 hover 시에만 트리거.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.glitchText.title')}</Heading>
+        <Lead>{t('effect.demo.glitchText.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           {/* 다크 배경 — 글리치 효과는 다크 위에서 선명함 */}
@@ -63,11 +61,11 @@ export default function GlitchTextDemoPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Control label="텍스트">
+            <Control label={t('effect.demo.glitchText.control.text')}>
               <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={60} />
             </Control>
 
-            <Control label="트리거">
+            <Control label={t('effect.demo.glitchText.control.trigger')}>
               <div className="flex gap-2">
                 <Button
                   size="sm"
@@ -86,7 +84,9 @@ export default function GlitchTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`Intensity (${intensity.toFixed(2)})`}>
+            <Control
+              label={`${t('effect.demo.glitchText.control.intensity')} (${intensity.toFixed(2)})`}
+            >
               <input
                 type="range"
                 min={0}
@@ -98,7 +98,7 @@ export default function GlitchTextDemoPage() {
               />
             </Control>
 
-            <Control label={`Speed (${speedMs}ms)`}>
+            <Control label={`${t('effect.demo.glitchText.control.speed')} (${speedMs}ms)`}>
               <input
                 type="range"
                 min={300}
@@ -110,14 +110,14 @@ export default function GlitchTextDemoPage() {
               />
             </Control>
 
-            <Control label="적색 채널">
+            <Control label={t('effect.demo.glitchText.control.redChannel')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={redChannelColor}
                   onChange={(e) => setRedChannelColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="적색 채널"
+                  aria-label={t('effect.demo.glitchText.control.redChannel')}
                 />
                 <Input
                   value={redChannelColor}
@@ -126,14 +126,14 @@ export default function GlitchTextDemoPage() {
               </div>
             </Control>
 
-            <Control label="청록 채널">
+            <Control label={t('effect.demo.glitchText.control.cyanChannel')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={cyanChannelColor}
                   onChange={(e) => setCyanChannelColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="청록 채널"
+                  aria-label={t('effect.demo.glitchText.control.cyanChannel')}
                 />
                 <Input
                   value={cyanChannelColor}
@@ -142,7 +142,7 @@ export default function GlitchTextDemoPage() {
               </div>
             </Control>
 
-            <Control label={`글자 크기 (${fontSize}px)`}>
+            <Control label={`${t('effect.demo.glitchText.control.fontSize')} (${fontSize}px)`}>
               <input
                 type="range"
                 min={16}
@@ -153,7 +153,7 @@ export default function GlitchTextDemoPage() {
               />
             </Control>
 
-            <Control label={`굵기 (${fontWeight})`}>
+            <Control label={`${t('effect.demo.glitchText.control.fontWeight')} (${fontWeight})`}>
               <input
                 type="range"
                 min={100}
@@ -165,14 +165,14 @@ export default function GlitchTextDemoPage() {
               />
             </Control>
 
-            <Control label="베이스 색">
+            <Control label={t('effect.demo.glitchText.control.baseColor')}>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
                   className="h-10 w-12 cursor-pointer border border-border-default p-1"
-                  aria-label="베이스 색"
+                  aria-label={t('effect.demo.glitchText.control.baseColor')}
                 />
                 <Input value={color} onChange={(e) => setColor(e.target.value)} />
               </div>
@@ -231,7 +231,7 @@ export default function GlitchTextDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

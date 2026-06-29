@@ -24,17 +24,14 @@ export default function RippleDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>Ripple</Heading>
-        <Lead>
-          자식 요소를 감싸 클릭 위치에서 물결이 퍼지는 효과를 입혀주는 래퍼. 버튼·카드·아이콘 등
-          어디든 적용 가능.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.ripple.title')}</Heading>
+        <Lead>{t('effect.demo.ripple.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>버튼에 적용</CardTitle>
+          <CardTitle>{t('effect.demo.ripple.sectionButton')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Ripple color={color} duration={duration}>
@@ -106,7 +103,7 @@ export default function RippleDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>카드 / 큰 영역에 적용</CardTitle>
+          <CardTitle>{t('effect.demo.ripple.sectionCard')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Ripple color="rgba(91, 168, 160, 0.25)" duration={900}>
@@ -133,13 +130,13 @@ export default function RippleDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>옵션 컨트롤</CardTitle>
+          <CardTitle>{t('effect.demo.ripple.sectionOptions')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
-          <Control label="Ripple 색상 (RGBA 권장)">
+          <Control label={t('effect.demo.ripple.control.color')}>
             <Input value={color} onChange={(e) => setColor(e.target.value)} />
           </Control>
-          <Control label={`Duration (${duration}ms)`}>
+          <Control label={`${t('effect.demo.ripple.control.duration')} (${duration}ms)`}>
             <input
               type="range"
               min={200}
@@ -155,7 +152,7 @@ export default function RippleDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">

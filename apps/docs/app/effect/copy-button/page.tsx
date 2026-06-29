@@ -24,17 +24,14 @@ export default function CopyButtonDemoPage() {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <Heading level={1}>CopyButton</Heading>
-        <Lead>
-          클릭 시 <code>navigator.clipboard</code>로 복사 + 아이콘이 copy → check로 모핑. 일정 시간
-          후 자동 복원, &quot;Copied!&quot; 툴팁 옵션.
-        </Lead>
+        <Heading level={1}>{t('effect.demo.copyButton.title')}</Heading>
+        <Lead>{t('effect.demo.copyButton.lead')}</Lead>
       </header>
       <Separator />
 
       <Card>
         <CardHeader>
-          <CardTitle>라이브 미리보기</CardTitle>
+          <CardTitle>{t('demo.livePreview')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
@@ -76,7 +73,7 @@ export default function CopyButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>코드 블록 + Copy</CardTitle>
+          <CardTitle>{t('effect.demo.copyButton.sectionCodeBlock')}</CardTitle>
         </CardHeader>
         <CardContent>
           {/* 코드 블록 상단 우측에 iconOnly 버튼 — 일반적인 패턴 */}
@@ -93,7 +90,7 @@ export default function CopyButtonDemoPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>사용</CardTitle>
+          <CardTitle>{t('effect.demo.usage')}</CardTitle>
         </CardHeader>
         <CardContent>
           <pre className="overflow-x-auto bg-surface p-4 text-sm leading-relaxed">
