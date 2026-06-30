@@ -1,5 +1,28 @@
 # @baneung-pack/editor
 
+## 0.1.2
+
+### Patch Changes
+
+- placeholder 깜박이는 커서 위치가 placeholder 텍스트 한 줄 아래에 표시되던 버그 수정.
+
+  # 원인
+
+  `.baneung-editor-content[data-empty='true']::before`가 `display: block`이라
+  contenteditable의 빈 첫 노드 (`<br>` / 빈 `<p>`)와 세로로 쌓임 — placeholder
+  한 줄 + 빈 줄 (커서) = 2줄.
+
+  # 수정
+
+  가상요소를 `position: absolute`로 overlay 처리:
+  - 호스트(`.baneung-editor-content`)에 `position: relative` 부여
+  - 가상요소 `top: 0; left: 0` + `padding: inherit` → 호스트 padding을 그대로 받아
+    내부 텍스트 위치가 사용자 콘텐츠 시작점과 정확히 일치
+  - normal flow 밖이므로 contenteditable의 빈 노드가 같은 자리(0,0)를 차지 →
+    커서와 placeholder가 같은 줄에서 겹쳐 보임
+
+  첫 글자 입력 시 `data-empty='true'`가 해제되며 placeholder가 자연스럽게 사라짐.
+
 ## 0.1.1
 
 ### Patch Changes

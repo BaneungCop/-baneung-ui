@@ -65,12 +65,28 @@
     outline: none;
   }
 
-  /* placeholder — 비어 있을 때만 표시 (data-empty 속성으로 토글) */
+  /*
+   * placeholder — 비어 있을 때만 표시 (data-empty 속성으로 토글).
+   *
+   * position: absolute로 overlay 처리. (이전 display: block은 placeholder가
+   * 블록 레벨로 자리잡아 contenteditable의 빈 첫 노드와 함께 두 줄로 쌓이고
+   * 커서가 placeholder 아래 한 줄에 깜박이는 버그가 있었음.)
+   *
+   * 부모(.baneung-editor-content)는 position: relative여야 함 — 컴포넌트
+   * 본체에서 padding 안에 위치하도록 컨테이너에 부여.
+   */
+  .baneung-editor-content {
+    position: relative;
+  }
   .baneung-editor-content[data-empty='true']::before {
     content: attr(data-placeholder);
     color: var(--color-text-tertiary);
     pointer-events: none;
-    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* padding은 컴포넌트의 inline style로 적용되므로 placeholder도 같은 padding 영역에 위치 */
+    padding: inherit;
   }
 
   .baneung-editor-content > *:first-child {
