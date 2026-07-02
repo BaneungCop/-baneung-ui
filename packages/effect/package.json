@@ -1,6 +1,6 @@
 {
   "name": "@baneung-pack/effect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "license": "Apache-2.0",
   "description": "바능 디자인 시스템 비주얼 이펙트 라이브러리 — 타이프라이터/리빌/카운터 등 작은 React 모션 컴포넌트 모음. 디자인 토큰 통합, 0-dependency 코어.",

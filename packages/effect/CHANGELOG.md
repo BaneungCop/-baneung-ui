@@ -1,5 +1,17 @@
 # @baneung-pack/effect
 
+## 0.1.1
+
+### Patch Changes
+
+- README를 시각 라이브러리 특성에 맞게 개편.
+  - 상단에 별도 "📖 데모 사이트에서 직접 보기" 섹션으로 강조
+  - 15개 컴포넌트 각각에 인라인 데모 링크 (`https://ui.baneung.com/effect/<name>`) 추가 — npm 페이지에서 컴포넌트 이름 옆 링크로 바로 라이브 데모 이동
+  - 사용 예시는 Typewriter 하나만 남기고 나머지는 데모 링크로 유도
+  - 총 109 → 72줄로 축약 (약 34% 감소)
+
+  코드 변경 없음.
+
 ## 0.1.0
 
 ### Minor Changes
